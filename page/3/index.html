@@ -23,27 +23,27 @@
   <meta name="description" content="吃饭睡觉打豆豆">
 <meta property="og:type" content="website">
 <meta property="og:title" content="CallmeLins&#39;Blog">
-<meta property="og:url" content="http://example.com/archives/2021/07/index.html">
+<meta property="og:url" content="http://example.com/page/3/index.html">
 <meta property="og:site_name" content="CallmeLins&#39;Blog">
 <meta property="og:description" content="吃饭睡觉打豆豆">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="CallmeLins">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/archives/2021/07/">
+<link rel="canonical" href="http://example.com/page/3/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
+    isHome : true,
     isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | CallmeLins'Blog</title>
+  <title>CallmeLins'Blog</title>
   
 
 
@@ -152,71 +152,106 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/26/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%EF%BC%8C%E5%85%B3%E9%97%AD%E5%8A%A8%E7%94%BB%E7%B2%BE%E7%AE%80%E8%BD%AF%E4%BB%B6%E7%AD%89/">
 
-  
-  
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 21 篇日志。 继续努力。</span>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="CallmeLins">
+      <meta itemprop="description" content="吃饭睡觉打豆豆">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CallmeLins'Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/26/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%EF%BC%8C%E5%85%B3%E9%97%AD%E5%8A%A8%E7%94%BB%E7%B2%BE%E7%AE%80%E8%BD%AF%E4%BB%B6%E7%AD%89/" class="post-title-link" itemprop="url">虚拟机安装Ubuntu，关闭动画精简软件等</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-26 18:45:11" itemprop="dateCreated datePublished" datetime="2021-04-26T18:45:11+08:00">2021-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+          <span id="more"></span>
+
+<h3 id="虚拟机安装Ubuntu配置记录"><a href="#虚拟机安装Ubuntu配置记录" class="headerlink" title="虚拟机安装Ubuntu配置记录"></a>虚拟机安装Ubuntu配置记录</h3><ul>
+<li><a href="#_2">关闭动画</a></li>
+<li><a href="#_15">精简软件</a></li>
+<li><a href="#WIN10UbuntuUbuntuBOOT_25">WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项</a></li>
+</ul>
+<h1 id="关闭动画"><a href="#关闭动画" class="headerlink" title="关闭动画"></a>关闭动画</h1><p>关闭动画</p>
+<pre><code class="powershell">gsettings set org.gnome.desktop.interface enable-animations false
+</code></pre>
+<p>打开动画</p>
+<pre><code class="powershell">gsettings set org.gnome.desktop.interface enable-animations true
+</code></pre>
+<h1 id="精简软件"><a href="#精简软件" class="headerlink" title="精简软件"></a>精简软件</h1><p>卸载libreoffice</p>
+<pre><code class="powershell">sudo apt-get remove libreoffice-common
+</code></pre>
+<p>卸载无用软件</p>
+<pre><code class="powershell">sudo apt-get remove thunderbird totem rhythmbox empathy brasero simple-scan gnome-mahjongg aisleriot gnome-mines cheese transmission-common gnome-orca gnome-sudoku
+</code></pre>
+<h1 id="WIN10-Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项"><a href="#WIN10-Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项" class="headerlink" title="WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项"></a>WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项</h1><p>1、首先进入BIOS将Windows boot manager设为第一启动项<br>2、进入Windows后使用DiskGenius 删除系统EFI分区中的Ubuntu启动项<br><img src="https://img-blog.csdnimg.cn/20210426185515146.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>3、最后使用EasyUEFI删除启动项中的Ubuntu即可，大功告成<br><img src="https://img-blog.csdnimg.cn/2021042618584411.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20210426185853166.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+
+      
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-07-04T19:48:42+08:00"
-              content="2021-07-04">
-          07-04
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/07/04/Selenium%E7%9A%84%E4%BD%BF%E7%94%A8/" itemprop="url">
-            <span itemprop="name">Selenium的使用</span>
-          </a>
-      </div>
-
-    </header>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
   </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-07-04T10:23:01+08:00"
-              content="2021-07-04">
-          07-04
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/07/04/Linux%E4%B8%8B%E9%85%8D%E7%BD%AESelenium/" itemprop="url">
-            <span itemprop="name">Linux下配置Selenium</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-
-    </div>
-  </div>
   
   
   
 
+
   
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
 
 
 
