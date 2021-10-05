@@ -118,12 +118,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">4</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">5</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">21</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -154,6 +154,151 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/26/%E6%96%B0%E5%AE%89%E8%A3%85Ubuntu%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="CallmeLins">
+      <meta itemprop="description" content="吃饭睡觉打豆豆">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CallmeLins'Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/26/%E6%96%B0%E5%AE%89%E8%A3%85Ubuntu%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">新安装Ubuntu配置过程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-26 21:19:18" itemprop="dateCreated datePublished" datetime="2021-04-26T21:19:18+08:00">2021-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <span id="more"></span>
+
+<h2 id="2021-5-3-Update"><a href="#2021-5-3-Update" class="headerlink" title="2021.5.3 Update"></a>2021.5.3 Update</h2><h2 id="Linux-Setting"><a href="#Linux-Setting" class="headerlink" title="Linux-Setting"></a>Linux-Setting</h2><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>Linux安装后自动配置脚本</p>
+<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ol>
+<li> 更换自带源为阿里源</li>
+<li> 卸载自带无用软件如libreoffice、thunderbird等</li>
+<li> 安装常用软件如git、curl、vim等</li>
+<li> git设置</li>
+<li> zsh&amp;oh-my-zsh</li>
+</ol>
+<h4 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h4><p>首先安装git，curl，zsh</p>
+<pre><code>sudo apt install git curl
+</code></pre>
+<p>然后安装zsh</p>
+<pre><code>sudo apt install -y zsh
+
+sh -c &quot;$(curl -fsSL https://gitee.com/pocmon/ohmyzsh/raw/master/tools/install.sh)&quot;
+</code></pre>
+<ol>
+<li><pre><code>克隆本仓库至本地
+</code></pre>
+</li>
+</ol>
+<pre><code>git clone https://gitee.com/xiaolinzinvshen/linux-setting.git
+</code></pre>
+<ol start="2">
+<li><pre><code>cd到相应文件夹中
+</code></pre>
+</li>
+<li><pre><code>对相应的脚本增加执行权限后执行脚本
+</code></pre>
+</li>
+</ol>
+<pre><code>chmod +x ./init-ubuntu.sh
+
+./init-ubuntu.sh
+</code></pre>
+<hr>
+<hr>
+<hr>
+<h2 id="Old"><a href="#Old" class="headerlink" title="Old"></a>Old</h2><h2 id="更换清华镜像源"><a href="#更换清华镜像源" class="headerlink" title="更换清华镜像源"></a>更换清华镜像源</h2><p>Ubuntu 的软件源配置文件是 /etc/apt/sources.list。将系统自带的该文件做个备份</p>
+<pre><code class="powershell">sudo cp /etc/apt/sources.list /etc/apt/sources_backup.list
+</code></pre>
+<p>使用gedit将源中内容替换</p>
+<pre><code class="bash">sudo gedit /etc/apt/sources.list
+</code></pre>
+<p>链接: <a target="_blank" rel="noopener" href="https://mirror.tuna.tsinghua.edu.cn/help/ubuntu/">清华镜像源</a>.<br>升级自带包</p>
+<pre><code class="powershell">sudo apt update
+</code></pre>
+<p>安装常用基本软件</p>
+<pre><code class="powershell">sudo apt install curl git openssh-server net-tools
+</code></pre>
+<h2 id="自动脚本配置"><a href="#自动脚本配置" class="headerlink" title="自动脚本配置"></a>自动脚本配置</h2><p>搜索marswang42 找到My-Vim-Conf<br>安装第三方shell-zsh，并替换自带的bash</p>
+<pre><code class="powershell">sudo apt install -y zsh
+</code></pre>
+<pre><code class="powershell">sh -c &quot;$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&quot;
+</code></pre>
+<p>clone博主的源</p>
+<pre><code class="powershell">git clone https://github.com/MarsWang42/My-Vim-Conf.git
+</code></pre>
+<pre><code class="powershell">cd My-Vim-Conf
+</code></pre>
+<p>脚本自动安装</p>
+<pre><code class="powershell">chmod +x ./setup.sh ./tmux.sh
+</code></pre>
+<pre><code class="powershell">./setup.sh
+</code></pre>
+<p>最后刷新应用最新的设置</p>
+<pre><code class="powershell">source ~/.zshrc
+</code></pre>
+<h2 id="Ubuntu助手：一键安装软件、进行系统配置"><a href="#Ubuntu助手：一键安装软件、进行系统配置" class="headerlink" title="Ubuntu助手：一键安装软件、进行系统配置"></a>Ubuntu助手：一键安装软件、进行系统配置</h2><pre><code class="xml">https://github.com/borninfreedom/linux-assistant
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -316,14 +461,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
