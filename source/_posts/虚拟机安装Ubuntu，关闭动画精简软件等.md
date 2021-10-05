@@ -5,7 +5,6 @@ tags: linux
 categories: Linux
 ---
 
-<!--more-->
 
 ### 虚拟机安装Ubuntu配置记录
 
@@ -13,6 +12,7 @@ categories: Linux
 - [精简软件](#_15)
 - [WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项](#WIN10UbuntuUbuntuBOOT_25)
 
+<!--more-->
 # 关闭动画
 
 关闭动画

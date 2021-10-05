@@ -5,7 +5,6 @@ tags:
 categories: Python
 ---
 
-<!--more-->
 
 ### Selenium的使用
 
@@ -13,6 +12,7 @@ categories: Python
 - - [通过webdriver自带的元素选择器等选择元素](#webdriver_2)
   - - [选择元素](#_3)
     - [操纵元素](#_38)
+<!--more-->
   - [通过CSS Selector 选择元素](#CSS_Selector__52)
   - [通过xpath选择元素](#xpath_86)
 

@@ -5,7 +5,6 @@ tags: linux
 categories: Linux
 ---
 
-<!--more-->
 
 ## 2021.5.3 Update
 
@@ -13,6 +12,7 @@ categories: Linux
 
 #### 介绍
 
+<!--more-->
 Linux安装后自动配置脚本
 
 #### 说明

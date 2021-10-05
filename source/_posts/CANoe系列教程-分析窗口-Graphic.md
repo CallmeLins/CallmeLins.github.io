@@ -5,7 +5,6 @@ tags:
 categories: 汽车电子
 ---
 
-<!--more-->
 
 Graphic窗口是以信号为导向展示和分析曲线的窗口
 
@@ -13,6 +12,7 @@ Graphic窗口是以信号为导向展示和分析曲线的窗口
 
 1、从主菜单栏中的 Analysis \-> Graphics新建  
 2、从Measurement Setup中的Graphics模块打开即可
+<!--more-->
 
 ## 添加信号
 

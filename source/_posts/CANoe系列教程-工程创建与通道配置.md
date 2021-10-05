@@ -5,7 +5,6 @@ tags:
 categories: 汽车电子
 ---
 
-<!--more-->
 
 # 工程创建与通道配置
 
@@ -13,6 +12,7 @@ categories: 汽车电子
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210526210840844.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70)
 
 # 通道数目和通信波特率配置
+<!--more-->
 
 选择Channel Usage 就可以对总线的通道数进行配置  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210526211036227.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70)  

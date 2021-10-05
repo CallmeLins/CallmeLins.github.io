@@ -5,7 +5,6 @@ tags:
 categories: Python
 ---
 
-<!--more-->
 
 ### Python学习-从面向对象开始
 
@@ -13,6 +12,7 @@ categories: Python
 - - [类和实例](#_2)
   - [访问限制](#_75)
   - [继承和多态](#_88)
+<!--more-->
 
 # 面向对象
 

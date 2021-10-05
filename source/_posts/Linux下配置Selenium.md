@@ -5,7 +5,6 @@ tags:
 categories: # Python
 ---
 
-<!--more-->
 
 ### Linux下使用Selenium进行自动化测试
 
@@ -13,6 +12,7 @@ categories: # Python
   - [安装chrome以及chrome driver](#chromechrome_driver_5)
   - [Chrome driver 配置](#Chrome_driver__16)
 
+<!--more-->
 ## selenium的安装
 
 ```python

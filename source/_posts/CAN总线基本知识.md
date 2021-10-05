@@ -5,7 +5,6 @@ tags:
 categories: 汽车电子
 ---
 
-<!--more-->
 
 # CAN总线基本知识
 
@@ -13,6 +12,7 @@ categories: 汽车电子
 
 CAN 是Contoller Area Network 缩写，即控制域网络，简单来说就是用于汽车不同电子器件之间传输网络。  
 CAN 总线两个主要ISO国际标准是：ISO11898和ISO11519  
+<!--more-->
 ISO11898 定义了通信速率为 125 kbps～1 Mbps 的**高速 CAN** 通信标准，属于闭环总线，传输速率可达1Mbps，总线长度 ≤ 40米。  
 ISO11519 定义了通信速率为 10～125 kbps 的**低速 CAN**通信标准，属于开环总线，传输速率为40kbps时，总线长度可达1000米。
 

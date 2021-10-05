@@ -12,6 +12,7 @@ categories: Hexo
 
 ```bash
 git version
+<!--more-->
 node -v
 npm -v
 ```
@@ -76,7 +77,6 @@ backup:
 
 ### Hexo 文章显示摘要
 
-在新版本中 _config.yml 下已经没有 auto_excerpt， 官方对于此选项已不支持，要显示摘要只有通过加 `<!--more-->`的方式，但此方式太繁琐，另外的方法是通过安装插件的方法
 
 1：使用npm安装hexo-excerpt
 

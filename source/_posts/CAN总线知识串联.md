@@ -5,7 +5,6 @@ tags:
 categories: 汽车电子
 ---
 
-<!--more-->
 
 ## CAN Matrix定义
 
@@ -13,6 +12,7 @@ categories: 汽车电子
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210529135417253.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70)  
 一个完整的CAN Matrix通常应该包括以下信息  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210529135441416.png)
+<!--more-->
 
 ## CAN Matrix转化为DBC
 

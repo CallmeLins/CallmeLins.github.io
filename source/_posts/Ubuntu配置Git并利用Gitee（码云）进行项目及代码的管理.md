@@ -5,7 +5,6 @@ tags: git linux
 categories: Linux
 ---
 
-<!--more-->
 
 # Ubuntu配置Git并利用Gitee（码云）进行项目及代码的管理
 
@@ -13,6 +12,7 @@ categories: Linux
 
 ```bash
 apt-get install git
+<!--more-->
 apt-get remove git
 ```
 

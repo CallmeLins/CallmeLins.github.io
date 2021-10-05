@@ -5,7 +5,6 @@ tags:
 categories: Python
 ---
 
-<!--more-->
 
 ### Python学习-网络编程
 
@@ -13,6 +12,7 @@ categories: Python
 - - [网络](#_5)
   - [IP](#IP_7)
   - [端口](#_9)
+<!--more-->
   - [协议](#_11)
 - [TCP/IP网络模型](#TCPIP_15)
 - - [UDP](#UDP_27)

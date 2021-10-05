@@ -189,7 +189,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+                <time title="修改时间：2021-10-05 21:32:59" itemprop="dateModified" datetime="2021-10-05T21:32:59+08:00">2021-10-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -212,79 +212,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <span id="more"></span>
-
-<h2 id="2021-5-3-Update"><a href="#2021-5-3-Update" class="headerlink" title="2021.5.3 Update"></a>2021.5.3 Update</h2><h2 id="Linux-Setting"><a href="#Linux-Setting" class="headerlink" title="Linux-Setting"></a>Linux-Setting</h2><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>Linux安装后自动配置脚本</p>
-<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ol>
-<li> 更换自带源为阿里源</li>
-<li> 卸载自带无用软件如libreoffice、thunderbird等</li>
-<li> 安装常用软件如git、curl、vim等</li>
-<li> git设置</li>
-<li> zsh&amp;oh-my-zsh</li>
-</ol>
-<h4 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h4><p>首先安装git，curl，zsh</p>
-<pre><code>sudo apt install git curl
-</code></pre>
-<p>然后安装zsh</p>
-<pre><code>sudo apt install -y zsh
-
-sh -c &quot;$(curl -fsSL https://gitee.com/pocmon/ohmyzsh/raw/master/tools/install.sh)&quot;
-</code></pre>
-<ol>
-<li><pre><code>克隆本仓库至本地
-</code></pre>
-</li>
-</ol>
-<pre><code>git clone https://gitee.com/xiaolinzinvshen/linux-setting.git
-</code></pre>
-<ol start="2">
-<li><pre><code>cd到相应文件夹中
-</code></pre>
-</li>
-<li><pre><code>对相应的脚本增加执行权限后执行脚本
-</code></pre>
-</li>
-</ol>
-<pre><code>chmod +x ./init-ubuntu.sh
-
-./init-ubuntu.sh
-</code></pre>
-<hr>
-<hr>
-<hr>
-<h2 id="Old"><a href="#Old" class="headerlink" title="Old"></a>Old</h2><h2 id="更换清华镜像源"><a href="#更换清华镜像源" class="headerlink" title="更换清华镜像源"></a>更换清华镜像源</h2><p>Ubuntu 的软件源配置文件是 /etc/apt/sources.list。将系统自带的该文件做个备份</p>
-<pre><code class="powershell">sudo cp /etc/apt/sources.list /etc/apt/sources_backup.list
-</code></pre>
-<p>使用gedit将源中内容替换</p>
-<pre><code class="bash">sudo gedit /etc/apt/sources.list
-</code></pre>
-<p>链接: <a target="_blank" rel="noopener" href="https://mirror.tuna.tsinghua.edu.cn/help/ubuntu/">清华镜像源</a>.<br>升级自带包</p>
-<pre><code class="powershell">sudo apt update
-</code></pre>
-<p>安装常用基本软件</p>
-<pre><code class="powershell">sudo apt install curl git openssh-server net-tools
-</code></pre>
-<h2 id="自动脚本配置"><a href="#自动脚本配置" class="headerlink" title="自动脚本配置"></a>自动脚本配置</h2><p>搜索marswang42 找到My-Vim-Conf<br>安装第三方shell-zsh，并替换自带的bash</p>
-<pre><code class="powershell">sudo apt install -y zsh
-</code></pre>
-<pre><code class="powershell">sh -c &quot;$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&quot;
-</code></pre>
-<p>clone博主的源</p>
-<pre><code class="powershell">git clone https://github.com/MarsWang42/My-Vim-Conf.git
-</code></pre>
-<pre><code class="powershell">cd My-Vim-Conf
-</code></pre>
-<p>脚本自动安装</p>
-<pre><code class="powershell">chmod +x ./setup.sh ./tmux.sh
-</code></pre>
-<pre><code class="powershell">./setup.sh
-</code></pre>
-<p>最后刷新应用最新的设置</p>
-<pre><code class="powershell">source ~/.zshrc
-</code></pre>
-<h2 id="Ubuntu助手：一键安装软件、进行系统配置"><a href="#Ubuntu助手：一键安装软件、进行系统配置" class="headerlink" title="Ubuntu助手：一键安装软件、进行系统配置"></a>Ubuntu助手：一键安装软件、进行系统配置</h2><pre><code class="xml">https://github.com/borninfreedom/linux-assistant
-</code></pre>
-
+          <h2 id="2021-5-3-Update"><a href="#2021-5-3-Update" class="headerlink" title="2021.5.3 Update"></a>2021.5.3 Update</h2><h2 id="Linux-Setting"><a href="#Linux-Setting" class="headerlink" title="Linux-Setting"></a>Linux-Setting</h2><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/26/%E6%96%B0%E5%AE%89%E8%A3%85Ubuntu%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -334,7 +270,7 @@ sh -c &quot;$(curl -fsSL https://gitee.com/pocmon/ohmyzsh/raw/master/tools/insta
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+                <time title="修改时间：2021-10-05 21:32:59" itemprop="dateModified" datetime="2021-10-05T21:32:59+08:00">2021-10-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -357,27 +293,19 @@ sh -c &quot;$(curl -fsSL https://gitee.com/pocmon/ohmyzsh/raw/master/tools/insta
     <div class="post-body" itemprop="articleBody">
 
       
-          <span id="more"></span>
-
-<h3 id="虚拟机安装Ubuntu配置记录"><a href="#虚拟机安装Ubuntu配置记录" class="headerlink" title="虚拟机安装Ubuntu配置记录"></a>虚拟机安装Ubuntu配置记录</h3><ul>
+          <h3 id="虚拟机安装Ubuntu配置记录"><a href="#虚拟机安装Ubuntu配置记录" class="headerlink" title="虚拟机安装Ubuntu配置记录"></a>虚拟机安装Ubuntu配置记录</h3><ul>
 <li><a href="#_2">关闭动画</a></li>
 <li><a href="#_15">精简软件</a></li>
 <li><a href="#WIN10UbuntuUbuntuBOOT_25">WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项</a></li>
 </ul>
-<h1 id="关闭动画"><a href="#关闭动画" class="headerlink" title="关闭动画"></a>关闭动画</h1><p>关闭动画</p>
-<pre><code class="powershell">gsettings set org.gnome.desktop.interface enable-animations false
-</code></pre>
-<p>打开动画</p>
-<pre><code class="powershell">gsettings set org.gnome.desktop.interface enable-animations true
-</code></pre>
-<h1 id="精简软件"><a href="#精简软件" class="headerlink" title="精简软件"></a>精简软件</h1><p>卸载libreoffice</p>
-<pre><code class="powershell">sudo apt-get remove libreoffice-common
-</code></pre>
-<p>卸载无用软件</p>
-<pre><code class="powershell">sudo apt-get remove thunderbird totem rhythmbox empathy brasero simple-scan gnome-mahjongg aisleriot gnome-mines cheese transmission-common gnome-orca gnome-sudoku
-</code></pre>
-<h1 id="WIN10-Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项"><a href="#WIN10-Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项" class="headerlink" title="WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项"></a>WIN10+Ubuntu双系统完全删除Ubuntu并删除BOOT引导中的启动项</h1><p>1、首先进入BIOS将Windows boot manager设为第一启动项<br>2、进入Windows后使用DiskGenius 删除系统EFI分区中的Ubuntu启动项<br><img src="https://img-blog.csdnimg.cn/20210426185515146.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>3、最后使用EasyUEFI删除启动项中的Ubuntu即可，大功告成<br><img src="https://img-blog.csdnimg.cn/2021042618584411.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20210426185853166.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/26/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%EF%BC%8C%E5%85%B3%E9%97%AD%E5%8A%A8%E7%94%BB%E7%B2%BE%E7%AE%80%E8%BD%AF%E4%BB%B6%E7%AD%89/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

@@ -5,7 +5,6 @@ tags:
 categories: Linux
 ---
 
-<!--more-->
 
 ### pip的安装
 
@@ -13,6 +12,7 @@ categories: Linux
 `wget https://bootstrap.pypa.io/get-pip.py`  
 使用python命令运行安装脚本  
 `python3 get-pip.py`
+<!--more-->
 
 ### Jupyter的安装
 
