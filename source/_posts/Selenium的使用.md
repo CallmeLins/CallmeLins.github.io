@@ -2,7 +2,7 @@
 title: Selenium的使用
 date: 2021-07-04 19:48:42
 tags: 
-categories: # Python
+categories: Python
 ---
 
 <!--more-->

@@ -2,7 +2,7 @@
 title: Python学习-从面向对象开始
 date: 2021-06-21 22:30:25
 tags: 
-categories: # Python
+categories: Python
 ---
 
 <!--more-->

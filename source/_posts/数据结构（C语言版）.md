@@ -2,7 +2,7 @@
 title: 数据结构（C语言版）
 date: 2021-06-06 14:38:30
 tags: 
-categories: # C/C++
+categories: C/C++
 ---
 
 <!--more-->

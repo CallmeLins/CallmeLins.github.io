@@ -2,7 +2,7 @@
 title: Python学习-多线程和多进程
 date: 2021-06-23 22:33:04
 tags: 
-categories: # Python
+categories: Python
 ---
 
 <!--more-->
