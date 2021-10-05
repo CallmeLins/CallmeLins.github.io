@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="pip的安装下载pip安装脚本wget https:&#x2F;&#x2F;bootstrap.pypa.io&#x2F;get-pip.py使用python命令运行安装脚本python3 get-pip.py Jupyter的安装pip install ipython   pip install jupyter  Ubuntu此时使用jupyter notebook命令启动jupyter会提示未找到命令，按照提示安装ju">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux安装Jupyter并且远程访问">
+<meta property="og:url" content="http://example.com/2021/06/20/Linux%E5%AE%89%E8%A3%85Jupyter%E5%B9%B6%E4%B8%94%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE/index.html">
+<meta property="og:site_name" content="CallmeLins&#39;Blog">
+<meta property="og:description" content="pip的安装下载pip安装脚本wget https:&#x2F;&#x2F;bootstrap.pypa.io&#x2F;get-pip.py使用python命令运行安装脚本python3 get-pip.py Jupyter的安装pip install ipython   pip install jupyter  Ubuntu此时使用jupyter notebook命令启动jupyter会提示未找到命令，按照提示安装ju">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210620102132972.png">
+<meta property="article:published_time" content="2021-06-20T05:16:12.000Z">
+<meta property="article:modified_time" content="2021-10-05T11:34:36.922Z">
+<meta property="article:author" content="CallmeLins">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20210620102132972.png">
+
+<link rel="canonical" href="http://example.com/2021/06/20/Linux%E5%AE%89%E8%A3%85Jupyter%E5%B9%B6%E4%B8%94%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux安装Jupyter并且远程访问 | CallmeLins'Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">CallmeLins'Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录生活点点滴滴</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">2</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">21</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/20/Linux%E5%AE%89%E8%A3%85Jupyter%E5%B9%B6%E4%B8%94%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="CallmeLins">
+      <meta itemprop="description" content="吃饭睡觉打豆豆">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CallmeLins'Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux安装Jupyter并且远程访问
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-20 13:16:12" itemprop="dateCreated datePublished" datetime="2021-06-20T13:16:12+08:00">2021-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <span id="more"></span>
+
+<h3 id="pip的安装"><a href="#pip的安装" class="headerlink" title="pip的安装"></a>pip的安装</h3><p>下载pip安装脚本<br><code>wget https://bootstrap.pypa.io/get-pip.py</code><br>使用python命令运行安装脚本<br><code>python3 get-pip.py</code></p>
+<h3 id="Jupyter的安装"><a href="#Jupyter的安装" class="headerlink" title="Jupyter的安装"></a>Jupyter的安装</h3><pre><code class="bash">pip install ipython  
+pip install jupyter
+</code></pre>
+<p>Ubuntu此时使用jupyter notebook命令启动jupyter会提示未找到命令，按照提示安装jupyter即可<br><code>sudo snap install jupyter</code><br><img src="https://img-blog.csdnimg.cn/20210620102132972.png" alt="在这里插入图片描述"></p>
+<h3 id="配置Jupyter-notebook-server"><a href="#配置Jupyter-notebook-server" class="headerlink" title="配置Jupyter notebook server"></a>配置Jupyter notebook server</h3><h4 id="生成配置文件"><a href="#生成配置文件" class="headerlink" title="生成配置文件"></a>生成配置文件</h4><p>安装jupyter后续通过以下命令生成配置文件<br><code>jupyter notebook \--generate-config</code></p>
+<h4 id="生成访问密码"><a href="#生成访问密码" class="headerlink" title="生成访问密码"></a>生成访问密码</h4><p>只需要需要运行一行命令 jupyter notebook password ，会让你填写密码和确认密码，并且生成含有密码的hash的jupyter_notebook_config.json在配置文件中</p>
+<pre><code class="bash">jupyter notebook password
+Enter password: 
+Verify password: 
+[NotebookPasswordApp] Wrote hashed password to /home/coke/snap/jupyter/6/.jupyter/jupyter_notebook_config.json
+</code></pre>
+<h4 id="生成hash密码"><a href="#生成hash密码" class="headerlink" title="生成hash密码"></a>生成hash密码</h4><p>下面我们还需要手动生成一个hash密码。</p>
+<p>可能你会问，为什么前面我们生成了一个Jupyter密码，这里还需生成一个hash密码呢？</p>
+<p>原因很简单，如果你没有生成这么一个hash密码的话，那么每次通过浏览器远程访问Jupyter时，你都需要输入一次密码，这很繁琐！</p>
+<p>但如果我们启用了这个hash密码，只需要首次远程访问Jupyter文档时，输入一次密码，在下次访问时，这个hash密码就好比一个钥匙（token），替我们打开密码之门，也就是免密码登录。</p>
+<p>然后在IPython中，依次输入如下代码：</p>
+<pre><code class="bash">In [1]: from notebook.auth import passwd
+In [2]: passwd()
+Enter password:
+Verify password:
+Out[2]: &#39;sha1:67c9e60bb8b6:9ffede0825894254b2e042ea597d771089e11aed&#39;
+</code></pre>
+<h4 id="修改默认配置文件"><a href="#修改默认配置文件" class="headerlink" title="修改默认配置文件"></a>修改默认配置文件</h4><p>使用vim对配置文件进行修改，配置文件目录以本机为准<br><code>vim /home/coke/snap/jupyter/6/.jupyter/jupyter_notebook_config.py</code><br>主要对以下几条进行修改</p>
+<pre><code class="bash">c.NotebookApp.ip=&#39;0.0.0.0&#39;
+c.NotebookApp.password = u&#39;sha:ce...刚才复制的那个密文&#39;
+c.NotebookApp.open_browser = False #避免服务器端浏览器自动打开
+c.NotebookApp.port =8888 #随便指定一个端口
+</code></pre>
+<p>如果此时依然无法访问，最简单的方法在本地主机建立SSH通道</p>
+<pre><code class="bash">PS C:\Users\z&gt; ssh coke@192.168.20.135
+coke@192.168.20.135&#39;s password:
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.8.0-55-generic x86_64)
+</code></pre>
+<p>此时启动jupyter notebook 就可以在本地主机进入notebook了</p>
+<pre><code class="bash">jupyter notebook #服务启动
+
+http://192.168.0.1:8888/tree #访问ip地址更换为服务器地址
+</code></pre>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>CallmeLins
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2021/06/20/Linux%E5%AE%89%E8%A3%85Jupyter%E5%B9%B6%E4%B8%94%E8%BF%9C%E7%A8%8B%E8%AE%BF%E9%97%AE/" title="Linux安装Jupyter并且远程访问">http://example.com/2021/06/20/Linux安装Jupyter并且远程访问/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/18/%E8%87%AA%E5%8A%A8%E9%A9%BE%E9%A9%B6%E5%9F%BA%E7%A1%80-AEB/" rel="prev" title="自动驾驶基础-AEB">
+      <i class="fa fa-chevron-left"></i> 自动驾驶基础-AEB
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/21/Python%E5%AD%A6%E4%B9%A0-%E4%BB%8E%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%BC%80%E5%A7%8B/" rel="next" title="Python学习-从面向对象开始">
+      Python学习-从面向对象开始 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#pip%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">pip的安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jupyter%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">Jupyter的安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEJupyter-notebook-server"><span class="nav-number">3.</span> <span class="nav-text">配置Jupyter notebook server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">3.1.</span> <span class="nav-text">生成配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%AE%BF%E9%97%AE%E5%AF%86%E7%A0%81"><span class="nav-number">3.2.</span> <span class="nav-text">生成访问密码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90hash%E5%AF%86%E7%A0%81"><span class="nav-number">3.3.</span> <span class="nav-text">生成hash密码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E9%BB%98%E8%AE%A4%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">3.4.</span> <span class="nav-text">修改默认配置文件</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">CallmeLins</p>
+  <div class="site-description" itemprop="description">吃饭睡觉打豆豆</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">CallmeLins</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

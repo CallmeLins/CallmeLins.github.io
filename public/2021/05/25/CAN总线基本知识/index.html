@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CAN总线基本知识基本概念CAN 是Contoller Area Network 缩写，即控制域网络，简单来说就是用于汽车不同电子器件之间传输网络。CAN 总线两个主要ISO国际标准是：ISO11898和ISO11519ISO11898 定义了通信速率为 125 kbps～1 Mbps 的高速 CAN 通信标准，属于闭环总线，传输速率可达1Mbps，总线长度 ≤ 40米。ISO11519 定义">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAN总线基本知识">
+<meta property="og:url" content="http://example.com/2021/05/25/CAN%E6%80%BB%E7%BA%BF%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="CallmeLins&#39;Blog">
+<meta property="og:description" content="CAN总线基本知识基本概念CAN 是Contoller Area Network 缩写，即控制域网络，简单来说就是用于汽车不同电子器件之间传输网络。CAN 总线两个主要ISO国际标准是：ISO11898和ISO11519ISO11898 定义了通信速率为 125 kbps～1 Mbps 的高速 CAN 通信标准，属于闭环总线，传输速率可达1Mbps，总线长度 ≤ 40米。ISO11519 定义">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/8c4f412321d012aca6ec4f23efb4ce5b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210525202118238.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/5cbf37862a779c69d6737487a755c4d2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/8d8c61b486a991f265908f2404fc03f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/8b83142a7ce96e17755ee71390e74e39.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/e40676e4e27a71ab3ea8eb9418914cad.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210525201812946.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2021-05-25T12:19:01.000Z">
+<meta property="article:modified_time" content="2021-10-05T11:34:36.926Z">
+<meta property="article:author" content="CallmeLins">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/8c4f412321d012aca6ec4f23efb4ce5b.png">
+
+<link rel="canonical" href="http://example.com/2021/05/25/CAN%E6%80%BB%E7%BA%BF%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CAN总线基本知识 | CallmeLins'Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">CallmeLins'Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录生活点点滴滴</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">2</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">21</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/05/25/CAN%E6%80%BB%E7%BA%BF%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="CallmeLins">
+      <meta itemprop="description" content="吃饭睡觉打豆豆">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CallmeLins'Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CAN总线基本知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-25 20:19:01" itemprop="dateCreated datePublished" datetime="2021-05-25T20:19:01+08:00">2021-05-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-05 19:34:36" itemprop="dateModified" datetime="2021-10-05T19:34:36+08:00">2021-10-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B1%BD%E8%BD%A6%E7%94%B5%E5%AD%90/" itemprop="url" rel="index"><span itemprop="name">汽车电子</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <span id="more"></span>
+
+<h1 id="CAN总线基本知识"><a href="#CAN总线基本知识" class="headerlink" title="CAN总线基本知识"></a>CAN总线基本知识</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>CAN 是Contoller Area Network 缩写，即控制域网络，简单来说就是用于汽车不同电子器件之间传输网络。<br>CAN 总线两个主要ISO国际标准是：ISO11898和ISO11519<br>ISO11898 定义了通信速率为 125 kbps～1 Mbps 的<strong>高速 CAN</strong> 通信标准，属于闭环总线，传输速率可达1Mbps，总线长度 ≤ 40米。<br>ISO11519 定义了通信速率为 10～125 kbps 的<strong>低速 CAN</strong>通信标准，属于开环总线，传输速率为40kbps时，总线长度可达1000米。</p>
+<p>CAN为了减少外部电磁场对内部点评的干扰，通常采用双绞线</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8c4f412321d012aca6ec4f23efb4ce5b.png" alt="在这里插入图片描述"></p>
+<h3 id="CAN的拓扑结构"><a href="#CAN的拓扑结构" class="headerlink" title="CAN的拓扑结构"></a>CAN的拓扑结构</h3><p>下图中，左边是高速CAN总线的拓扑结构，右边是低速CAN总线的拓扑结构。</p>
+<p><img src="https://img-blog.csdnimg.cn/20210525202118238.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-CVTFaKPI-1621944831661)(https://gitee.com/xiaolinzinvshen/article-pic/raw/master/2019071514355785.jpeg)]"></p>
+<h3 id="CAN信号表示"><a href="#CAN信号表示" class="headerlink" title="CAN信号表示"></a>CAN信号表示</h3><p>在CAN总线上，利用CAN_H和CAN_L两根线上的电位差来表示CAN信号。CAN总线上的电位差分为显性电平和隐性电平。其中显性电平为逻辑0，隐性电平为逻辑1。<br>ISO11898标准（125kbps ~ 1Mbps）和ISO11519标准（10kbps ~ 125kbps）中CAN信号的表示分别如下所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/5cbf37862a779c69d6737487a755c4d2.png" alt="在这里插入图片描述"></p>
+<h3 id="CAN信号传输"><a href="#CAN信号传输" class="headerlink" title="CAN信号传输"></a>CAN信号传输</h3><p>发送过程：CAN控制器将CPU传来的信号转为逻辑电平（即逻辑0-显性电平或者逻辑1-隐性电平）。CAN发射器接收逻辑电平之后，再将其转换为差分电平输出到CAN总线上。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8d8c61b486a991f265908f2404fc03f9.png" alt="在这里插入图片描述"></p>
+<p>接受过程则刚好相反。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8b83142a7ce96e17755ee71390e74e39.png" alt="在这里插入图片描述"></p>
+<h2 id="CAN通信网络结构"><a href="#CAN通信网络结构" class="headerlink" title="CAN通信网络结构"></a>CAN通信网络结构</h2><h3 id="OSI基本参照模型"><a href="#OSI基本参照模型" class="headerlink" title="OSI基本参照模型"></a>OSI基本参照模型</h3><p>OSI参考模型为7层，物理层、数据链路层、网络层、传输层、会话层、表示层和应用层，而CAN通信底层仅使用了物理层和数据链路层</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/e40676e4e27a71ab3ea8eb9418914cad.png" alt="在这里插入图片描述"></p>
+<h3 id="CAN总线报文类型"><a href="#CAN总线报文类型" class="headerlink" title="CAN总线报文类型"></a>CAN总线报文类型</h3><p>CAN总线的报文类型主要有五种，数据帧、远程帧、错误帧、过载帧、帧间隔<br>下面以数据帧为例进行简单介绍，其帧结构如下图所示，包含七个段：<strong>帧起始、仲裁段、控制段、数据段、CRC段、ACK段、帧结束</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20210525201812946.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0hhb190b3A=,size_16,color_FFFFFF,t_70" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-fHkSnbCs-1621944831669)(https://gitee.com/xiaolinzinvshen/article-pic/raw/master/20190715151924879.png)]"></p>
+<p>帧起始<br>仲裁域：通过11位标识符对报文优先级进行判断，RTR位判断为数据帧还是远程帧<br>控制域：描述数据域中的字节数<br>数据域：8个字节传递信息，如转速等<br>CRC域：循环冗余校验，避免因物理层传递出现丢失的情况<br>ACK域：表明总线中至少有一个节点正确接收到发送的报文，没有发生干扰<br>帧结束</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>CallmeLins
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2021/05/25/CAN%E6%80%BB%E7%BA%BF%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" title="CAN总线基本知识">http://example.com/2021/05/25/CAN总线基本知识/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/01/Ubuntu%E9%85%8D%E7%BD%AEGit%E5%B9%B6%E5%88%A9%E7%94%A8Gitee%EF%BC%88%E7%A0%81%E4%BA%91%EF%BC%89%E8%BF%9B%E8%A1%8C%E9%A1%B9%E7%9B%AE%E5%8F%8A%E4%BB%A3%E7%A0%81%E7%9A%84%E7%AE%A1%E7%90%86/" rel="prev" title="Ubuntu配置Git并利用Gitee（码云）进行项目及代码的管理">
+      <i class="fa fa-chevron-left"></i> Ubuntu配置Git并利用Gitee（码云）进行项目及代码的管理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/27/CANoe%E7%B3%BB%E5%88%97%E6%95%99%E7%A8%8B-%E5%B7%A5%E7%A8%8B%E5%88%9B%E5%BB%BA%E4%B8%8E%E9%80%9A%E9%81%93%E9%85%8D%E7%BD%AE/" rel="next" title="CANoe系列教程-工程创建与通道配置">
+      CANoe系列教程-工程创建与通道配置 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CAN%E6%80%BB%E7%BA%BF%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">CAN总线基本知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAN%E7%9A%84%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">CAN的拓扑结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAN%E4%BF%A1%E5%8F%B7%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.1.2.</span> <span class="nav-text">CAN信号表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAN%E4%BF%A1%E5%8F%B7%E4%BC%A0%E8%BE%93"><span class="nav-number">1.1.3.</span> <span class="nav-text">CAN信号传输</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAN%E9%80%9A%E4%BF%A1%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">CAN通信网络结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OSI%E5%9F%BA%E6%9C%AC%E5%8F%82%E7%85%A7%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">OSI基本参照模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAN%E6%80%BB%E7%BA%BF%E6%8A%A5%E6%96%87%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">CAN总线报文类型</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">CallmeLins</p>
+  <div class="site-description" itemprop="description">吃饭睡觉打豆豆</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">CallmeLins</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
