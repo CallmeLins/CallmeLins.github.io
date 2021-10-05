@@ -10,7 +10,7 @@ categories: Hexo
 
 首先查看环境是否安装，主要用到的工具有git，node，npm
 
-```
+```bash
 git version
 node -v
 npm -v
@@ -25,7 +25,8 @@ npm -v
 
 安装 Hexo 完成后，再执行下列命令，Hexo 将会在指定文件夹中新建所需要的文件
 
-```hexo init myBlog
+```bash
+hexo init myBlog
 cd myBlog
 npm install
 ```
@@ -44,7 +45,7 @@ npm install
 
 修改配置。
 
-```
+```bash
 deploy:
   type: git
   repository: git@github.com:xxx/xxx.git,branchName
@@ -61,7 +62,7 @@ deploy:
 
 到 Hexo 博客根目录的 `_config.yml` 配置文件里添加以下配置：
 
-```
+```bash
 backup:
     type: git
     message: update myblog
@@ -72,3 +73,23 @@ backup:
 然后使用命令即可
 
 `hexo b`
+
+### Hexo 文章显示摘要
+
+在新版本中 _config.yml 下已经没有 auto_excerpt， 官方对于此选项已不支持，要显示摘要只有通过加 `<!--more-->`的方式，但此方式太繁琐，另外的方法是通过安装插件的方法
+
+1：使用npm安装hexo-excerpt
+
+```bash
+npm install hexo-excerpt --save
+```
+
+2：在站点配置文件中添加
+
+```bash
+excerpt:
+  depth: 5  
+  excerpt_excludes: []
+  more_excludes: []
+  hideWholePostExcerpts: true
+
