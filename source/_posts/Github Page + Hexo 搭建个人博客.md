@@ -11,7 +11,6 @@ categories: Hexo
 
 ```bash
 git version
-<!--more-->
 node -v
 npm -v
 ```
@@ -91,3 +90,16 @@ excerpt:
   more_excludes: []
   hideWholePostExcerpts: true
 ```
+
+## 增加新文章
+
+将文章放入source/_posts/目录下即可
+因为hexo是静态博客，所以每次对博客做出改变后都需要清除原来的缓存重新生成一次
+
+```
+hexo clean
+hexo g
+
+```
+
+
