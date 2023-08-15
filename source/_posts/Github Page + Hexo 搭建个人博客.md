@@ -2,7 +2,6 @@
 title: Github Page + Hexo 搭建个人博客
 categories: Hexo
 ---
-复制代码
 
 ## Github Page + Hexo 搭建个人博客
 
@@ -77,7 +76,6 @@ backup:
 
 ### Hexo 文章显示摘要
 
-
 1：使用npm安装hexo-excerpt
 
 ```bash
@@ -92,3 +90,4 @@ excerpt:
   excerpt_excludes: []
   more_excludes: []
   hideWholePostExcerpts: true
+```
