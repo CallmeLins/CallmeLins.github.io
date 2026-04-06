@@ -13,7 +13,7 @@ timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://callmelins.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -97,19 +97,33 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next-reloaded
+theme: cactus
 
-# Deployment
-## Docs: https://hexo.io/docs/one-command-deployment
-
-deploy:
-  type: git
-  repository: git@github.com:CallmeLins/CallmeLins.github.io.git
-  branch: master
-
-backup:
-    type: git
-    message: backup my blog
-    repository:
-       github: git@github.com:CallmeLins/CallmeLins.github.io.git,hexo
-
+theme_config:
+  colorscheme: white
+  highlight: github
+  nav:
+    home: /
+    articles: /archives/
+    categories: /categories/
+    tags: /tags/
+    about: /about/
+  posts_overview:
+    show_all_posts: false
+    post_count: 10
+  post:
+    show_updated: true
+  social_links:
+    - icon: github
+      link: https://github.com/CallmeLins
+    - icon: mail
+      label: Email
+      link: mailto:zhao5638@gmail.com
+    - icon: link
+      label: CSDN
+      link: https://blog.csdn.net/Hao_top
+    - icon: book
+      label: cnblogs
+      link: https://www.cnblogs.com/cokefentas
+  copyright:
+    start_year: 2021

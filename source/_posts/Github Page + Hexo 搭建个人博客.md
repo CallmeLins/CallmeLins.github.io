@@ -1,5 +1,7 @@
 ---
 title: Github Page + Hexo 搭建个人博客
+date: 2023-08-15 21:30:05
+updated: 2023-08-15 22:00:39
 categories: Hexo
 ---
 
@@ -101,5 +103,4 @@ hexo clean
 hexo g
 
 ```
-
 
