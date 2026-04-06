@@ -53,7 +53,40 @@
     <%- partial('./google_analytics.ejs') %>
     <%- partial('./umami_analytics.ejs') %>
     <!-- styles -->
-    <%- css('css/style') %>
+    <script>
+      window.CACTUS_THEME = {
+        storageKey: "cactus-colorscheme",
+        defaultScheme: "<%- theme.colorscheme || 'dark' %>",
+        cssBase: "<%- url_for('/css/style-') %>",
+        schemes: ["white", "light", "classic", "dark"],
+        toggleLabel: "<%- __('theme.toggle') %>",
+        labels: {
+          white: "<%- __('theme.white') %>",
+          light: "<%- __('theme.light') %>",
+          classic: "<%- __('theme.classic') %>",
+          dark: "<%- __('theme.dark') %>"
+        }
+      };
+      (function() {
+        var config = window.CACTUS_THEME;
+        var scheme = config.defaultScheme;
+        try {
+          var stored = localStorage.getItem(config.storageKey);
+          if (config.schemes.indexOf(stored) !== -1) {
+            scheme = stored;
+          }
+        } catch (error) {}
+        document.documentElement.setAttribute("data-theme", scheme);
+        var link = document.createElement("link");
+        link.id = "theme-stylesheet";
+        link.rel = "stylesheet";
+        link.href = config.cssBase + scheme + ".css";
+        document.head.appendChild(link);
+      })();
+    </script>
+    <noscript>
+      <%- css('css/style') %>
+    </noscript>
     <!-- persian styles -->
     <% if (theme.direction && theme.direction === 'rtl') { %>
       <%- css('css/rtl') %>

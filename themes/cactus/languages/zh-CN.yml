@@ -44,6 +44,13 @@ tag_cloud:
 
 pagination:
   page: 第 %d 页，共 %d 页
+
+theme:
+  toggle: 主题
+  white: 白色
+  light: 浅色
+  classic: 经典
+  dark: 深色
  
 counter:
   tag_cloud:

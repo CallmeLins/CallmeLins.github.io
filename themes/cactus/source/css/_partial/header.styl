@@ -52,12 +52,29 @@
       a:hover
         underline(5px, $color-accent-1)
 
+      .theme-toggle
+        margin-right: 15px
+
       li
         display: inline-block
         margin-right: 15px
         border-right: 1px dotted
         border-color: $color-accent-1
         vertical-align: middle
+
+      button.theme-toggle
+        border: 0
+        background: none
+        padding: 0
+        color: $color-accent-1
+        font: inherit
+        cursor: pointer
+
+        &:hover
+          underline(5px, $color-accent-1)
+
+        i
+          margin-right: 6px
 
       .icon
         display: none
@@ -104,11 +121,17 @@ if $logo-grayout
       li
         display: block
     
-    ul 
-      a[aria-label="Menu"]
+    ul
+      li.icon > a
         display: inline-block
         min-width: 48px
         min-height: 48px
+
+      button.theme-toggle
+        padding: 0
+        min-width: 48px
+        min-height: 48px
+        text-align: left
 
     li:not(:first-child)
       padding-top: 1rem

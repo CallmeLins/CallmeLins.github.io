@@ -27,6 +27,12 @@
       <% for (var i in theme.nav) { %><!--
      --><li><a href="<%- url_for(theme.nav[i]) %>"><%= __('nav.'+i).replace("nav.", "") %></a></li><!--
    --><% } %>
+      <li class="theme-toggle-item">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="<%- __('theme.toggle') %>">
+          <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>
+          <span class="theme-toggle-label" data-theme-toggle-label><%- __('theme.toggle') %></span>
+        </button>
+      </li>
     </ul>
   </div>
 </header>

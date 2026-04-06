@@ -45,6 +45,13 @@ tag_cloud:
 pagination:
   page: Page %d of %d
 
+theme:
+  toggle: Theme
+  white: White
+  light: Light
+  classic: Classic
+  dark: Dark
+
 counter:
   tag_cloud:
     zero: No tags
