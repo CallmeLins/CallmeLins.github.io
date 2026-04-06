@@ -2,6 +2,6 @@
   {
     "name": "BaYin",
     "url": "https://github.com/CallmeLins/BaYin",
-    "desc": "开源项目仓库"
+    "desc": "轻量音乐播放器，支持本地曲库播放，对接云端音乐资源"
   }
 ]
