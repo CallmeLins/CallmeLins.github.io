@@ -102,6 +102,7 @@ theme: cactus
 theme_config:
   colorscheme: white
   highlight: github
+  projects_url: https://github.com/CallmeLins
   nav:
     home: /
     articles: /archives/
