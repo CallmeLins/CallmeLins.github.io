@@ -93,13 +93,26 @@ if $logo-grayout
       -webkit-filter: none
 
 @media screen and (max-width: 480px)
-  #header #title
-    display: table
-    margin-right: 5rem
+  #header
+    position: relative
     min-height: $logo-height
+
+    > a.u-url
+      display: flex
+      align-items: center
+      padding-right: 4.5rem
+
+    #logo
+      float: none
+      flex-shrink: 0
+
+  #header #title
+    display: block
+    margin-right: 0
+    min-height: auto
     h1
-      display: table-cell
-      vertical-align: middle
+      display: block
+      line-height: 1.3
 
   #header #nav
     ul
@@ -112,10 +125,11 @@ if $logo-grayout
 
       li.icon
         position: absolute
-        top: 77px
+        top: 50%
         right: 1rem
         display: inline-block
         text-align: center
+        transform: translateY(-50%)
 
     ul.responsive
       li
