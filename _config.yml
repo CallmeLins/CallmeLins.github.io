@@ -119,11 +119,5 @@ theme_config:
     - icon: mail
       label: Email
       link: mailto:zhao5638@gmail.com
-    - icon: link
-      label: CSDN
-      link: https://blog.csdn.net/Hao_top
-    - icon: book
-      label: cnblogs
-      link: https://www.cnblogs.com/cokefentas
   copyright:
     start_year: 2021
