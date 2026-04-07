@@ -113,8 +113,8 @@ theme_config:
   nav:
     home: /
     articles: /archives/
-    categories: /categories/
-    tags: /tags/
+    category: /categories/
+    tag: /tags/
     search: /search/
     about: /about/
   posts_overview:
