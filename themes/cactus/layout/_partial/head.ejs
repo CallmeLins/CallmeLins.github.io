@@ -77,11 +77,7 @@
           }
         } catch (error) {}
         document.documentElement.setAttribute("data-theme", scheme);
-        var link = document.createElement("link");
-        link.id = "theme-stylesheet";
-        link.rel = "stylesheet";
-        link.href = config.cssBase + scheme + ".css";
-        document.head.appendChild(link);
+        document.write('<link id="theme-stylesheet" rel="stylesheet" href="' + config.cssBase + scheme + '.css">');
       })();
     </script>
     <noscript>
