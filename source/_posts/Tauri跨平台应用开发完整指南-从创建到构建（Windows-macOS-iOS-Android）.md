@@ -6,7 +6,6 @@ categories: Tauri
 tags:
   - Tauri
   - Rust
-  - 跨平台
 ---
 
 本文整理 **Tauri 项目全生命周期命令**，包含项目创建、初始化、桌面端（Windows/macOS）开发构建、移动端（Android/iOS）开发构建、常用运维命令，覆盖完整开发流程，可直接复制使用。
