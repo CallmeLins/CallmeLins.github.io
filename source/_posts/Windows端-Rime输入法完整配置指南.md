@@ -1,5 +1,5 @@
 ---
-title: "Windows 端 Rime 输入法（小狼毫）完整配置指南（基于白霜拼音+自然码双拼）"
+title: "Windows 端 Rime 输入法完整配置指南"
 date: 2026-05-06 21:00:00
 updated: 2026-05-06 21:00:00
 categories: 开发工具
