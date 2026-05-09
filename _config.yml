@@ -103,30 +103,4 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: cactus
-
-theme_config:
-  colorscheme: white
-  highlight: github
-  dark_highlight: tomorrow-night
-  projects_url: https://github.com/CallmeLins
-  nav:
-    home: /
-    articles: /archives/
-    category: /categories/
-    tag: /tags/
-    search: /search/
-    about: /about/
-  posts_overview:
-    show_all_posts: false
-    post_count: 10
-  post:
-    show_updated: true
-  social_links:
-    - icon: github
-      link: https://github.com/CallmeLins
-    - icon: mail
-      label: Email
-      link: mailto:zhao5638@gmail.com
-  copyright:
-    start_year: 2021
+theme: shiro
