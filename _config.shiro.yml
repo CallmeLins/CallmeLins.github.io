@@ -21,6 +21,8 @@ menu:
     url: /categories
   - name: 标签
     url: /tags
+  - name: 搜索
+    url: /search
   - name: 关于
     url: /about
 
@@ -67,7 +69,7 @@ comments:
     emit_metadata: 0
     input_position: bottom
     lang: zh-CN
-    theme: https://cdn.jsdelivr.net/npm/hexo-theme-shiro@1.3.2/source/css/giscus.css
+    theme: https://cdn.jsdelivr.net/npm/hexo-theme-shiro@1.4.0/source/css/giscus.css
     lazy_loading: false
 
 # Analytics
@@ -75,3 +77,8 @@ analytics:
   google:
     enabled: false
     id: ""
+
+# Site search powered by Pagefind (https://pagefind.app/)
+search:
+  enabled: true
+  # force_language: zh
