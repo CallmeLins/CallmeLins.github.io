@@ -1,12 +1,13 @@
 # CallmeLins.github.io
 
-Personal blog source built with Hexo and the Cactus theme.
+Personal blog source built with [Hexo](https://hexo.io/) and the [Shiro](https://github.com/Acris/hexo-theme-shiro) theme.
 
 ## Stack
 
 - Hexo 8
-- Cactus theme
+- [Shiro](https://github.com/Acris/hexo-theme-shiro) theme (v1.4.0)
 - GitHub Actions for Pages deployment
+- [Pagefind](https://pagefind.app/) — static site search (CJK-friendly)
 
 ## Local development
 
@@ -22,11 +23,19 @@ Start the local server:
 npm run server
 ```
 
-Build the site:
+Build the site (with search index):
 
 ```bash
 npm run clean
 npm run build
+```
+
+Preview the production build locally (required for Pagefind search):
+
+```bash
+npm run clean
+npm run build
+npx serve public
 ```
 
 ## Deployment
@@ -36,5 +45,6 @@ Pushing to `master` triggers the GitHub Actions workflow in [`.github/workflows/
 ## Content
 
 - Posts: [`source/_posts`](./source/_posts)
-- Pages: [`source/about`](./source/about), [`source/categories`](./source/categories), [`source/tags`](./source/tags)
+- Pages: [`source/about`](./source/about)
 - Site config: [`_config.yml`](./_config.yml)
+- Theme config: [`_config.shiro.yml`](./_config.shiro.yml)
