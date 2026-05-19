@@ -3,7 +3,6 @@ import Content from "@/components/Content.astro"
 import Footer from "@/components/Footer.astro"
 import Header from "@/components/Header.astro"
 import Layout from "@/layouts/Layout.astro"
-import { config } from "@/lib/config"
 ---
 
 <Layout title="关于 - CallmeLins'Blog">
@@ -54,26 +53,6 @@ import { config } from "@/lib/config"
         <p>
           无关名利，不问归途，只因兴趣，所以坚持。这就是这个无名小站的全部，也是我想对你说的话。往后余生，愿我们一起，在热爱里奔赴，在平凡中闪光，让每一份喜欢，都有处可放，让每一份坚持，都有意义。
         </p>
-      </div>
-    </Content>
-    <Content name="Project" index={2}>
-      <div>
-        {
-          config.projects.map((project) => (
-            <div class="group relative w-fit rounded-md px-2 pb-1 pt-2 transition-colors duration-300 hover:bg-secondary">
-              <a
-                target="_blank"
-                href={project.link}
-                class="flex w-fit items-end leading-none underline-offset-4 transition-transform group-hover:-translate-y-0.5 group-hover:underline"
-              >
-                <span class="font-medium">{project.name}</span>
-              </a>
-              <div class="mt-2 text-sm text-muted-foreground transition-colors group-hover:text-foreground">
-                {project.desc}
-              </div>
-            </div>
-          ))
-        }
       </div>
     </Content>
   </main>
