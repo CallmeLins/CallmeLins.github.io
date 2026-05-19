@@ -1,0 +1,92 @@
+---
+import Content from "@/components/Content.astro"
+import Footer from "@/components/Footer.astro"
+import Header from "@/components/Header.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getCollection } from "astro:content"
+import { Folder, Hash } from "lucide-react"
+
+const posts = await getCollection("posts")
+const catMap = new Map<string, number>()
+posts.forEach((post) => {
+  const cats = post.data.categories
+  const catList = cats ? (Array.isArray(cats) ? cats : [cats]) : []
+  catList.forEach((cat) => {
+    catMap.set(cat, (catMap.get(cat) || 0) + 1)
+  })
+})
+const sortedCats = [...catMap.entries()].sort((a, b) => b[1] - a[1])
+---
+
+<Layout title="分类 - CallmeLins'Blog">
+  <Header />
+  <main class="space-y-4">
+    <Content name="Categories" index={1}>
+      <div>
+        {sortedCats.length === 0 && (
+          <p class="text-muted-foreground">暂无分类。</p>
+        )}
+        <div class="space-y-3">
+          {sortedCats.map(([cat, count]) => (
+            <div class="group flex items-center gap-2">
+              <a
+                id={cat}
+                href={`/categories#${cat}`}
+                class="flex items-center gap-2 text-muted-foreground underline underline-offset-2 transition-colors group-hover:text-foreground"
+              >
+                <Folder size={16} />
+                <span class="font-medium">{cat}</span>
+                <span class="text-xs">({count})</span>
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Content>
+    <Content name={`Posts by Category`} index={2}>
+      <div class="space-y-6">
+        {sortedCats.map(([cat]) => {
+          const catPosts = posts.filter((post) => {
+            const cats = post.data.categories
+            const catList = cats
+              ? Array.isArray(cats)
+                ? cats
+                : [cats]
+              : []
+            return catList.includes(cat)
+          })
+          catPosts.sort(
+            (a, b) => b.data.date.getTime() - a.data.date.getTime()
+          )
+          return (
+            <div>
+              <h4
+                id={cat}
+                class="mb-2 text-base font-medium"
+              >
+                <Hash size={14} class="inline mr-1" />
+                {cat}
+              </h4>
+              <ul class="space-y-1 pl-5">
+                {catPosts.map((post) => (
+                  <li>
+                    <a
+                      href={`/posts/${post.id.replace(/\.md$/, "")}`}
+                      class="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    >
+                      {post.data.title}
+                    </a>
+                    <span class="ml-2 text-xs text-muted-foreground/60">
+                      {new Date(post.data.date).toISOString().slice(0, 10)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
+      </div>
+    </Content>
+  </main>
+  <Footer />
+</Layout>

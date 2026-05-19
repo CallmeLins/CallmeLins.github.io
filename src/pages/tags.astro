@@ -1,0 +1,82 @@
+---
+import Content from "@/components/Content.astro"
+import Footer from "@/components/Footer.astro"
+import Header from "@/components/Header.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getCollection } from "astro:content"
+import { Hash, Tag } from "lucide-react"
+
+const posts = await getCollection("posts")
+const tagMap = new Map<string, number>()
+posts.forEach((post) => {
+  post.data.tags?.forEach((tag) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1)
+  })
+})
+const sortedTags = [...tagMap.entries()].sort((a, b) => b[1] - a[1])
+---
+
+<Layout title="标签 - CallmeLins'Blog">
+  <Header />
+  <main class="space-y-4">
+    <Content name="Tags" index={1}>
+      <div>
+        {sortedTags.length === 0 && (
+          <p class="text-muted-foreground">暂无标签。</p>
+        )}
+        <div class="flex flex-wrap gap-2">
+          {sortedTags.map(([tag, count]) => (
+            <a
+              id={tag}
+              href={`/tags#${tag}`}
+              class="group inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              <Tag size={12} />
+              <span>{tag}</span>
+              <span class="text-xs">({count})</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </Content>
+    <Content name={`Posts by Tag`} index={2}>
+      <div class="space-y-6">
+        {sortedTags.map(([tag]) => {
+          const tagPosts = posts.filter((post) =>
+            post.data.tags?.includes(tag)
+          )
+          tagPosts.sort(
+            (a, b) => b.data.date.getTime() - a.data.date.getTime()
+          )
+          return (
+            <div>
+              <h4
+                id={tag}
+                class="mb-2 text-base font-medium"
+              >
+                <Hash size={14} class="inline mr-1" />
+                {tag}
+              </h4>
+              <ul class="space-y-1 pl-5">
+                {tagPosts.map((post) => (
+                  <li>
+                    <a
+                      href={`/posts/${post.id.replace(/\.md$/, "")}`}
+                      class="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    >
+                      {post.data.title}
+                    </a>
+                    <span class="ml-2 text-xs text-muted-foreground/60">
+                      {new Date(post.data.date).toISOString().slice(0, 10)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
+      </div>
+    </Content>
+  </main>
+  <Footer />
+</Layout>

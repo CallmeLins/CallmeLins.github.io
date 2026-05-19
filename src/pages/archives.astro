@@ -1,0 +1,58 @@
+---
+import Content from "@/components/Content.astro"
+import Footer from "@/components/Footer.astro"
+import Header from "@/components/Header.astro"
+import Layout from "@/layouts/Layout.astro"
+import { Calendar } from "lucide-react"
+import { getCollection } from "astro:content"
+
+const posts = await getCollection("posts", ({ data }) => {
+  return import.meta.env.DEV ? true : data.date <= new Date()
+})
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+// Group by year
+const groupedByYear = new Map<number, typeof posts>()
+posts.forEach((post) => {
+  const year = post.data.date.getFullYear()
+  if (!groupedByYear.has(year)) {
+    groupedByYear.set(year, [])
+  }
+  groupedByYear.get(year)!.push(post)
+})
+---
+
+<Layout title="归档 - CallmeLins'Blog">
+  <Header />
+  <main class="space-y-4">
+    <Content name="Archives" index={1}>
+      <div class="space-y-6">
+        {[...groupedByYear.entries()].map(([year, yearPosts]) => (
+          <div>
+            <h3 class="mb-3 text-lg font-medium">{year}</h3>
+            <ul class="space-y-2">
+              {yearPosts.map((post) => (
+                <li class="flex items-center gap-3">
+                  <Calendar
+                    size={14}
+                    class="shrink-0 text-muted-foreground"
+                  />
+                  <span class="text-xs text-muted-foreground w-12 shrink-0">
+                    {new Date(post.data.date).toISOString().slice(5, 10)}
+                  </span>
+                  <a
+                    href={`/posts/${post.id.replace(/\.md$/, "")}`}
+                    class="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                  >
+                    {post.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Content>
+  </main>
+  <Footer />
+</Layout>

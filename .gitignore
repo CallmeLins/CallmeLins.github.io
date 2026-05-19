@@ -1,5 +1,6 @@
 node_modules/
-public/
-.deploy_git/
-db.json
+dist/
+.astro/
+.env
 .DS_Store
+*.log

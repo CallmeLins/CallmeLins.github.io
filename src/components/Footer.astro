@@ -1,0 +1,23 @@
+---
+import BlurFade from "@/components/magicui/blur-fade"
+import { FADE_DELAY } from "@/lib/constant"
+import { config } from "@/lib/config"
+---
+
+<footer class="mt-4">
+  <BlurFade yOffset={8} duration={0.3} delay={FADE_DELAY * 4} client:load>
+    <div class="translate-y-2 text-xs text-muted-foreground">
+      &copy; {config.since} - {new Date().getFullYear()} CallmeLins. Built by
+      <a
+        target="_blank"
+        href="https://astro.build"
+        class="font-medium underline underline-offset-2">Astro</a
+      >. The source code is available on
+      <a
+        target="_blank"
+        href="https://github.com/CallmeLins/CallmeLins.github.io"
+        class="font-medium underline underline-offset-2">Github</a
+      >.
+    </div>
+  </BlurFade>
+</footer>

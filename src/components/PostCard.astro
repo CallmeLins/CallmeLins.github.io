@@ -1,0 +1,69 @@
+---
+import BlurFade from "@/components/magicui/blur-fade"
+import { FADE_DELAY } from "@/lib/constant"
+import { Calendar, Folder, Tag } from "lucide-react"
+import type { CollectionEntry } from "astro:content"
+
+interface Props {
+  post: CollectionEntry<"posts">
+  index: number
+}
+
+const { post, index } = Astro.props
+const { title, date, categories, tags } = post.data
+const url = `/posts/${post.id.replace(/\.md$/, "")}`
+const catList = categories
+  ? Array.isArray(categories)
+    ? categories
+    : [categories]
+  : []
+---
+
+<BlurFade yOffset={8} duration={0.3} delay={FADE_DELAY * index} client:load>
+  <div
+    class="group mb-3 translate-y-2 rounded-lg border border-transparent p-3 transition-colors duration-700 hover:border-secondary hover:bg-blue-50/80 hover:shadow dark:hover:bg-secondary"
+  >
+    <a href={url} class="block">
+      <h2
+        class="mb-2 text-lg font-medium text-muted-foreground transition-colors duration-700 group-hover:text-foreground"
+      >
+        {title}
+      </h2>
+    </a>
+    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+      <span class="flex items-center gap-1">
+        <Calendar size={12} />
+        {new Date(date).toISOString().slice(0, 10)}
+      </span>
+      {catList.length > 0 && (
+        <span class="flex items-center gap-1">
+          <Folder size={12} />
+          {catList.map((cat: string) => (
+            <a
+              href={`/categories#${cat}`}
+              class="underline underline-offset-2 hover:text-foreground"
+            >
+              {cat}
+            </a>
+          ))}
+        </span>
+      )}
+      {tags && tags.length > 0 && (
+        <span class="flex items-center gap-1">
+          <Tag size={12} />
+          <span class="flex gap-1">
+            {tags.slice(0, 3).map((tag: string) => (
+              <a
+                href={`/tags#${tag}`}
+                class="underline underline-offset-2 hover:text-foreground"
+              >
+                {tag}
+              </a>
+            ))}
+            {tags.length > 3 && <span>...</span>}
+          </span>
+        </span>
+      )}
+    </div>
+  </div>
+</BlurFade>
