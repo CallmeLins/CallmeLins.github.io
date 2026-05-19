@@ -1,28 +1,111 @@
 ---
+import About from "@/components/About.astro"
 import Content from "@/components/Content.astro"
 import Footer from "@/components/Footer.astro"
 import Header from "@/components/Header.astro"
-import PostCard from "@/components/PostCard.astro"
+import Icon from "@/components/Icon"
+import { BorderBeam } from "@/components/magicui/border-beam"
 import Layout from "@/layouts/Layout.astro"
+import { config } from "@/lib/config"
+import { ExternalLink, Minus, Newspaper } from "lucide-react"
 import { getCollection } from "astro:content"
 
 const posts = await getCollection("posts", ({ data }) => {
   return import.meta.env.DEV ? true : data.date <= new Date()
 })
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+const recentPosts = posts.slice(0, 5)
 ---
 
 <Layout>
   <Header />
   <main class="space-y-4">
-    <Content name="Posts" index={1}>
-      <div>
-        {
-          posts.length === 0 && (
-            <p class="text-muted-foreground">暂无文章。</p>
+    <Content name="Projects" index={1}>
+      {
+        config.projects.map((value) => {
+          return (
+            <div class="group relative w-fit rounded-md px-2 pb-1 pt-2 transition-colors duration-300 hover:bg-secondary">
+              <a
+                target="_blank"
+                href={value.link}
+                class="flex w-fit items-end leading-none underline-offset-4 transition-transform group-hover:-translate-y-0.5 group-hover:underline"
+              >
+                <Icon name={value.icon} className="mr-1" size={16} />
+                {value.name}
+                <ExternalLink
+                  size={15}
+                  className="ml-10 opacity-0 transition duration-300 group-hover:block group-hover:-translate-x-8 group-hover:opacity-100"
+                />
+              </a>
+              <div class="mt-2 text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                {value.desc}
+              </div>
+              <BorderBeam
+                size={108}
+                duration={3}
+                colorFrom="#60a5fa"
+                colorTo="#facc15"
+                className="opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+            </div>
           )
-        }
-        {posts.map((post, i) => <PostCard post={post} index={i} />)}
+        })
+      }
+    </Content>
+    <Content name="Links" index={2}>
+      {
+        config.links.map((value) => {
+          return (
+            <div class="group flex w-fit items-center py-1">
+              <a
+                target={value.link.startsWith("/") ? "_self" : "_blank"}
+                href={value.link}
+                class="flex w-fit min-w-[82px] items-end leading-none underline-offset-4 transition-transform group-hover:-translate-y-0.5 group-hover:underline"
+              >
+                <Icon name={value.icon} className="mr-2" size={16} />
+                {value.name}
+              </a>
+              <Minus size={20} className="mx-1" strokeWidth={1.6} />
+              <div class="text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+                {value.desc}
+              </div>
+            </div>
+          )
+        })
+      }
+    </Content>
+    <Content name="About me" index={3}>
+      <About />
+    </Content>
+    <Content name="Recent Articles" index={4}>
+      <div class="space-y-1">
+        {recentPosts.map((post) => (
+          <div class="group flex w-fit items-center py-0.5">
+            <Newspaper size={14} className="mr-2 text-muted-foreground shrink-0" />
+            <a
+              href={`/posts/${post.id.replace(/\.md$/, "")}`}
+              class="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              {post.data.title}
+            </a>
+            <span class="ml-2 shrink-0 text-xs text-muted-foreground/60">
+              {new Date(post.data.date).toISOString().slice(0, 10)}
+            </span>
+          </div>
+        ))}
+        {recentPosts.length === 0 && (
+          <p class="text-sm text-muted-foreground">暂无文章。</p>
+        )}
+        {posts.length > 5 && (
+          <div class="pt-2">
+            <a
+              href="/articles"
+              class="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              查看全部 {posts.length} 篇文章 &rarr;
+            </a>
+          </div>
+        )}
       </div>
     </Content>
   </main>

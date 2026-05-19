@@ -7,11 +7,19 @@ interface Item {
   icon: keyof typeof icons
 }
 
+interface AboutConfig {
+  mail: string
+  me: string
+  backend: string[]
+  frontend: string[]
+}
+
 interface Config {
   github: string
   since: number
   projects: Item[]
   links: Item[]
+  about: AboutConfig
 }
 
 export const config: Config = {
@@ -26,6 +34,12 @@ export const config: Config = {
     },
   ],
   links: [
+    {
+      name: "ARTICLE",
+      link: "/articles",
+      desc: "技术文章与折腾记录",
+      icon: "Newspaper",
+    },
     {
       name: "ARCHIVES",
       link: "/archives",
@@ -47,8 +61,14 @@ export const config: Config = {
     {
       name: "ABOUT",
       link: "/about",
-      desc: "关于这个无名小站",
+      desc: "关于这个兴趣使然的无名小站",
       icon: "User",
     },
   ],
+  about: {
+    mail: "",
+    me: "兴趣使然的全栈工程师，崇尚简约，少即是多 💪",
+    backend: ["Python", "Rust", "Docker", "Linux", "CUDA"],
+    frontend: ["TypeScript", "React", "Next.js", "Flutter", "Astro"],
+  },
 }
