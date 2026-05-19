@@ -1,0 +1,110 @@
+---
+import Content from "@/components/Content.astro"
+import Footer from "@/components/Footer.astro"
+import Header from "@/components/Header.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getCollection } from "astro:content"
+import { Search } from "lucide-react"
+
+const posts = await getCollection("posts")
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const searchData = posts.map((post) => ({
+  title: post.data.title,
+  slug: post.id.replace(/\.md$/, ""),
+  date: post.data.date.toISOString().slice(0, 10),
+  categories: post.data.categories
+    ? Array.isArray(post.data.categories)
+      ? post.data.categories
+      : [post.data.categories]
+    : [],
+  tags: post.data.tags || [],
+}))
+---
+
+<Layout title="搜索 - CallmeLins'Blog">
+  <Header />
+  <main class="space-y-4">
+    <Content name="Search" index={1}>
+      <div>
+        <div class="relative mb-4">
+          <Search
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="搜索文章..."
+            class="w-full rounded-md border bg-background py-2 pl-9 pr-4 text-sm outline-none transition-colors focus:border-foreground/20 focus:bg-secondary/50"
+          />
+        </div>
+        <div id="results" class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            输入关键词搜索 {posts.length} 篇文章
+          </p>
+        </div>
+      </div>
+    </Content>
+  </main>
+  <Footer />
+</Layout>
+
+<script define:vars={{ searchData, postCount: posts.length }}>
+  const data = searchData;
+
+  const input = document.getElementById("searchInput");
+  const results = document.getElementById("results");
+
+  function render(list) {
+    if (!results) return;
+    if (list.length === 0) {
+      results.innerHTML = '<p class="text-sm text-muted-foreground">没有找到匹配的文章。</p>';
+      return;
+    }
+    results.innerHTML = list
+      .map(
+        (post) =>
+          '<div class="group rounded-md px-2 py-1.5 transition-colors hover:bg-secondary">' +
+          '<a href="/posts/' + post.slug + '" class="block text-sm text-foreground underline-offset-2 hover:underline">' +
+          highlight(post.title, input.value) +
+          '</a>' +
+          '<div class="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">' +
+          '<span>' + post.date + '</span>' +
+          post.categories.map(function (c) { return '<span>#' + c + '</span>'; }).join(" ") +
+          '</div>' +
+          '</div>'
+      )
+      .join("");
+  }
+
+  function highlight(text, query) {
+    if (!query.trim()) return text;
+    var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var regex = new RegExp("(" + escaped + ")", "gi");
+    return text.replace(
+      regex,
+      '<mark class="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">$1</mark>'
+    );
+  }
+
+  if (input) {
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      if (!q) {
+        if (results) {
+          results.innerHTML = '<p class="text-sm text-muted-foreground">输入关键词搜索 ' + postCount + ' 篇文章</p>';
+        }
+        return;
+      }
+      var filtered = data.filter(function (post) {
+        return (
+          post.title.toLowerCase().indexOf(q) !== -1 ||
+          post.tags.some(function (t) { return t.toLowerCase().indexOf(q) !== -1; }) ||
+          post.categories.some(function (c) { return c.toLowerCase().indexOf(q) !== -1; })
+        );
+      });
+      render(filtered);
+    });
+  }
+</script>

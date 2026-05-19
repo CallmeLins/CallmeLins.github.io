@@ -41,6 +41,12 @@ export const config: Config = {
       icon: "Newspaper",
     },
     {
+      name: "SEARCH",
+      link: "/search",
+      desc: "搜索文章内容",
+      icon: "Search",
+    },
+    {
       name: "ARCHIVES",
       link: "/archives",
       desc: "按时间线浏览所有文章",
