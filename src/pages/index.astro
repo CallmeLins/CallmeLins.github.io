@@ -7,14 +7,7 @@ import Icon from "@/components/Icon"
 import { BorderBeam } from "@/components/magicui/border-beam"
 import Layout from "@/layouts/Layout.astro"
 import { config } from "@/lib/config"
-import { ExternalLink, Minus, Newspaper } from "lucide-react"
-import { getCollection } from "astro:content"
-
-const posts = await getCollection("posts", ({ data }) => {
-  return import.meta.env.DEV ? true : data.date <= new Date()
-})
-posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-const recentPosts = posts.slice(0, 5)
+import { ExternalLink, Minus } from "lucide-react"
 ---
 
 <Layout>
@@ -76,37 +69,6 @@ const recentPosts = posts.slice(0, 5)
     </Content>
     <Content name="About me" index={3}>
       <About />
-    </Content>
-    <Content name="Recent Articles" index={4}>
-      <div class="space-y-1">
-        {recentPosts.map((post) => (
-          <div class="group flex w-fit items-center py-0.5">
-            <Newspaper size={14} className="mr-2 text-muted-foreground shrink-0" />
-            <a
-              href={`/posts/${post.id.replace(/\.md$/, "")}`}
-              class="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            >
-              {post.data.title}
-            </a>
-            <span class="ml-2 shrink-0 text-xs text-muted-foreground/60">
-              {new Date(post.data.date).toISOString().slice(0, 10)}
-            </span>
-          </div>
-        ))}
-        {recentPosts.length === 0 && (
-          <p class="text-sm text-muted-foreground">暂无文章。</p>
-        )}
-        {posts.length > 5 && (
-          <div class="pt-2">
-            <a
-              href="/articles"
-              class="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-            >
-              查看全部 {posts.length} 篇文章 &rarr;
-            </a>
-          </div>
-        )}
-      </div>
     </Content>
   </main>
   <Footer />

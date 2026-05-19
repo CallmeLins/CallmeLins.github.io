@@ -1,50 +1,40 @@
 # CallmeLins.github.io
 
-Personal blog source built with [Hexo](https://hexo.io/) and the [Shiro](https://github.com/Acris/hexo-theme-shiro) theme.
+Personal blog built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com), inspired by [sunls24/sunls24](https://github.com/sunls24/sunls24).
 
 ## Stack
 
-- Hexo 8
-- [Shiro](https://github.com/Acris/hexo-theme-shiro) theme (v1.4.0)
-- GitHub Actions for Pages deployment
-- [Pagefind](https://pagefind.app/) — static site search (CJK-friendly)
+- **Astro 5** + **React 19** + **Tailwind CSS 3**
+- **Framer Motion** — BlurFade entrance animations
+- **lucide-react** — icon library
+- **GitHub Actions** — Pages deployment
+- Dark / light mode with system preference detection
 
 ## Local development
 
-Install dependencies:
-
 ```bash
-npm ci
+npm install
+npm run dev
 ```
 
-Start the local server:
+## Build
 
 ```bash
-npm run server
-```
-
-Build the site (with search index):
-
-```bash
-npm run clean
 npm run build
 ```
 
-Preview the production build locally (required for Pagefind search):
+## Preview production build
 
 ```bash
-npm run clean
-npm run build
-npx serve public
+npm run preview
 ```
 
 ## Deployment
 
-Pushing to `master` triggers the GitHub Actions workflow in [`.github/workflows/pages.yml`](./.github/workflows/pages.yml), which builds the Hexo site and deploys it to GitHub Pages.
+Pushing to `master` triggers the GitHub Actions workflow in [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml), which builds the Astro site and deploys to GitHub Pages.
 
 ## Content
 
-- Posts: [`source/_posts`](./source/_posts)
-- Pages: [`source/about`](./source/about)
-- Site config: [`_config.yml`](./_config.yml)
-- Theme config: [`_config.shiro.yml`](./_config.shiro.yml)
+- Posts: [`src/content/posts`](./src/content/posts)
+- Site config: [`src/lib/config.ts`](./src/lib/config.ts)
+- Meta info: [`src/lib/meta.ts`](./src/lib/meta.ts)
