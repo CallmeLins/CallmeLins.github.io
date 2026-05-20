@@ -2,7 +2,7 @@
 import Footer from "@/components/Footer.astro"
 import Header from "@/components/Header.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getCollection } from "astro:content"
+import { getCollection, render } from "astro:content"
 import { Calendar, Folder, Tag } from "lucide-react"
 
 export async function getStaticPaths() {
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props
 const { title, date, updated, categories, tags } = post.data
-const { Content } = await post.render()
+const { Content } = await render(post)
 const catList = categories
   ? Array.isArray(categories)
     ? categories
