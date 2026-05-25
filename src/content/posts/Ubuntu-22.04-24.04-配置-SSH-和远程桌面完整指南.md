@@ -1,7 +1,7 @@
 ---
 title: "Ubuntu 22.04/24.04 配置 SSH 和远程桌面完整指南"
-date: 2026-05-25 10:00:00
-updated: 2026-05-25 10:00:00
+date: 2026-05-25
+updated: 2026-05-25
 categories: 运维
 tags:
   - Ubuntu
