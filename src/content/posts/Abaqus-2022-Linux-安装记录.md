@@ -1,13 +1,16 @@
 ---
 title: Abaqus 2022 Linux 安装记录
 date: 2026-06-08
+updated: 2026-06-08
 categories: 运维
 tags: [Ubuntu, CAE, FEA]
 ---
 
-> 系统：Ubuntu（基于 Manjaro/Arch 教程适配）
+> 系统：Ubuntu
 > 安装日期：2026-06-08
 > 安装目录：`/home/xfusion/Workspace/abaqus/`
+
+---
 
 ## 1. 软件获取与解压
 
@@ -58,14 +61,10 @@ chmod -R 777 DS.SIMULIA.Suite.2022.Linux64/
 ### 3.1 安装依赖
 
 ```bash
-sudo apt install patchelf libjpeg62
+sudo apt install patchelf libjpeg62 libxcb-xinerama0
 ```
 
-> Ubuntu 上需额外安装 `libxcb-xinerama0`，否则 GUI 安装程序启动时报错 `libxcb-xinerama.so.0: cannot open shared object file`。
->
-> ```bash
-> sudo apt install libxcb-xinerama0
-> ```
+> `libxcb-xinerama0` 是 Ubuntu 额外需要的 GUI 依赖，否则 `./StartGUI.sh` 报错 `libxcb-xinerama.so.0: cannot open shared object file`。
 
 ### 3.2 运行安装程序
 
@@ -170,14 +169,138 @@ abaquslm_license_file="27800@localhost"
 
 > `27800` 即 lmgrd 启动时监听的默认端口。
 
-## 6. 启动 Abaqus CAE
+## 6. 多核运行修复（Ubuntu 必看）
+
+Abaqus/Explicit 多核运行时在 Ubuntu 上会遇到两个问题，都需要修复。
+
+### 6.1 问题一：mpiexec.hydra not found
+
+#### 现象
+
+```
+mpirun: 101: mpiexec.hydra: not found
+```
+
+#### 原因
+
+Ubuntu 的 `/bin/sh` 是 dash，而非 bash。Abaqus 自带的 Intel MPI 的 `mpirun` 脚本会 source `mpivars.sh`，而 `mpivars.sh` 使用了 bash 专属的 `${BASH_SOURCE}` 来获取 `I_MPI_ROOT` 路径：
+
+```sh
+# mpivars.sh 中：
+if [ "${BASH_SOURCE}" != "" ]; then
+    I_MPI_ROOT=$(command -p cd ${MPIVARS_DIR}/../.. && pwd)  # 仅 bash 有效
+else
+    I_MPI_ROOT=/r/third_party_software/.../linux/mpi  # dash 走这，路径不存在
+fi
+```
+
+在 dash 下 `${BASH_SOURCE}` 为空，`I_MPI_ROOT` 被设为不存在的构建路径，导致 PATH 中没有 `mpiexec.hydra`。
+
+### 6.2 问题二：OFI addrinfo() failed
+
+#### 现象
+
+解决了 `mpiexec.hydra not found` 之后，多核运行时继续报错：
+
+```
+MPIDI_OFI_mpi_init_hook: OFI addrinfo() failed (ofi_init.c:986)
+```
+
+#### 原因
+
+Intel MPI 默认使用 OFI（OpenFabrics Interfaces）通信层，在无 InfiniBand/RDMA 硬件的普通网卡上，OFI 的默认 provider 无法解析网络接口信息。
+
+### 6.3 修复方法
+
+修改 `SMAExternal/impi/intel64/bin/mpirun`，替换开头的环境设置部分，添加 libfabric 库路径并指定 `FI_PROVIDER=tcp`。
+
+将：
+
+```sh
+if [ -z "$I_MPI_ROOT" -a -z "`uname -m | grep 1om`" ] ; then
+    . ${0%/*}/mpivars.sh ""
+fi
+```
+
+改为：
+
+```sh
+if [ -z "$I_MPI_ROOT" -a -z "`uname -m | grep 1om`" ] ; then
+    MPI_BINDIR=${0%/*}
+    MPI_ROOT_DIR=$(command -p cd ${MPI_BINDIR}/../.. && pwd)
+    PATH="${MPI_BINDIR}:${PATH}"
+    LD_LIBRARY_PATH="${MPI_BINDIR}/../libfabric/lib:${MPI_ROOT_DIR}/intel64/lib/release:${MPI_ROOT_DIR}/intel64/lib:${LD_LIBRARY_PATH}"
+    FI_PROVIDER_PATH="${MPI_ROOT_DIR}/intel64/libfabric/lib/prov"
+    FI_PROVIDER=tcp
+    export PATH LD_LIBRARY_PATH FI_PROVIDER_PATH FI_PROVIDER
+fi
+```
+
+同时，将所有 `mpiexec.hydra` 调用改为全路径 `${0%/*}/mpiexec.hydra`，共 4 处（分别在 LoadLeveler、SGE、Netbatch、PBS 分支中）：
+
+```sh
+# 修改前
+mpiexec.hydra "$@" <&0
+# 修改后
+"${0%/*}/mpiexec.hydra" "$@" <&0
+```
+
+### 6.4 最终 `mpirun` 脚本头
+
+修复完成后，`mpirun` 脚本开头部分如下：
+
+```sh
+#!/bin/sh
+# ... 版权声明 ...
+
+tempdir="/tmp"
+# ... 临时目录设置 ...
+
+np_boot=
+username=`whoami`
+rc=0
+
+if [ -z "$I_MPI_ROOT" -a -z "`uname -m | grep 1om`" ] ; then
+    MPI_BINDIR=${0%/*}
+    MPI_ROOT_DIR=$(command -p cd ${MPI_BINDIR}/../.. && pwd)
+    PATH="${MPI_BINDIR}:${PATH}"
+    LD_LIBRARY_PATH="${MPI_BINDIR}/../libfabric/lib:${MPI_ROOT_DIR}/intel64/lib/release:${MPI_ROOT_DIR}/intel64/lib:${LD_LIBRARY_PATH}"
+    FI_PROVIDER_PATH="${MPI_ROOT_DIR}/intel64/libfabric/lib/prov"
+    FI_PROVIDER=tcp
+    export PATH LD_LIBRARY_PATH FI_PROVIDER_PATH FI_PROVIDER
+fi
+
+##### mpirun detection #####
+export I_MPI_MPIRUN="mpirun"
+############################
+```
+
+### 6.5 验证
+
+修复后测试 MPI 多核通信：
+
+```bash
+$ cd .../impi/intel64/bin/
+$ LD_LIBRARY_PATH=../libfabric/lib FI_PROVIDER=tcp ./mpiexec.hydra -np 2 hostname
+xfusion-2288H-V6
+xfusion-2288H-V6
+```
+
+在 Abaqus 中即可正常多核运行：
+
+```bash
+cd SIMULIA_EstProduces/Commands
+./abq2022 job=任务名 input=输入.inp cpus=8 interactive
+```
+
+## 7. 启动 Abaqus CAE
 
 ```bash
 cd /home/xfusion/Workspace/abaqus/SIMULIA_EstProduces/Commands
 ./abq2022 cae
 ```
 
-## 7. 设置许可证开机自启（可选）
+## 8. 设置许可证开机自启（可选）
 
 创建 systemd 服务：
 
@@ -205,7 +328,7 @@ sudo systemctl enable abaqus-lmgrd.service
 sudo systemctl start abaqus-lmgrd.service
 ```
 
-## 8. Fortran 环境（用户子程序编译需要）
+## 9. Fortran 环境（用户子程序编译需要）
 
 如果需要编译用户子程序（UEL、UMAT、VUMAT 等），需要安装 Intel oneAPI HPC Toolkit。
 
@@ -245,6 +368,8 @@ cd /home/xfusion/Workspace/abaqus/SIMULIA_EstProduces/Commands
 | `libjpeg.so.62` 缺失 | 缺少 JPEG 库 | `sudo apt install libjpeg62` |
 | `Failed to continue. Cannot install in same directory` | License Server 和主程序冲突 | 分开安装目录 |
 | `/usr/tmp/.flexlm: No such file or directory` | 缺少临时目录 | `sudo mkdir -p /usr/tmp && sudo chmod 1777 /usr/tmp` |
+| `mpiexec.hydra: not found`（多核报错） | dash 下 Intel MPI 路径检测失败 | 修改 `mpirun` 脚本，直接设置 PATH 和 LD_LIBRARY_PATH |
+| `OFI addrinfo() failed`（多核报错） | 无 InfiniBand 硬件，OFI provider 初始化失败 | `FI_PROVIDER=tcp`，改用 TCP 通信 |
 
 ## 文件结构
 
@@ -261,6 +386,9 @@ cd /home/xfusion/Workspace/abaqus/SIMULIA_EstProduces/Commands
 ├── SIMULIA_EstProduces/                  # Abaqus 主程序
 │   ├── Commands/abq2022
 │   ├── linux_a64/code/bin/
+│   │   └── SMAExternal/impi/intel64/bin/
+│   │       ├── mpirun            (已修复)
+│   │       └── mpiexec.hydra
 │   └── linux_a64/SMA/site/custom_v6.env
 └── Abaqus2022_安装记录.md
 ```
