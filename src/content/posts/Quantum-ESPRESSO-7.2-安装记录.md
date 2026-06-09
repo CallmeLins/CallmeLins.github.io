@@ -1,8 +1,9 @@
 ---
 title: Quantum ESPRESSO 7.2 安装记录
 date: 2026-05-08
+updated: 2026-06-08
 categories: 运维
-tags: [Ubuntu, HPC]
+tags: [Ubuntu, HPC, MPI]
 ---
 
 > 安装日期: 2026-05-08
@@ -130,6 +131,112 @@ mpirun -np 1 pw.x < input.in > output.out
 # 并行运行
 mpirun -np 4 pw.x < input.in > output.out
 ```
+
+## 多节点 MPI 并行配置
+
+当前集群由两台节点构成, 通过 NFS + OpenMPI 实现跨节点并行计算。
+
+### 集群节点信息
+
+| 节点 | IP 地址 | CPU 核心数 | 角色 |
+|------|---------|-----------|------|
+| node1 | 10.0.0.1 | 152 | QE 安装 + NFS 服务端 |
+| node2 | 10.0.0.2 | 152 | NFS 客户端 |
+
+### 前置条件: SSH 免密登录
+
+OpenMPI 依赖 SSH 在远程节点启动进程:
+
+```bash
+# 在 node1 生成密钥（如无）
+ssh-keygen -t rsa -b 4096
+
+# 将公钥复制到 node2（需输入 node2 用户密码）
+ssh-copy-id 10.0.0.2
+
+# 验证免密登录
+ssh 10.0.0.2 "hostname"
+```
+
+### NFS 共享 QE 目录
+
+QE 只需在一台机器编译, 通过 NFS 共享给其他节点。
+
+#### 服务端配置（node1）
+
+```bash
+# 安装 NFS 服务端
+sudo apt install -y nfs-kernel-server
+
+# 配置共享目录
+echo "/home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+
+# 重启服务
+sudo exportfs -a && sudo systemctl restart nfs-kernel-server
+```
+
+#### 客户端配置（node2）
+
+```bash
+# 安装 NFS 客户端
+sudo apt install -y nfs-common
+
+# 创建挂载点
+sudo mkdir -p /home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2
+
+# 挂载 NFS 共享
+sudo mount -t nfs 10.0.0.1:/home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2 /home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2
+
+# 配置开机自动挂载
+echo "10.0.0.1:/home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2 /home/xfusion/Workspace/quantum_espresso/q-e-qe-7.2 nfs defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+```
+
+#### 客户端安装 OpenMPI（node2）
+
+```bash
+sudo apt install -y openmpi-bin
+```
+
+> **注意**: 所有节点需安装相同版本的 OpenMPI, 否则可能导致运行时错误。
+
+### 多节点运行
+
+```bash
+# 方式一: 指定 host 和核心数
+mpirun --host 10.0.0.1:152,10.0.0.2:152 -np 16 pw.x -i input.in
+
+# 方式二: 使用 hostfile（主机名冲突时优先使用 IP）
+echo -e "10.0.0.1 slots=152\n10.0.0.2 slots=152" > hostfile
+mpirun --hostfile hostfile -np 16 pw.x -i input.in
+```
+
+建议设置别名简化命令:
+```bash
+alias mpirun-qe='mpirun --host 10.0.0.1:152,10.0.0.2:152'
+mpirun-qe -np 16 pw.x -i input.in
+```
+
+### 验证跨节点并行
+
+运行以下测试确认跨节点 MPI 通信正常:
+
+```bash
+# 测试 MPI 跨节点通信
+mpirun --host 10.0.0.1,10.0.0.2 -np 2 hostname -I
+# 应输出:
+# 10.0.0.1
+# 10.0.0.2
+
+# 测试 QE 双节点计算（先准备好赝势文件）
+mpirun --host 10.0.0.1:152,10.0.0.2:152 -np 4 pw.x -i test.in
+# 输出结尾应有 "JOB DONE."
+```
+
+### 说明
+
+- **单机运行**: 仍可使用 `mpirun -np N pw.x -i input.in`, 不受影响。
+- **网络协议**: 当前基于 TCP 通信（无 InfiniBand）, 跨节点延迟较高, 计算密集场景下使用效率较好。
+- **扩展性**: 添加新节点时, 重复客户端配置步骤即可。
 
 ## 已知问题
 
