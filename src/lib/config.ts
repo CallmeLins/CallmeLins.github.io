@@ -32,6 +32,12 @@ export const config: Config = {
       link: "https://github.com/CallmeLins/BaYin",
       icon: "Music",
     },
+    {
+      name: "pi-switch",
+      desc: "A cross-platform CLI All-in-One assistant tool for Pi Agent",
+      link: "https://github.com/CallmeLins/pi-switch",
+      icon: "Terminal",
+    },
   ],
   links: [
     {
