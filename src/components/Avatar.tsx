@@ -5,7 +5,7 @@ export default function () {
   const [avatarSrc, setAvatarSrc] = useState("")
 
   useEffect(() => {
-    const seed = "CallmeLins"
+    const seed = Math.random().toString(36).slice(2)
     import("@multiavatar/multiavatar").then(({ default: multiavatar }) => {
       const svg = multiavatar(seed)
       setAvatarSrc(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`)
