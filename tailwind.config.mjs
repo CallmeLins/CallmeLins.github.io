@@ -58,7 +58,7 @@ export default {
         },
       },
       animation: {
-        "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
+        "border-beam": "border-beam calc(var(--duration, 15)*1s) infinite linear",
       },
     },
   },

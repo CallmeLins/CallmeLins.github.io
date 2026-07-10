@@ -28,6 +28,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
+  --duration: 15;
   --animate-border-beam: border-beam calc(var(--duration)*1s) infinite linear;
 
   @keyframes border-beam {
