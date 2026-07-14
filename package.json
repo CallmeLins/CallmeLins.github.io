@@ -23,7 +23,7 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "astro": "^7.0.2",
-    "autoprefixer": "^10.5.2",
+    "autoprefixer": "^10.5.3",
     "class-variance-authority": "^0.7.1",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.17.0",
