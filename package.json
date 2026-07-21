@@ -11,7 +11,7 @@
   "dependencies": {
     "@multiavatar/multiavatar": "^1.0.7",
     "clsx": "^2.1.1",
-    "react": "^19.2.3",
+    "react": "^19.2.8",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
