@@ -27,7 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.17.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwind-merge": "^3.4.0",
