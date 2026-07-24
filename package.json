@@ -18,7 +18,7 @@
     "@astrojs/check": "^0.9.6",
     "@astrojs/react": "^6.0.1",
     "@fontsource-variable/roboto-mono": "^5.2.8",
-    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-avatar": "^1.2.3",
     "@tailwindcss/postcss": "^4.3.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
