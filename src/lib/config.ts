@@ -29,7 +29,7 @@ export const config: Config = {
     {
       name: "BaYin",
       desc: "轻量音乐播放器，支持本地曲库播放，对接云端音乐资源",
-      link: "https://github.com/CallmeLins/BaYin",
+      link: "https://callmelins.github.io/bayin",
       icon: "Music",
     },
     {
