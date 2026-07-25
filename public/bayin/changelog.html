@@ -41,158 +41,156 @@
         <div class="max-w-4xl mx-auto px-6">
             <h1 class="text-4xl font-bold mb-8">更新日志</h1>
             <p class="text-gray-600 mb-12">
-                查看八音的版本历史和功能更新。完整的 Release Notes 请访问 <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="text-gray-900 hover:underline">GitHub Releases</a>
+                查看八音的版本历史和功能更新
             </p>
 
-            <!-- Loading State -->
-            <div id="loading" class="text-center py-12">
-                <div class="animate-pulse text-gray-400">加载中...</div>
-            </div>
-
             <!-- Timeline -->
-            <div id="releases-container" class="space-y-12 hidden">
-                <!-- Releases will be dynamically loaded here -->
-            </div>
-
-            <!-- Fallback Static Content (shown if API fails) -->
-            <div id="fallback-content" class="space-y-12 hidden">
+            <div class="space-y-12">
+                <!-- v2.4.2 -->
                 <div class="border-l-2 border-gray-200 pl-6">
-                    <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center gap-3 mb-3 flex-wrap">
                         <span class="px-3 py-1 bg-gray-900 text-white text-sm rounded-full">最新</span>
-                        <h2 class="text-2xl font-semibold">查看 GitHub Releases</h2>
+                        <h2 class="text-2xl font-semibold">v2.4.2</h2>
+                        <span class="text-gray-500">2026-06-24</span>
                     </div>
-                    <p class="text-gray-600 mb-4">
-                        由于网络原因，无法自动加载更新日志。请访问 GitHub Releases 页面查看完整的版本历史和下载链接。
-                    </p>
-                    <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 smooth-transition">
-                        访问 GitHub Releases →
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">🚀 新功能</h3>
+                        <div class="space-y-4 text-gray-600">
+                            <div>
+                                <h4 class="font-medium mb-2">首页全新改版</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 重构首页为卡片式移动端优先布局，全新五大卡片模块：继续播放、最近歌曲、本地曲库、在线流媒体曲库、快捷工具</li>
+                                    <li>• 在线曲库卡片关联后端接口 <code class="bg-gray-100 px-1 rounded">dbGetStreamServers</code>，实时读取已配置流媒体服务状态</li>
+                                    <li>• 封面统一使用懒加载组件 <code class="bg-gray-100 px-1 rounded">LazyImage</code></li>
+                                    <li>• 配套新增首页全新中英双语多语言词条</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">响应式适配优化</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 深度优化首页移动端自适应布局，小屏展示更合理</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">🎨 样式统一规范</h3>
+                        <ul class="space-y-1 text-gray-600 ml-4 text-sm">
+                            <li>• 首页页面宽度、玻璃拟物样式、卡片悬浮交互与歌曲列表页面完全对齐</li>
+                            <li>• 清理首页废弃、未使用的多语言 Key，精简语言文件</li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">📦 其他改进</h3>
+                        <ul class="space-y-1 text-gray-600 ml-4 text-sm">
+                            <li>• 统一页面容器宽度规范，标准化全局卡片交互样式</li>
+                        </ul>
+                    </div>
+                    <a href="https://github.com/CallmeLins/BaYin/releases/tag/v2.4.2" target="_blank" class="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 smooth-transition">
+                        查看完整版本 →
                     </a>
                 </div>
-            </div>
 
-            <!-- Error State -->
-            <div id="error" class="hidden p-6 bg-red-50 border border-red-200 rounded-xl text-red-600">
-                <p class="mb-2"><strong>加载失败</strong></p>
-                <p class="text-sm">无法加载 GitHub Releases，请直接访问 <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="underline">GitHub Releases 页面</a></p>
+                <!-- v2.3.9 -->
+                <div class="border-l-2 border-gray-200 pl-6">
+                    <div class="flex items-center gap-3 mb-3 flex-wrap">
+                        <h2 class="text-2xl font-semibold">v2.3.9</h2>
+                        <span class="text-gray-500">2026-06-04</span>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">🚀 新功能</h3>
+                        <div class="space-y-4 text-gray-600">
+                            <div>
+                                <h4 class="font-medium mb-2">首页推荐引擎（全新上线）</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 新增智能首页推荐系统，包含 6 大个性化模块</li>
+                                    <li>• 每日推荐电台（Daily Mix）：基于播放次数、最近播放、音质加权随机推荐</li>
+                                    <li>• 最近播放、最新添加、发现音乐、推荐艺术家、遗忘的收藏</li>
+                                    <li>• 新增独立首页开关，可选择启动显示首页或歌曲列表</li>
+                                    <li>• 首页卡片全新设计：模糊封面背景、横向滚动、远程封面支持</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">播放统计与历史</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 新增播放统计追踪：数据库升级 v8，增加 <code class="bg-gray-100 px-1 rounded">play_count</code> / <code class="bg-gray-100 px-1 rounded">last_played_at</code></li>
+                                    <li>• 自动记录每首歌播放次数与最后播放时间</li>
+                                    <li>• 新增最近播放页面，支持多维度排序</li>
+                                    <li>• 歌曲列表显示播放次数</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">流媒体推荐优化</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 推荐算法全面支持远程流媒体库（Subsonic/Navidrome/Jellyfin）</li>
+                                    <li>• 艺术家卡片显示远程封面</li>
+                                    <li>• 每日推荐修复 ID 错误，改用 <code class="bg-gray-100 px-1 rounded">RANDOM()</code> 随机算法</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">Pro 功能 IAP 架构搭建</h4>
+                                <ul class="space-y-1 ml-4 text-sm">
+                                    <li>• 新增应用内购买（IAP）基础流程</li>
+                                    <li>• 新增《会员服务协议》页面</li>
+                                    <li>• 全平台 IAP 抽象层，后续接入插件无需改动业务代码</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">🐛 Bug 修复</h3>
+                        <ul class="space-y-1 text-gray-600 ml-4 text-sm">
+                            <li>• 修复每日推荐列不存在错误</li>
+                            <li>• 修复新歌推荐无数据时空白问题</li>
+                            <li>• 优化顶级艺术家查询，支持远程封面显示</li>
+                            <li>• 修复首页路由滚动锁定问题</li>
+                        </ul>
+                    </div>
+                    <a href="https://github.com/CallmeLins/BaYin/releases/tag/v2.3.9" target="_blank" class="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 smooth-transition">
+                        查看完整版本 →
+                    </a>
+                </div>
+
+                <!-- v2.3.8 -->
+                <div class="border-l-2 border-gray-200 pl-6">
+                    <div class="flex items-center gap-3 mb-3 flex-wrap">
+                        <h2 class="text-2xl font-semibold">v2.3.8</h2>
+                        <span class="text-gray-500">2026-05-19</span>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-3 text-gray-700">🚀 新功能</h3>
+                        <ul class="space-y-1 text-gray-600 ml-4 text-sm">
+                            <li>• 更多功能优化和性能提升</li>
+                        </ul>
+                    </div>
+                    <a href="https://github.com/CallmeLins/BaYin/releases/tag/v2.3.8" target="_blank" class="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 smooth-transition">
+                        查看完整版本 →
+                    </a>
+                </div>
+
+                <!-- More versions placeholder -->
+                <div class="border-l-2 border-gray-200 pl-6 opacity-50">
+                    <div class="flex items-center gap-3 mb-3">
+                        <h2 class="text-2xl font-semibold">更早版本...</h2>
+                    </div>
+                    <p class="text-gray-600 mb-4">
+                        查看完整版本历史，请访问 GitHub Releases 页面
+                    </p>
+                    <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 smooth-transition">
+                        查看所有版本 →
+                    </a>
+                </div>
             </div>
 
             <!-- Note -->
             <div class="mt-12 p-6 bg-gray-50 rounded-xl">
                 <p class="text-sm text-gray-600">
-                    <strong>提示：</strong>更新日志会自动从 GitHub Releases 加载。完整的更新日志和下载链接请访问
+                    <strong>提示：</strong>这里展示主要版本的更新摘要。完整的更新日志和下载链接请访问
                     <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="text-gray-900 hover:underline">GitHub Releases 页面</a>
                 </p>
             </div>
         </div>
     </main>
-
-    <script>
-        // Fetch and display GitHub Releases
-        async function loadReleases() {
-            const container = document.getElementById('releases-container');
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-
-            try {
-                const response = await fetch('https://api.github.com/repos/CallmeLins/BaYin/releases', {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const releases = await response.json();
-
-                if (releases.length === 0) {
-                    loading.innerHTML = '<p class="text-gray-500">暂无发布版本</p>';
-                    return;
-                }
-
-                loading.classList.add('hidden');
-                container.classList.remove('hidden');
-
-                releases.forEach((release, index) => {
-                    const isLatest = index === 0 && !release.prerelease;
-                    const date = new Date(release.published_at).toLocaleDateString('zh-CN', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                    });
-
-                    const releaseHTML = `
-                        <div class="border-l-2 border-gray-200 pl-6">
-                            <div class="flex items-center gap-3 mb-3 flex-wrap">
-                                ${isLatest ? '<span class="px-3 py-1 bg-gray-900 text-white text-sm rounded-full">最新</span>' : ''}
-                                ${release.prerelease ? '<span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">预发布</span>' : ''}
-                                <h2 class="text-2xl font-semibold">${escapeHtml(release.tag_name)}</h2>
-                                <span class="text-gray-500">${date}</span>
-                            </div>
-                            ${release.name ? `<h3 class="text-xl font-semibold mb-3">${escapeHtml(release.name)}</h3>` : ''}
-                            <div class="prose prose-gray max-w-none text-gray-600 mb-4">
-                                ${parseMarkdown(release.body || '暂无更新说明')}
-                            </div>
-                            <a href="${escapeHtml(release.html_url)}" target="_blank" class="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 smooth-transition">
-                                查看详情 →
-                            </a>
-                        </div>
-                    `;
-
-                    container.innerHTML += releaseHTML;
-                });
-
-            } catch (err) {
-                console.error('Error loading releases:', err);
-                loading.classList.add('hidden');
-                error.classList.remove('hidden');
-
-                // Show fallback content after 2 seconds
-                setTimeout(() => {
-                    error.classList.add('hidden');
-                    document.getElementById('fallback-content').classList.remove('hidden');
-                }, 2000);
-            }
-        }
-
-        // HTML escape
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Simple markdown parser
-        function parseMarkdown(text) {
-            if (!text) return '';
-
-            // Escape HTML first
-            let html = text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-
-            // Parse markdown
-            html = html
-                .replace(/### (.*?)$/gm, '<h3 class="font-semibold mt-4 mb-2 text-gray-700">$1</h3>')
-                .replace(/## (.*?)$/gm, '<h2 class="font-semibold mt-4 mb-2 text-lg text-gray-700">$1</h2>')
-                .replace(/# (.*?)$/gm, '<h1 class="font-semibold mt-4 mb-2 text-xl text-gray-700">$1</h1>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/__(.*?)__/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/_(.*?)_/g, '<em>$1</em>')
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-gray-900 hover:underline">$1</a>')
-                .replace(/^[\*\-] (.+)$/gm, '<li>$1</li>')
-                .replace(/(<li>.*?<\/li>)/gs, '<ul class="list-disc ml-4 space-y-1 my-2">$1</ul>')
-                .replace(/\n\n+/g, '</p><p class="mb-2">');
-
-            return `<p class="mb-2">${html}</p>`;
-        }
-
-        // Load releases on page load
-        loadReleases();
-    </script>
 
     <!-- Footer -->
     <footer class="py-12 bg-gray-50 border-t border-gray-200">
