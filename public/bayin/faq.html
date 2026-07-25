@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="八音常见问题 - FAQ">
+    <title>常见问题 | 八音 BaYin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-xl font-semibold smooth-transition hover:text-gray-600">八音 BaYin</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="smooth-transition hover:text-gray-600">首页</a>
+                    <a href="about.html" class="smooth-transition hover:text-gray-600">关于</a>
+                    <a href="changelog.html" class="smooth-transition hover:text-gray-600">更新日志</a>
+                    <a href="faq.html" class="smooth-transition text-gray-900 font-medium">FAQ</a>
+                    <a href="contact.html" class="smooth-transition hover:text-gray-600">联系</a>
+                </div>
+                <a href="https://github.com/CallmeLins/BaYin" target="_blank" class="px-4 py-2 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20">
+        <div class="max-w-4xl mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-8">常见问题</h1>
+            <p class="text-gray-600 mb-12">
+                以下是一些常见问题的解答。如果你的问题没有在这里找到答案，欢迎在 <a href="https://github.com/CallmeLins/BaYin/issues" target="_blank" class="text-gray-900 hover:underline">GitHub Issues</a> 或 <a href="https://t.me/+sQPyUqlcYaY5OTI9" target="_blank" class="text-gray-900 hover:underline">TG 群组</a> 中提问。
+            </p>
+
+            <!-- FAQ List -->
+            <div class="space-y-6">
+                <!-- FAQ Item -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">八音支持哪些音频格式？</h3>
+                    <p class="text-gray-600">
+                        八音支持以下音频格式：MP3、FLAC、WAV、AAC、M4A、OGG、AIFF、OPUS。基于 Rust 的 symphonia 解码库，提供高质量的音频播放体验。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">如何连接流媒体服务器？</h3>
+                    <p class="text-gray-600 mb-3">
+                        八音支持多种流媒体服务器协议：
+                    </p>
+                    <ul class="text-gray-600 ml-4 space-y-1">
+                        <li>• <strong>Navidrome</strong>：在设置中输入服务器地址和凭证</li>
+                        <li>• <strong>Jellyfin</strong>：输入服务器 URL 和 API Key</li>
+                        <li>• <strong>Subsonic</strong>：支持所有 OpenSubsonic 兼容的服务器</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">八音支持哪些平台？</h3>
+                    <p class="text-gray-600">
+                        目前支持 <strong>Windows（10/11）</strong>、<strong>macOS（10.15+）</strong> 和 <strong>Linux</strong>。移动端（Android、iOS）版本正在开发中。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">如何导入本地音乐库？</h3>
+                    <p class="text-gray-600">
+                        在设置中点击「添加文件夹」，选择你的音乐文件夹。八音会自动扫描并导入音乐文件，同时监听文件夹变动，自动同步新增或删除的音乐。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">歌词文件放在哪里？</h3>
+                    <p class="text-gray-600">
+                        将 .lrc 歌词文件与音乐文件放在同一目录下，文件名保持一致即可。例如：<code class="bg-gray-100 px-2 py-1 rounded">song.mp3</code> 和 <code class="bg-gray-100 px-2 py-1 rounded">song.lrc</code>
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">均衡器如何使用？</h3>
+                    <p class="text-gray-600">
+                        在播放界面点击均衡器按钮，可以选择预设或自定义 10 段均衡器参数。支持多种音效预设（流行、摇滚、古典、爵士等）。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">如何切换主题？</h3>
+                    <p class="text-gray-600">
+                        在设置中可以切换深色/浅色主题，或选择跟随系统主题。八音采用 macOS 风格设计，提供优雅的视觉体验。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">八音是开源的吗？</h3>
+                    <p class="text-gray-600">
+                        是的！八音基于 <strong>Apache License 2.0</strong> 开源。你可以在 <a href="https://github.com/CallmeLins/BaYin" target="_blank" class="text-gray-900 hover:underline">GitHub</a> 上查看源代码、提交 Issue 或贡献代码。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-3">遇到问题如何反馈？</h3>
+                    <p class="text-gray-600 mb-3">
+                        你可以通过以下方式反馈问题：
+                    </p>
+                    <ul class="text-gray-600 ml-4 space-y-1">
+                        <li>• <a href="https://github.com/CallmeLins/BaYin/issues" target="_blank" class="text-gray-900 hover:underline">GitHub Issues</a>（推荐）</li>
+                        <li>• <a href="https://t.me/+sQPyUqlcYaY5OTI9" target="_blank" class="text-gray-900 hover:underline">TG 群组</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-gray-50 border-t border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 text-center text-gray-600">
+            <p class="mb-2">© 2026 八音 BaYin. 为音乐而设计。</p>
+            <p class="text-sm">
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

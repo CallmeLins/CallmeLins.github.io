@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="关于八音 - 跨平台音乐播放器">
+    <title>关于 | 八音 BaYin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-xl font-semibold smooth-transition hover:text-gray-600">八音 BaYin</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="smooth-transition hover:text-gray-600">首页</a>
+                    <a href="about.html" class="smooth-transition text-gray-900 font-medium">关于</a>
+                    <a href="changelog.html" class="smooth-transition hover:text-gray-600">更新日志</a>
+                    <a href="faq.html" class="smooth-transition hover:text-gray-600">FAQ</a>
+                    <a href="contact.html" class="smooth-transition hover:text-gray-600">联系</a>
+                </div>
+                <a href="https://github.com/CallmeLins/BaYin" target="_blank" class="px-4 py-2 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-20">
+        <div class="max-w-4xl mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-8">关于八音</h1>
+
+            <!-- Project Introduction -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-4">项目简介</h2>
+                <div class="prose prose-gray max-w-none">
+                    <p class="text-lg text-gray-600 leading-relaxed mb-4">
+                        八音（BaYin）是一款面向桌面与移动端的现代化音乐播放器，基于 <strong>Tauri 2 + React + Rust 原生音频引擎</strong> 构建，兼顾颜值、性能与跨平台一致性。
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-4">
+                        它不仅支持本地音乐库管理，也支持接入多种流媒体服务器（Navidrome、Jellyfin、Emby、Subsonic），并提供歌词、均衡器、频谱可视化、系统媒体控制、托盘等完整播放器能力。
+                    </p>
+                </div>
+            </section>
+
+            <!-- Supported Protocols -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6">支持的流媒体协议</h2>
+                <div class="bg-gray-50 rounded-xl p-8">
+                    <div class="grid md:grid-cols-2 gap-8 text-gray-600">
+                        <div>
+                            <h3 class="font-semibold mb-3 text-gray-900">官方支持</h3>
+                            <ul class="space-y-2">
+                                <li>• <a href="https://www.navidrome.org/" target="_blank" class="hover:text-gray-900">Navidrome</a></li>
+                                <li>• <a href="https://jellyfin.org/" target="_blank" class="hover:text-gray-900">Jellyfin</a></li>
+                                <li>• <a href="https://emby.media/" target="_blank" class="hover:text-gray-900">Emby</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-3 text-gray-900">OpenSubsonic 兼容</h3>
+                            <ul class="space-y-2">
+                                <li>• Airsonic-Advanced</li>
+                                <li>• Ampache</li>
+                                <li>• Astiga</li>
+                                <li>• Funkwhale</li>
+                                <li>• Gonic</li>
+                                <li>• LMS</li>
+                                <li>• Nextcloud Music</li>
+                                <li>• Supysonic</li>
+                                <li>• Qm-Music</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Stack -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6">技术栈</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-lg font-semibold mb-4">核心框架</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• <strong>Tauri 2</strong> - 桌面应用框架</li>
+                            <li>• <strong>React 18</strong> - 前端框架</li>
+                            <li>• <strong>TypeScript</strong> - 类型安全</li>
+                            <li>• <strong>Vite</strong> - 构建工具</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-lg font-semibold mb-4">UI & 样式</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• <strong>Tailwind CSS 4</strong> - 样式框架</li>
+                            <li>• <strong>Radix UI</strong> - 组件库</li>
+                            <li>• <strong>Framer Motion</strong> - 动画</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-lg font-semibold mb-4">音频引擎 (Rust)</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• <strong>symphonia</strong> - 音频解码</li>
+                            <li>• <strong>cpal</strong> - 跨平台音频播放</li>
+                            <li>• <strong>rustfft</strong> - 频谱分析</li>
+                            <li>• <strong>rubato</strong> - 重采样</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h3 class="text-lg font-semibold mb-4">状态 & 路由</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• <strong>React Context</strong> - 状态管理</li>
+                            <li>• <strong>React Router</strong> - 路由</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Open Source -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-4">开源许可</h2>
+                <p class="text-gray-600 mb-4">
+                    本项目基于 <a href="https://github.com/CallmeLins/BaYin/blob/main/LICENSE" target="_blank" class="text-gray-900 hover:underline">Apache License 2.0</a> 许可进行开源。
+                </p>
+                <p class="text-gray-600">
+                    这意味着你可以自由地使用、修改和分发本项目，但需要保留原始的版权声明和许可证。
+                </p>
+            </section>
+
+            <!-- Links -->
+            <section>
+                <h2 class="text-2xl font-semibold mb-6">相关链接</h2>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://github.com/CallmeLins/BaYin" target="_blank" class="px-6 py-3 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">
+                        GitHub 仓库
+                    </a>
+                    <a href="https://github.com/CallmeLins/BaYin/releases" target="_blank" class="px-6 py-3 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">
+                        发行版下载
+                    </a>
+                    <a href="https://github.com/CallmeLins/BaYin/issues" target="_blank" class="px-6 py-3 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">
+                        问题反馈
+                    </a>
+                    <a href="https://t.me/+sQPyUqlcYaY5OTI9" target="_blank" class="px-6 py-3 bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">
+                        TG 群组
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-gray-50 border-t border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 text-center text-gray-600">
+            <p class="mb-2">© 2026 八音 BaYin. 为音乐而设计。</p>
+            <p class="text-sm">
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
