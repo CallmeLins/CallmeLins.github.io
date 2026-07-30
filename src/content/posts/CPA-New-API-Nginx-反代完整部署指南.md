@@ -1,7 +1,7 @@
 ---
 title: "CPA + New-API + Nginx 反代：自建 AI API 中转平台的完整部署指南"
-date: 2026-07-30 14:00:00
-updated: 2026-07-30 14:00:00
+date: 2026-07-30
+updated: 2026-07-30
 categories: 运维
 tags:
   - CPA
