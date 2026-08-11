@@ -87,6 +87,7 @@
     },
     "fast-xml-parser": "5.7.0",
     "h3": "1.15.9",
+    "nanoid": "3.3.17",
     "postcss": "8.5.25",
     "rollup": "4.59.0",
     "volar-service-yaml": "0.0.70",
