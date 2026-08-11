@@ -50,7 +50,7 @@
     "@astrojs/markdown-remark": "^7.2.2",
     "@astrojs/svelte": "^9.0.1",
     "@codemirror/commands": "^6.10.3",
-    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/lang-markdown": "^6.5.2",
     "@codemirror/language": "^6.12.3",
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.43.0",
