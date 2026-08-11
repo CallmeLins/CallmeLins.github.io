@@ -1,0 +1,30 @@
+{
+  "title": "CallmeLins'Blog",
+  "description": "See see yours - 兴趣使然的无名小站",
+  "defaultLocale": "zh-CN",
+  "footer": {
+    "startYear": 2021,
+    "showCurrentYear": true,
+    "copyright": "CallmeLins · 兴趣使然的无名小站"
+  },
+  "adminOverview": {
+    "publicVisible": true,
+    "hiddenMessage": "作者暂未公开此页面。"
+  },
+  "favicon": {
+    "svg": null,
+    "png": null,
+    "appleTouchIcon": null
+  },
+  "socialLinks": {
+    "github": "https://github.com/CallmeLins",
+    "x": "https://twitter.com/yourname",
+    "email": "Astro@Whono.me",
+    "presetOrder": {
+      "github": 1,
+      "x": 2,
+      "email": 3
+    },
+    "custom": []
+  }
+}

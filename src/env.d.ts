@@ -1,1 +1,6 @@
-declare module "@fontsource-variable/roboto-mono" {}
+/// <reference types="astro/client" />
+
+declare module '*.astro' {
+  const Component: any;
+  export default Component;
+}

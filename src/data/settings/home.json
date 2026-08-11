@@ -1,0 +1,13 @@
+{
+  "introLead": "兴趣使然的全栈工程师的技术随笔与折腾记录。",
+  "introMore": "更多文章请访问",
+  "introMoreLinks": [
+    "archive",
+    "tag"
+  ],
+  "showIntroLead": true,
+  "showIntroMore": true,
+  "heroPresetId": "none",
+  "heroImageSrc": null,
+  "heroImageAlt": "Whono theme preview"
+}

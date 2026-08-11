@@ -1,0 +1,41 @@
+{
+  "brandTitle": "CallmeLins",
+  "quote": "See see yours\n兴趣使然的无名小站",
+  "nav": [
+    {
+      "id": "essay",
+      "label": "随笔",
+      "ornament": "·",
+      "visible": true,
+      "order": 1
+    },
+    {
+      "id": "bits",
+      "label": "絮语",
+      "ornament": "·",
+      "visible": false,
+      "order": 2
+    },
+    {
+      "id": "memo",
+      "label": "小记",
+      "ornament": "·",
+      "visible": false,
+      "order": 3
+    },
+    {
+      "id": "archive",
+      "label": "归档",
+      "ornament": "·",
+      "visible": true,
+      "order": 4
+    },
+    {
+      "id": "about",
+      "label": "关于",
+      "ornament": "·",
+      "visible": true,
+      "order": 5
+    }
+  ]
+}
