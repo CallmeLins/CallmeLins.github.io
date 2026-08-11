@@ -3,8 +3,6 @@
 CallmeLins 的个人博客，基于 [Astro](https://astro.build/) 和
 [astro-whono](https://github.com/cxro/astro-whono) 构建。
 
-本站作为独立项目维护，不与 `astro-whono` 建立 Fork 或自动同步关系。需要使用上游新功能时，按需移植对应改动。
-
 ## 技术栈
 
 - Astro 7
@@ -71,22 +69,6 @@ npm run build
 ## 部署
 
 推送到 `master` 分支会触发 [GitHub Actions](./.github/workflows/deploy.yml)，构建并发布到 GitHub Pages。
-
-- 正式域名：<https://blog.bayinlabs.com>
-- CNAME：`blog.bayinlabs.com`
-- 构建产物：`dist/`
-
-## 上游更新
-
-本项目不直接合并 `astro-whono` 的 Git 历史。需要更新时，先查看上游的 release、CHANGELOG 或具体提交，再单独移植所需功能，并在本地执行构建验证。
-
-优先保留本站的以下内容：
-
-- `src/content/`
-- `src/data/settings/`
-- `public/` 中的个人资源
-- `.github/workflows/deploy.yml`
-- `CNAME` 与 `public/CNAME`
 
 ## 致谢
 
