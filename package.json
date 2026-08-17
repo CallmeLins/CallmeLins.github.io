@@ -53,7 +53,7 @@
     "@codemirror/lang-markdown": "^6.5.2",
     "@codemirror/language": "^6.12.3",
     "@codemirror/state": "^6.7.1",
-    "@codemirror/view": "^6.43.0",
+    "@codemirror/view": "^6.43.8",
     "@iconify-json/logos": "^1.2.12",
     "@iconify-json/simple-icons": "^1.2.93",
     "@lezer/highlight": "^1.2.3",
