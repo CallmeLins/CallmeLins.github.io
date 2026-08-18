@@ -73,7 +73,7 @@
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "remark-smartypants": "^3.0.2",
+    "remark-smartypants": "^3.0.3",
     "svelte": "^5.55.5",
     "typescript": "^5.9.3",
     "unified": "^11.0.5",
