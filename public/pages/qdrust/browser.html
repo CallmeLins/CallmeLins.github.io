@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="qdrust 无头浏览器插件 api://browser/*：启用方式、action 一览、混合签到模板写法、会话生命周期与行为限制。">
+    <title>浏览器插件 | qdrust Wiki</title>
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/browser.html">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition { transition: all 0.2s ease; }
+
+        /* ---------- Wiki layout ---------- */
+        .wiki-shell { max-width: 1240px; margin: 0 auto; }
+        .wiki-grid { display: grid; grid-template-columns: 232px minmax(0, 1fr) 208px; gap: 40px; align-items: start; }
+        @media (max-width: 1100px) { .wiki-grid { grid-template-columns: 220px minmax(0, 1fr); } .wiki-toc { display: none; } }
+        @media (max-width: 860px) { .wiki-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+        .wiki-sidebar {
+            position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto;
+            padding-right: 8px;
+        }
+        @media (max-width: 860px) {
+            .wiki-sidebar {
+                position: static; max-height: none; overflow: visible; display: none;
+                border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 24px;
+            }
+            .wiki-sidebar.is-open { display: block; }
+        }
+        .wiki-nav-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            color: #9ca3af; margin: 20px 0 8px; padding-left: 10px;
+        }
+        .wiki-nav-title:first-child { margin-top: 0; }
+        .wiki-nav-link {
+            display: block; padding: 6px 10px; border-radius: 6px; font-size: 14px;
+            color: #4b5563; text-decoration: none; margin-bottom: 2px;
+        }
+        .wiki-nav-link:hover { background: #f3f4f6; color: #111827; }
+        .wiki-nav-link.is-active { background: #f3f4f6; color: #111827; font-weight: 600; }
+
+        .wiki-toc { position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto; }
+        .wiki-toc-title { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
+        .wiki-toc a {
+            display: block; font-size: 13px; color: #6b7280; text-decoration: none;
+            padding: 4px 0 4px 10px; border-left: 2px solid #e5e7eb; line-height: 1.5;
+        }
+        .wiki-toc a:hover { color: #111827; border-left-color: #9ca3af; }
+        .wiki-toc a.toc-h3 { padding-left: 22px; font-size: 12.5px; }
+        .wiki-toc a.is-current { color: #111827; border-left-color: #111827; font-weight: 500; }
+
+        /* ---------- Article typography ---------- */
+        .wiki-article { font-size: 15px; line-height: 1.85; color: #374151; }
+        .wiki-article h2 {
+            font-size: 24px; font-weight: 700; color: #111827; margin: 48px 0 16px;
+            padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; scroll-margin-top: 96px;
+        }
+        .wiki-article h2:first-child { margin-top: 0; }
+        .wiki-article h3 { font-size: 17px; font-weight: 600; color: #111827; margin: 32px 0 12px; scroll-margin-top: 96px; }
+        .wiki-article h4 { font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px; }
+        .wiki-article p { margin: 0 0 16px; }
+        .wiki-article ul, .wiki-article ol { margin: 0 0 16px; padding-left: 22px; }
+        .wiki-article ul { list-style: disc; }
+        .wiki-article ol { list-style: decimal; }
+        .wiki-article li { margin-bottom: 6px; }
+        .wiki-article strong { color: #111827; font-weight: 600; }
+        .wiki-article a { color: #111827; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: #d1d5db; }
+        .wiki-article a:hover { text-decoration-color: #111827; }
+        .wiki-article code:not(pre code) {
+            background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px;
+            padding: 1px 5px; font-size: 13px; color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-word;
+        }
+        .wiki-article pre {
+            background: #111827; color: #e5e7eb; border-radius: 10px; padding: 16px 18px;
+            overflow-x: auto; font-size: 13px; line-height: 1.7; margin: 0 0 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        .wiki-article pre code { white-space: pre; }
+        .wiki-article blockquote {
+            border-left: 3px solid #d1d5db; padding: 4px 0 4px 16px; margin: 0 0 20px; color: #4b5563;
+        }
+        .wiki-article table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; display: block; overflow-x: auto; }
+        .wiki-article thead { white-space: nowrap; }
+        .wiki-article th {
+            text-align: left; font-weight: 600; color: #111827; background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb; padding: 9px 12px;
+        }
+        .wiki-article td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .wiki-article tbody tr:hover { background: #fafafa; }
+
+        .callout {
+            border: 1px solid #e5e7eb; border-left: 3px solid #111827; background: #fafafa;
+            border-radius: 8px; padding: 14px 18px; margin: 0 0 20px; font-size: 14px;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout-title { font-weight: 600; color: #111827; margin-bottom: 6px; font-size: 13.5px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+        .wiki-card {
+            border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff;
+            display: block; text-decoration: none; color: inherit;
+        }
+        .wiki-card:hover { border-color: #9ca3af; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+        .wiki-card h4 { margin: 0 0 6px; font-size: 15px; }
+        .wiki-card p { margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.65; }
+
+        .badge {
+            display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px;
+            background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; margin-right: 6px;
+        }
+        .badge-dark { background: #111827; color: #fff; border-color: #111827; }
+
+        .wiki-meta {
+            margin-top: 56px; padding-top: 20px; border-top: 1px solid #e5e7eb;
+            font-size: 13px; color: #9ca3af; display: flex; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Top bar -->
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="wiki-shell px-6 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    </button>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
+                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
+                    </a>
+                    <span class="text-xs text-gray-300 hidden sm:inline">/</span>
+                    <a href="https://callmelins.github.io/" class="text-xs text-gray-500 hover:text-gray-900 smooth-transition hidden sm:inline">返回博客</a>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="wiki-shell px-6 pt-28 pb-20">
+        <div class="wiki-grid">
+            <!-- Sidebar -->
+            <aside class="wiki-sidebar" id="sidebar">
+                <div class="wiki-nav-title">入门</div>
+                <a href="index.html" class="wiki-nav-link">总览</a>
+                <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
+
+                <div class="wiki-nav-title">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
+
+                <div class="wiki-nav-title">进阶</div>
+                <a href="browser.html" class="wiki-nav-link is-active">浏览器插件</a>
+
+                <div class="wiki-nav-title">帮助</div>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
+
+                <div class="wiki-nav-title">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
+            </aside>
+
+            <!-- Article -->
+            <main class="wiki-article min-w-0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">浏览器插件（无头浏览器签到）</h1>
+                <p class="text-lg text-gray-600 mb-10">
+                    纯 HTTP 做不了的那一步，用 <code>api://browser/*</code> 补齐：签名、验证码、JS 渲染与多步表单交互。
+                </p>
+
+                <div class="callout">
+                    <div class="callout-title">设计取舍</div>
+                    <p>浏览器插件是<strong>可选的补充</strong>，不是主流程。推荐的用法是「混合签到」：只有真正需要浏览器的一步走 <code>api://browser/*</code>，其余步骤仍走普通 HTTP 请求。这样既保留了 HAR 的轻量，又不必为一个签名步骤引入整套爬虫框架。</p>
+                </div>
+
+                <h2 id="enable">启用方式（三步）</h2>
+                <ol>
+                    <li>准备一个无头浏览器端点（见下方「端点后端三选一」）。</li>
+                    <li>给服务设置 <code>QDRUST_BROWSER_URL</code>（Docker 部署写在 <code>compose.yaml</code> 的 environment 里）。</li>
+                    <li>重启服务。之后模板里就能直接用 <code>api://browser/*</code>，<strong>无需</strong>在 WebUI 插件管理页新建条目。</li>
+                </ol>
+                <pre><code>services:
+  qdrust:
+    # ...
+    environment:
+      QDRUST_BROWSER_URL: ws://browserless:3000
+  browserless:
+    image: ghcr.io/browserless/chromium:latest
+    environment:
+      TOKEN: change-me
+      CONCURRENT: 5
+    restart: unless-stopped</code></pre>
+                <p class="text-sm text-gray-500">浏览器客户端代码已编译进 server 二进制，不再需要单独的 <code>qdrust-plugin-browser</code> 子进程或 <code>QDRUST_BROWSER_PLUGIN_BIN</code> 配置。</p>
+
+                <h2 id="actions">Action 一览</h2>
+                <p>Action 分为<strong>一次性</strong>与<strong>会话</strong>两类：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>Action</th><th>类型</th><th>用途</th><th>参数</th><th>返回体</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><code>start</code></td><td>会话</td>
+                                <td>开一个标签页并导航到 <code>url</code>，返回可复用的会话 id</td>
+                                <td><code>url</code> 必填</td>
+                                <td><code>{"session": "&lt;id&gt;"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>end</code></td><td>会话</td>
+                                <td>关闭会话并释放标签页</td>
+                                <td><code>session</code> 必填</td>
+                                <td><code>{"session": ..., "status": "closed"}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>keepalive</code></td><td>会话</td>
+                                <td>刷新会话空闲 TTL（长时间等待人工输入时保活）</td>
+                                <td><code>session</code> 必填</td>
+                                <td><code>{"ok": true, "session": ...}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>type</code></td><td>会话</td>
+                                <td>在 <code>selector</code> 元素上输入 <code>value</code>（原生键盘事件，兼容 SPA）；<code>clear=1</code> 先清空，<code>submit=1</code> 输入后按回车</td>
+                                <td><code>session</code>、<code>selector</code>、<code>value</code> 必填；可选 <code>clear</code>、<code>submit</code></td>
+                                <td><code>{"ok": true, "session": ..., "selector": ...}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>click</code></td><td>会话</td>
+                                <td>点击 <code>selector</code> 元素；可选 <code>wait=&lt;ms&gt;</code> 点击后等待、<code>wait_selector=&lt;css&gt;</code> 轮询等某元素出现（最长 15s）</td>
+                                <td><code>session</code>、<code>selector</code> 必填；可选 <code>wait</code>、<code>wait_selector</code></td>
+                                <td><code>{"ok": true, "session": ..., "selector": ...}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>content</code></td><td>一次性</td>
+                                <td>渲染后取页面 HTML（JS 已执行，适合 SPA / 动态加载）</td>
+                                <td><code>url</code> 必填</td>
+                                <td>页面 HTML 文本</td>
+                            </tr>
+                            <tr>
+                                <td><code>eval</code></td><td>一次性</td>
+                                <td>在页面里执行 JS，取 token / 签名 / cookie / 页面状态</td>
+                                <td><code>url</code>、<code>expr</code> 必填</td>
+                                <td>求值结果的 JSON</td>
+                            </tr>
+                            <tr>
+                                <td><code>screenshot</code></td><td>一次性</td>
+                                <td>截图（过验证码给人看 / 留档）</td>
+                                <td><code>url</code> 必填；可选 <code>full_page=1</code>、<code>format=png|jpeg</code>、<code>width</code>/<code>height</code>、<code>wait=&lt;ms&gt;</code></td>
+                                <td><code>{"mimeType": ..., "data": &lt;base64&gt;}</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>判定规则</strong>：<code>content</code> / <code>eval</code> / <code>screenshot</code> 若带 <code>session</code> 参数则在指定会话页上执行，否则开一张一次性标签页（用完即关）；<code>type</code> / <code>click</code> 必须带 <code>session</code>。
+                </p>
+
+                <h2 id="endpoints">端点后端三选一</h2>
+                <ul>
+                    <li><strong>Browserless 自托管</strong>：<code>ws://localhost:3000</code>——推荐，<code>compose.yaml</code> 里已备好注释掉的 <code>browserless</code> 服务。</li>
+                    <li><strong>本地 Chromium / obscura</strong>：<code>http://localhost:9222</code>，即带 <code>--remote-debugging-port=9222</code> 启动的 Chrome。</li>
+                    <li><strong>Browserless 云端</strong>：<code>wss://chrome.browserless.io?token=...</code>。</li>
+                </ul>
+
+                <h2 id="hybrid">混合签到：模板怎么写</h2>
+                <p>
+                    核心思路：<strong>普通 HTTP 步骤用 HAR 原样请求；需要浏览器的一步插入 <code>api://browser/*</code>，把它的返回体用 <code>extract_variables</code> 提取成变量，供后续 HAR 步骤用 <code>{{var}}</code> 填充。</strong>
+                </p>
+
+                <h3 id="one-shot">一次性用法</h3>
+                <h4>例 1：<code>eval</code> 取签名 / token，回填到后续 HTTP 请求</h4>
+                <pre><code>{
+  "entries": [
+    {
+      // 浏览器步骤：登录页里执行 JS 取签名
+      "request": { "method": "GET", "url": "api://browser/eval?url=https://example.com/signin&expr=window.__sig()" },
+      "extract_variables": [
+        { "name": "sig", "re": "\"([a-zA-Z0-9_-]+)\"", "from": "content" }
+      ]
+    },
+    {
+      // 真正的签到请求：把签名回填进 body
+      "request": {
+        "method": "POST",
+        "url": "https://example.com/api/checkin",
+        "postData": { "mimeType": "application/json", "text": "{\"sig\":\"{{sig}}\"}" }
+      }
+    }
+  ]
+}</code></pre>
+                <div class="callout">
+                    <div class="callout-title">正则要带上引号</div>
+                    <p><code>extract_variables</code> 的 <code>re</code> 是对整个返回体文本做正则匹配。<code>eval</code> 返回的是 JSON（字符串值带引号），所以取字符串时要转义引号：<code>"([a-zA-Z0-9_-]+)"</code>；数字 / 布尔值则不带引号。</p>
+                </div>
+
+                <h4>例 2：<code>content</code> 抓渲染后的页面，正则提取变量</h4>
+                <p>SPA 页面内容由 JS 动态生成，普通 HTTP 拿到的只是空壳。用 <code>content</code> 拿渲染后的 HTML 再提取：</p>
+                <pre><code>{
+  "request": { "method": "GET", "url": "api://browser/content?url=https://example.com/dashboard" },
+  "extract_variables": [
+    { "name": "nickname", "re": "nickname[^&gt;]*&gt;([^&lt;]+)&lt;", "from": "content" }
+  ]
+}</code></pre>
+
+                <h4>例 3：<code>screenshot</code> 过验证码 / 留档</h4>
+                <p>截图把当前页面状态打给人看（<code>data</code> 为 base64）。适合无法自动破解的验证码场景——人工看图后把答案填进下一步变量，或单纯用于失败时留档排查：</p>
+                <pre><code>{
+  "request": {
+    "method": "GET",
+    "url": "api://browser/screenshot?url=https://example.com/captcha&wait=2000&format=png"
+  },
+  "extract_variables": [
+    { "name": "captcha_img", "re": "\"data\":\"([A-Za-z0-9+/=]+)\"", "from": "content" }
+  ]
+}</code></pre>
+
+                <h3 id="session-flow">会话用法：多步页面交互 / 人工过验证码</h3>
+                <p>
+                    对于「登录后拿 cookie 再签到」这类需要<strong>在同一页面上连续操作</strong>的流程，用 <code>start</code> 开一个会话，跨多个步骤对同一 <code>session</code> 做 <code>type</code> / <code>click</code> / <code>content</code>。会话在多次独立调用间保持存活，因此天然支持中间等人——比如让人工过完验证码再继续。
+                </p>
+                <pre><code>{
+  "entries": [
+    {
+      // 1. 开会话进登录页，把 session id 存进变量
+      "request": { "method": "GET", "url": "api://browser/start?url=https://example.com/login" },
+      "extract_variables": [ { "name": "sess", "re": "\"session\":\"([0-9a-f]+)\"", "from": "content" } ]
+    },
+    {
+      // 2. 往 #user 输入账号
+      "request": { "method": "GET", "url": "api://browser/type?session={{sess}}&selector=%23user&value=my_account" }
+    },
+    {
+      // 3. 往 #pass 输入密码，submit=1 回车提交（触发登录跳转）
+      "request": { "method": "GET", "url": "api://browser/type?session={{sess}}&selector=%23pass&value=my_pw&submit=1" }
+    },
+    {
+      // 4. 等 dashboard 出现后抓渲染后 HTML，提取登录态信息
+      "request": { "method": "GET", "url": "api://browser/content?session={{sess}}&url=https://example.com/dashboard" },
+      "extract_variables": [ { "name": "nickname", "re": "nickname[^&gt;]*&gt;([^&lt;]+)&lt;", "from": "content" } ]
+    },
+    {
+      // 5. 用完关会话
+      "request": { "method": "GET", "url": "api://browser/end?session={{sess}}" }
+    }
+  ]
+}</code></pre>
+                <div class="callout">
+                    <div class="callout-title">两个最容易踩的坑</div>
+                    <p>
+                        ① 用 <code>#</code> 选择器时<strong>务必做 URL 编码</strong>（<code>#user</code> → <code>%23user</code>），否则 <code>#</code> 会被当作片段标识符，把 query 整个截掉。<br>
+                        ② 会话 id 要由第一步的 <code>extract_variables</code> 提出并存进变量，后续步骤才能用 <code>{{sess}}</code> 复用。
+                    </p>
+                </div>
+
+                <h2 id="lifecycle">会话生命周期与回收</h2>
+                <ul>
+                    <li><strong>存活位置</strong>：会话存于 server 内存，由 <code>QDRUST_BROWSER_URL</code> 配置的服务进程全局持有，每会话一个标签页。<strong>进程重启即全部清空</strong>，向导需要重新 <code>start</code>。</li>
+                    <li><strong>空闲回收</strong>：闲置超过 <strong>30 分钟</strong>被后台任务回收；无论是否活跃，<strong>最长存活 24 小时</strong>。</li>
+                    <li><strong>并发上限</strong>：<strong>16</strong> 个并发会话。</li>
+                    <li><strong>建议</strong>：向导式流程结束后显式 <code>end</code> 释放标签页；被遗忘的会话由上述回收规则兜底，不会泄漏。</li>
+                </ul>
+                <p>需要「人等验证码」的流程，可在人工环节前后用 <code>keepalive</code>（或直接让页面停留）刷新会话空闲 TTL，避免会话被 30 分钟空闲回收提前清掉。</p>
+
+                <h2 id="limits">行为与限制</h2>
+                <ul>
+                    <li><strong>错误处理</strong>：未配置 <code>QDRUST_BROWSER_URL</code>、连接失败、找不到元素或会话、参数缺失等都会返回 <strong>502 信封</strong>，可用 <code>success_asserts</code> / <code>failed_asserts</code> 感知——<strong>不会静默降级，也不会中断整个任务</strong>。</li>
+                    <li><strong>连接复用</strong>：未带 <code>session</code> 的 <code>content</code> / <code>eval</code> / <code>screenshot</code> 也复用同一条长连接（只是标签页用完即关），免去每次冷启动的握手开销。</li>
+                    <li><strong>选择器找不到</strong>：<code>type</code> / <code>click</code> 找不到目标元素返回 502；<code>click</code> 的 <code>wait_selector</code> 最长轮询 15 秒。</li>
+                    <li><strong>没有 <code>clear()</code></strong>：想清空输入框用 <code>type</code> 的 <code>clear=1</code>（内部是 Ctrl+A + Backspace）。</li>
+                    <li><strong>同会话串行</strong>：同一会话的并发操作按顺序执行，避免两次按键交叠；跨会话可并行。</li>
+                </ul>
+
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-03</span>
+                </div>
+            </main>
+
+            <!-- On-page TOC -->
+            <aside class="wiki-toc">
+                <div class="wiki-toc-title">本页目录</div>
+                <nav id="toc"></nav>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="py-10 bg-gray-50 border-t border-gray-200">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
+            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p>
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+                <span class="text-gray-300 mx-2">·</span>
+                <a href="https://callmelins.github.io/" class="hover:text-gray-900">返回博客</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 从正文 h2/h3 生成本页目录，并跟随滚动高亮当前小节。
+        (function () {
+            var article = document.querySelector('.wiki-article');
+            var toc = document.getElementById('toc');
+            if (!article || !toc) return;
+
+            var headings = article.querySelectorAll('h2[id], h3[id]');
+            if (!headings.length) { toc.parentNode.style.display = 'none'; return; }
+
+            var links = [];
+            headings.forEach(function (heading) {
+                var link = document.createElement('a');
+                link.href = '#' + heading.id;
+                link.textContent = heading.textContent;
+                if (heading.tagName === 'H3') link.className = 'toc-h3';
+                toc.appendChild(link);
+                links.push(link);
+                heading.setAttribute('data-toc-id', heading.id);
+            });
+
+            var onScroll = function () {
+                var current = null;
+                headings.forEach(function (heading) {
+                    if (heading.getBoundingClientRect().top <= 120) current = heading.id;
+                });
+                if (!current && headings.length) current = headings[0].id;
+                links.forEach(function (link) {
+                    link.classList.toggle('is-current', link.getAttribute('href') === '#' + current);
+                });
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // 移动端侧边目录开关
+        (function () {
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('sidebar');
+            if (!toggle || !sidebar) return;
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('is-open');
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -5,7 +5,7 @@
 ## 📁 文件结构
 
 ```
-public/bayin/
+public/pages/bayin/
 ├── index.html          # 首页（功能展示、下载）
 ├── about.html          # 关于页面（项目介绍、技术栈）
 ├── changelog.html      # 更新日志
@@ -16,7 +16,7 @@ public/bayin/
 
 ## 🚀 部署方式
 
-本项目作为静态站点部署在 Astro 博客的 `public/bayin/` 目录中。
+本项目作为静态站点部署在 Astro 博客的 `public/pages/bayin/` 目录中。
 
 ### 本地开发
 
@@ -25,7 +25,7 @@ public/bayin/
    ```bash
    npm run dev
    ```
-   访问：http://localhost:4321/bayin/
+   访问：http://localhost:4321/pages/bayin/
 
 ### 生产部署
 
@@ -35,7 +35,7 @@ Astro 构建时会自动将 `public/` 目录的内容复制到输出目录：
 npm run build
 ```
 
-部署后访问：https://callmelins.github.io/bayin/
+部署后访问：https://callmelins.github.io/pages/bayin/
 
 ## 🎨 设计特点
 

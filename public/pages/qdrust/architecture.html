@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型、API 一览与横向扩展边界。">
+    <title>架构设计 | qdrust Wiki</title>
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/architecture.html">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition { transition: all 0.2s ease; }
+
+        /* ---------- Wiki layout ---------- */
+        .wiki-shell { max-width: 1240px; margin: 0 auto; }
+        .wiki-grid { display: grid; grid-template-columns: 232px minmax(0, 1fr) 208px; gap: 40px; align-items: start; }
+        @media (max-width: 1100px) { .wiki-grid { grid-template-columns: 220px minmax(0, 1fr); } .wiki-toc { display: none; } }
+        @media (max-width: 860px) { .wiki-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+        .wiki-sidebar {
+            position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto;
+            padding-right: 8px;
+        }
+        @media (max-width: 860px) {
+            .wiki-sidebar {
+                position: static; max-height: none; overflow: visible; display: none;
+                border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 24px;
+            }
+            .wiki-sidebar.is-open { display: block; }
+        }
+        .wiki-nav-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            color: #9ca3af; margin: 20px 0 8px; padding-left: 10px;
+        }
+        .wiki-nav-title:first-child { margin-top: 0; }
+        .wiki-nav-link {
+            display: block; padding: 6px 10px; border-radius: 6px; font-size: 14px;
+            color: #4b5563; text-decoration: none; margin-bottom: 2px;
+        }
+        .wiki-nav-link:hover { background: #f3f4f6; color: #111827; }
+        .wiki-nav-link.is-active { background: #f3f4f6; color: #111827; font-weight: 600; }
+
+        .wiki-toc { position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto; }
+        .wiki-toc-title { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
+        .wiki-toc a {
+            display: block; font-size: 13px; color: #6b7280; text-decoration: none;
+            padding: 4px 0 4px 10px; border-left: 2px solid #e5e7eb; line-height: 1.5;
+        }
+        .wiki-toc a:hover { color: #111827; border-left-color: #9ca3af; }
+        .wiki-toc a.toc-h3 { padding-left: 22px; font-size: 12.5px; }
+        .wiki-toc a.is-current { color: #111827; border-left-color: #111827; font-weight: 500; }
+
+        /* ---------- Article typography ---------- */
+        .wiki-article { font-size: 15px; line-height: 1.85; color: #374151; }
+        .wiki-article h2 {
+            font-size: 24px; font-weight: 700; color: #111827; margin: 48px 0 16px;
+            padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; scroll-margin-top: 96px;
+        }
+        .wiki-article h2:first-child { margin-top: 0; }
+        .wiki-article h3 { font-size: 17px; font-weight: 600; color: #111827; margin: 32px 0 12px; scroll-margin-top: 96px; }
+        .wiki-article h4 { font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px; }
+        .wiki-article p { margin: 0 0 16px; }
+        .wiki-article ul, .wiki-article ol { margin: 0 0 16px; padding-left: 22px; }
+        .wiki-article ul { list-style: disc; }
+        .wiki-article ol { list-style: decimal; }
+        .wiki-article li { margin-bottom: 6px; }
+        .wiki-article strong { color: #111827; font-weight: 600; }
+        .wiki-article a { color: #111827; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: #d1d5db; }
+        .wiki-article a:hover { text-decoration-color: #111827; }
+        .wiki-article code:not(pre code) {
+            background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px;
+            padding: 1px 5px; font-size: 13px; color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-word;
+        }
+        .wiki-article pre {
+            background: #111827; color: #e5e7eb; border-radius: 10px; padding: 16px 18px;
+            overflow-x: auto; font-size: 13px; line-height: 1.7; margin: 0 0 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        .wiki-article pre code { white-space: pre; }
+        .wiki-article blockquote {
+            border-left: 3px solid #d1d5db; padding: 4px 0 4px 16px; margin: 0 0 20px; color: #4b5563;
+        }
+        .wiki-article table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; display: block; overflow-x: auto; }
+        .wiki-article thead { white-space: nowrap; }
+        .wiki-article th {
+            text-align: left; font-weight: 600; color: #111827; background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb; padding: 9px 12px;
+        }
+        .wiki-article td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .wiki-article tbody tr:hover { background: #fafafa; }
+
+        .callout {
+            border: 1px solid #e5e7eb; border-left: 3px solid #111827; background: #fafafa;
+            border-radius: 8px; padding: 14px 18px; margin: 0 0 20px; font-size: 14px;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout-title { font-weight: 600; color: #111827; margin-bottom: 6px; font-size: 13.5px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+        .wiki-card {
+            border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff;
+            display: block; text-decoration: none; color: inherit;
+        }
+        .wiki-card:hover { border-color: #9ca3af; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+        .wiki-card h4 { margin: 0 0 6px; font-size: 15px; }
+        .wiki-card p { margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.65; }
+
+        .badge {
+            display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px;
+            background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; margin-right: 6px;
+        }
+        .badge-dark { background: #111827; color: #fff; border-color: #111827; }
+
+        .wiki-meta {
+            margin-top: 56px; padding-top: 20px; border-top: 1px solid #e5e7eb;
+            font-size: 13px; color: #9ca3af; display: flex; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Top bar -->
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="wiki-shell px-6 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    </button>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
+                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
+                    </a>
+                    <span class="text-xs text-gray-300 hidden sm:inline">/</span>
+                    <a href="https://callmelins.github.io/" class="text-xs text-gray-500 hover:text-gray-900 smooth-transition hidden sm:inline">返回博客</a>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="wiki-shell px-6 pt-28 pb-20">
+        <div class="wiki-grid">
+            <!-- Sidebar -->
+            <aside class="wiki-sidebar" id="sidebar">
+                <div class="wiki-nav-title">入门</div>
+                <a href="index.html" class="wiki-nav-link">总览</a>
+                <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
+
+                <div class="wiki-nav-title">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link is-active">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
+
+                <div class="wiki-nav-title">进阶</div>
+                <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
+
+                <div class="wiki-nav-title">帮助</div>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
+
+                <div class="wiki-nav-title">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
+            </aside>
+
+            <!-- Article -->
+            <main class="wiki-article min-w-0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">架构设计</h1>
+                <p class="text-lg text-gray-600 mb-10">
+                    运行时模型、执行链路、调度与租约队列、数据模型、安全边界与 API 全景。
+                </p>
+
+                <h2 id="workspace">工作区结构</h2>
+                <p>整个项目是一个 Cargo workspace（resolver 3，Rust 2024 edition），默认成员是 <code>qdrust-server</code>：</p>
+                <pre><code>qdrust/
+├── crates/
+│   ├── qdrust-core/            # HAR 解析、编译、变量求值、HTTP 执行
+│   ├── qdrust-cli/             # 命令行校验与执行
+│   ├── qdrust-server/          # Axum API、认证、调度、运行管理
+│   └── qdrust-plugin-browser/  # chromiumoxide 无头浏览器插件
+├── webui/                      # Vue 3 + TypeScript + Vite
+├── migrations/                 # SQLite 迁移
+├── migrations-mysql/           # MySQL 迁移
+├── docs/                       # OpenAPI、模板 schema、各阶段设计文档
+└── tests/fixtures/             # 旧 QD HAR 兼容样本</code></pre>
+                <p>
+                    依赖方向是单向的：<code>server</code> 与 <code>cli</code> 都依赖 <code>core</code>，而 <code>core</code> 不依赖任何服务端概念。这意味着「解析并执行一个 HAR」这件事可以脱离 Web 服务独立存在——CLI 就是这条路线的产物。
+                </p>
+
+                <h2 id="runtime">运行时模型</h2>
+                <p>
+                    qdrust 采用<strong>单进程 Tokio 异步模型</strong>（<code>axum::serve</code>），而不是 QD 的 Tornado 多进程模型。这个选择带来几个直接后果：
+                </p>
+                <ul>
+                    <li><strong>横向扩展靠副本而非进程数</strong>：<code>docker compose up --scale qdrust=N</code> 加反向代理，而不是在单容器内 fork worker。</li>
+                    <li><strong>进程内共享状态</strong>：无头浏览器客户端（chromiumoxide）在 server 进程启动时创建一次并全局共享。DOM 状态因此可以在多次独立调用间存活，这是实现「多步页面交互 / 人工过验证码后继续」的前提。代价是进程重启即清空会话。</li>
+                    <li><strong>热重载与热更新</strong>：开发期用 <code>cargo watch -x run</code>；生产期由 <code>QDRUST_CONFIG_FILE</code> 与站点设置（admin API）提供运行时配置热更新，无需重启进程。</li>
+                </ul>
+
+                <h2 id="pipeline">一次运行的执行链路</h2>
+                <p>从调度器到 HTTP 请求落地，链路大致如下：</p>
+                <pre><code>scheduler (SCHEDULER_INTERVAL_SECONDS，默认 15s)
+   │  轮询到期任务
+   ▼
+run queue  ── claim_run / 租约 ──▶  运行记录 (runs + run_steps)
+   │
+   ▼
+executor ──▶ 渲染变量 (minijinja) ──▶ fetcher
+   │                                    │
+   │                                    ├── 普通 HTTP 请求
+   │                                    └── api:// 伪协议
+   │                                          ├── api://util/*      进程内计算
+   │                                          └── api://browser/*   远程 CDP
+   ▼
+extract_variables → 写入变量表 → 供后续步骤 {{var}} 引用
+   ▼
+success_asserts / failed_asserts → 判定成败
+   ▼
+通知渠道投递（10 种）· WebSocket 实时步骤流 · 运行日志</code></pre>
+                <p>
+                    关键点在于 <code>api://</code> 伪协议：当步骤 URL 以 <code>api://</code> 开头时，executor 不会发起真实 HTTP 请求，而是在进程内计算结果（<code>util</code>）或驱动浏览器（<code>browser</code>）。因此「取个时间戳」「算个 MD5」这类步骤不需要任何外部服务，也不产生网络出站。
+                </p>
+
+                <h2 id="scheduling">调度与运行队列</h2>
+                <p>
+                    调度器按 <code>SCHEDULER_INTERVAL_SECONDS</code>（默认 15 秒）轮询到期任务，因此<strong>触发精度受该间隔影响</strong>——需要更精确就调小这个值，代价是更频繁的数据库轮询。
+                </p>
+                <p>
+                    运行队列是<strong>非持久化本地队列</strong>，基于 SQLite 事务实现：
+                </p>
+                <ul>
+                    <li><code>claim_run</code> 以事务方式领取一条待执行运行，保证单实例下不会被重复领取；</li>
+                    <li>配合<strong>租约（lease）机制</strong>，实例崩溃或重启后未完成的运行会被重新认领，不会永久卡死；</li>
+                    <li>多实例共享同一个数据库时，同样由租约机制保证同一条运行不会被两个实例同时执行。</li>
+                </ul>
+                <div class="callout">
+                    <div class="callout-title">随机延迟</div>
+                    <p>可视化调度器支持「随机延迟」，让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。对于签到类任务，这是一个实用而非装饰性的功能。</p>
+                </div>
+
+                <h2 id="data-model">数据模型</h2>
+                <p>迁移脚本按阶段递增（forward-only），核心实体如下：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>分组</th><th>表</th><th>用途</th></tr></thead>
+                        <tbody>
+                            <tr><td rowspan="2">模板</td><td><code>templates</code></td><td>模板本体，保留原始 HAR JSON</td></tr>
+                            <tr><td><code>push_requests</code></td><td>公共模板发布审批</td></tr>
+                            <tr><td rowspan="2">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板仓库</td></tr>
+                            <tr><td><code>subscription_syncs</code></td><td>同步记录</td></tr>
+                            <tr><td rowspan="2">任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填</td></tr>
+                            <tr><td><code>task_groups</code></td><td>任务分组</td></tr>
+                            <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录与状态</td></tr>
+                            <tr><td><code>run_steps</code></td><td>步骤级请求 / 响应 / 提取变量</td></tr>
+                            <tr><td>租约</td><td><code>run_leases</code></td><td>运行租约，用于崩溃恢复与防重复执行</td></tr>
+                            <tr><td rowspan="4">认证</td><td><code>users</code></td><td>用户</td></tr>
+                            <tr><td><code>sessions</code></td><td>会话</td></tr>
+                            <tr><td><code>password_reset_tokens</code></td><td>重置密码令牌</td></tr>
+                            <tr><td><code>email_verification_tokens</code></td><td>邮箱验证令牌</td></tr>
+                            <tr><td rowspan="2">通知</td><td><code>notification_channels</code></td><td>通知渠道配置</td></tr>
+                            <tr><td><code>notification_actions</code></td><td>渠道与任务的绑定关系</td></tr>
+                            <tr><td rowspan="3">系统</td><td><code>plugins</code></td><td>外部插件二进制与能力声明</td></tr>
+                            <tr><td><code>site_settings</code></td><td>站点级运行配置</td></tr>
+                            <tr><td><code>audit_logs</code></td><td>审计日志</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    SQLite 与 MySQL 共用同一套实体定义，迁移脚本分别在 <code>migrations/</code> 与 <code>migrations-mysql/</code>，切换只取决于 <code>DATABASE_URL</code> 的 scheme。
+                </p>
+
+                <h2 id="security">安全模型</h2>
+                <ul>
+                    <li><strong>认证</strong>：开放注册、bootstrap 初始管理员、忘记/重置密码、可选邮箱验证（<code>REQUIRE_EMAIL_VERIFICATION</code>）。登录有独立限流（默认 5 次 / 60 秒）。</li>
+                    <li><strong>会话</strong>：<code>SESSION_TTL_SECONDS</code> 默认 7 天；<strong>CSRF 令牌轮换</strong>；HTTPS 下必须开启 <code>COOKIE_SECURE</code>。可选 Redis 会话缓存（仅加速，非必需）。</li>
+                    <li><strong>归属校验</strong>：所有用户资源（模板、任务、运行、通知渠道）均在服务端执行归属校验，而不是依赖前端过滤。</li>
+                    <li><strong>SSRF 防护</strong>：CLI 默认拒绝私网地址、localhost 与无效 TLS 证书——这是刻意区别于旧 QD 宽松策略的一点。服务端执行不受此限制。</li>
+                    <li><strong>模板沙箱</strong>：模板是声明式 JSON，<strong>不执行 Python 或任意代码</strong>。Template Schema v1 限制最多 1000 个静态步骤、16 层嵌套、单次 delay 最长 5 分钟；运行时另外限制请求数、循环次数、响应体大小与总时长。</li>
+                    <li><strong>插件能力声明</strong>：外部插件二进制需带 manifest，声明 <code>network</code> / <code>read_file</code> / <code>write_file</code> / <code>environment</code> 能力并做 API 版本校验，通过子进程 JSON 协议调用。</li>
+                </ul>
+
+                <h2 id="api">API 一览</h2>
+                <p>所有业务接口位于 <code>/api/v1</code> 下，完整契约见仓库内的 <code>docs/openapi-v1.json</code> 与运行时的 <code>/api/v1/openapi.json</code>。</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>分组</th><th>端点</th></tr></thead>
+                        <tbody>
+                            <tr><td>运维</td><td><code>GET /health</code> · <code>GET /ready</code> · <code>GET /api/v1/openapi.json</code></td></tr>
+                            <tr><td>认证</td><td><code>/api/v1/auth/bootstrap</code> · <code>/login</code> · <code>/logout</code> · <code>/register</code> · <code>/session</code></td></tr>
+                            <tr><td>模板</td><td><code>/api/v1/templates</code> · <code>/{id}</code> · <code>/import-qd-har</code> · <code>/validate-qd-har</code> · <code>/{id}/publish</code> · <code>/{id}/qd-har</code></td></tr>
+                            <tr><td>任务</td><td><code>/api/v1/tasks</code> · <code>/tasks/batch</code> · <code>/task-groups</code> · <code>/tasks/{id}/run</code></td></tr>
+                            <tr><td>运行</td><td><code>/api/v1/runs</code> · <code>/{id}</code> · <code>/{id}/cancel</code> · <code>/{id}/steps</code> · <code>/{id}/steps/live</code>（WebSocket）</td></tr>
+                            <tr><td>管理员</td><td><code>/api/v1/admin/users</code> · <code>/settings</code> · <code>/backup</code> · <code>/restore</code> · <code>/push-requests</code></td></tr>
+                            <tr><td>生态</td><td><code>/api/v1/plugins</code> · <code>/api/v1/public-templates</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="observability">可观测性与运维端点</h2>
+                <ul>
+                    <li><strong>步骤级回放</strong>：每次运行按步骤记录请求、响应与提取到的变量，可在运行记录里逐步查看。</li>
+                    <li><strong>QD 风格运行日志</strong>：文本化日志，便于直接阅读与检索。</li>
+                    <li><strong>WebSocket 实时流</strong>：<code>/api/v1/runs/{id}/steps/live</code> 推送活跃运行的步骤；订阅导入进度同样走 WebSocket。</li>
+                    <li><strong>探针</strong>：<code>/health</code> 与 <code>/ready</code> 供 Compose 健康检查与反向代理使用。</li>
+                    <li><strong>日志保留</strong>：<code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留）控制已完成运行记录的自动清理，系统每小时执行一次。</li>
+                </ul>
+
+                <h2 id="scaling">横向扩展的边界</h2>
+                <p>
+                    单进程模型不意味着只能单实例。多实例共享同一数据库时，运行队列的租约机制保证不重复执行；会话可由可选的 Redis 缓存加速。推荐形态是 Docker 副本 + 反向代理。
+                </p>
+                <p>
+                    但有两处状态是<strong>进程内、不跨实例共享</strong>的，扩展时需要留意：无头浏览器会话（存在 server 内存中）与运行时热更新配置（各实例需各自加载同一份 <code>QDRUST_CONFIG_FILE</code>）。
+                </p>
+
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-03</span>
+                </div>
+            </main>
+
+            <!-- On-page TOC -->
+            <aside class="wiki-toc">
+                <div class="wiki-toc-title">本页目录</div>
+                <nav id="toc"></nav>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="py-10 bg-gray-50 border-t border-gray-200">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
+            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p>
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+                <span class="text-gray-300 mx-2">·</span>
+                <a href="https://callmelins.github.io/" class="hover:text-gray-900">返回博客</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 从正文 h2/h3 生成本页目录，并跟随滚动高亮当前小节。
+        (function () {
+            var article = document.querySelector('.wiki-article');
+            var toc = document.getElementById('toc');
+            if (!article || !toc) return;
+
+            var headings = article.querySelectorAll('h2[id], h3[id]');
+            if (!headings.length) { toc.parentNode.style.display = 'none'; return; }
+
+            var links = [];
+            headings.forEach(function (heading) {
+                var link = document.createElement('a');
+                link.href = '#' + heading.id;
+                link.textContent = heading.textContent;
+                if (heading.tagName === 'H3') link.className = 'toc-h3';
+                toc.appendChild(link);
+                links.push(link);
+                heading.setAttribute('data-toc-id', heading.id);
+            });
+
+            var onScroll = function () {
+                var current = null;
+                headings.forEach(function (heading) {
+                    if (heading.getBoundingClientRect().top <= 120) current = heading.id;
+                });
+                if (!current && headings.length) current = headings[0].id;
+                links.forEach(function (link) {
+                    link.classList.toggle('is-current', link.getAttribute('href') === '#' + current);
+                });
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // 移动端侧边目录开关
+        (function () {
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('sidebar');
+            if (!toggle || !sidebar) return;
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('is-open');
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="qdrust —— 用 Rust + Vue 3 重写的 QD 兼容 HTTP 定时任务自动执行框架。本页为项目 Wiki 总览：定位、核心特性、与 QD 的关系、项目组成与快速上手。">
+    <title>总览 | qdrust Wiki</title>
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition { transition: all 0.2s ease; }
+
+        /* ---------- Wiki layout ---------- */
+        .wiki-shell { max-width: 1240px; margin: 0 auto; }
+        .wiki-grid { display: grid; grid-template-columns: 232px minmax(0, 1fr) 208px; gap: 40px; align-items: start; }
+        @media (max-width: 1100px) { .wiki-grid { grid-template-columns: 220px minmax(0, 1fr); } .wiki-toc { display: none; } }
+        @media (max-width: 860px) { .wiki-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+        .wiki-sidebar {
+            position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto;
+            padding-right: 8px;
+        }
+        @media (max-width: 860px) {
+            .wiki-sidebar {
+                position: static; max-height: none; overflow: visible; display: none;
+                border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 24px;
+            }
+            .wiki-sidebar.is-open { display: block; }
+        }
+        .wiki-nav-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            color: #9ca3af; margin: 20px 0 8px; padding-left: 10px;
+        }
+        .wiki-nav-title:first-child { margin-top: 0; }
+        .wiki-nav-link {
+            display: block; padding: 6px 10px; border-radius: 6px; font-size: 14px;
+            color: #4b5563; text-decoration: none; margin-bottom: 2px;
+        }
+        .wiki-nav-link:hover { background: #f3f4f6; color: #111827; }
+        .wiki-nav-link.is-active { background: #f3f4f6; color: #111827; font-weight: 600; }
+
+        .wiki-toc { position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto; }
+        .wiki-toc-title { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
+        .wiki-toc a {
+            display: block; font-size: 13px; color: #6b7280; text-decoration: none;
+            padding: 4px 0 4px 10px; border-left: 2px solid #e5e7eb; line-height: 1.5;
+        }
+        .wiki-toc a:hover { color: #111827; border-left-color: #9ca3af; }
+        .wiki-toc a.toc-h3 { padding-left: 22px; font-size: 12.5px; }
+        .wiki-toc a.is-current { color: #111827; border-left-color: #111827; font-weight: 500; }
+
+        /* ---------- Article typography ---------- */
+        .wiki-article { font-size: 15px; line-height: 1.85; color: #374151; }
+        .wiki-article h2 {
+            font-size: 24px; font-weight: 700; color: #111827; margin: 48px 0 16px;
+            padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; scroll-margin-top: 96px;
+        }
+        .wiki-article h2:first-child { margin-top: 0; }
+        .wiki-article h3 { font-size: 17px; font-weight: 600; color: #111827; margin: 32px 0 12px; scroll-margin-top: 96px; }
+        .wiki-article h4 { font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px; }
+        .wiki-article p { margin: 0 0 16px; }
+        .wiki-article ul, .wiki-article ol { margin: 0 0 16px; padding-left: 22px; }
+        .wiki-article ul { list-style: disc; }
+        .wiki-article ol { list-style: decimal; }
+        .wiki-article li { margin-bottom: 6px; }
+        .wiki-article strong { color: #111827; font-weight: 600; }
+        .wiki-article a { color: #111827; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: #d1d5db; }
+        .wiki-article a:hover { text-decoration-color: #111827; }
+        .wiki-article code:not(pre code) {
+            background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px;
+            padding: 1px 5px; font-size: 13px; color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-word;
+        }
+        .wiki-article pre {
+            background: #111827; color: #e5e7eb; border-radius: 10px; padding: 16px 18px;
+            overflow-x: auto; font-size: 13px; line-height: 1.7; margin: 0 0 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        .wiki-article pre code { white-space: pre; }
+        .wiki-article blockquote {
+            border-left: 3px solid #d1d5db; padding: 4px 0 4px 16px; margin: 0 0 20px; color: #4b5563;
+        }
+        .wiki-article table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; display: block; overflow-x: auto; }
+        .wiki-article thead { white-space: nowrap; }
+        .wiki-article th {
+            text-align: left; font-weight: 600; color: #111827; background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb; padding: 9px 12px;
+        }
+        .wiki-article td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .wiki-article tbody tr:hover { background: #fafafa; }
+
+        .callout {
+            border: 1px solid #e5e7eb; border-left: 3px solid #111827; background: #fafafa;
+            border-radius: 8px; padding: 14px 18px; margin: 0 0 20px; font-size: 14px;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout-title { font-weight: 600; color: #111827; margin-bottom: 6px; font-size: 13.5px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+        .wiki-card {
+            border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff;
+            display: block; text-decoration: none; color: inherit;
+        }
+        .wiki-card:hover { border-color: #9ca3af; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+        .wiki-card h4 { margin: 0 0 6px; font-size: 15px; }
+        .wiki-card p { margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.65; }
+
+        .badge {
+            display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px;
+            background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; margin-right: 6px;
+        }
+        .badge-dark { background: #111827; color: #fff; border-color: #111827; }
+
+        .wiki-meta {
+            margin-top: 56px; padding-top: 20px; border-top: 1px solid #e5e7eb;
+            font-size: 13px; color: #9ca3af; display: flex; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Top bar -->
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="wiki-shell px-6 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    </button>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
+                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
+                    </a>
+                    <span class="text-xs text-gray-300 hidden sm:inline">/</span>
+                    <a href="https://callmelins.github.io/" class="text-xs text-gray-500 hover:text-gray-900 smooth-transition hidden sm:inline">返回博客</a>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="wiki-shell px-6 pt-28 pb-20">
+        <div class="wiki-grid">
+            <!-- Sidebar -->
+            <aside class="wiki-sidebar" id="sidebar">
+                <div class="wiki-nav-title">入门</div>
+                <a href="index.html" class="wiki-nav-link is-active">总览</a>
+                <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
+
+                <div class="wiki-nav-title">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
+
+                <div class="wiki-nav-title">进阶</div>
+                <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
+
+                <div class="wiki-nav-title">帮助</div>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
+
+                <div class="wiki-nav-title">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
+            </aside>
+
+            <!-- Article -->
+            <main class="wiki-article min-w-0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">qdrust</h1>
+                <p class="text-lg text-gray-600 mb-6">
+                    用 Rust + Vue 3 重写的 <strong>QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
+                </p>
+                <div class="mb-10">
+                    <span class="badge badge-dark">v0.1.4</span>
+                    <span class="badge">Rust 2024 · 1.85+</span>
+                    <span class="badge">MIT</span>
+                    <span class="badge">linux / amd64 / arm64</span>
+                </div>
+
+                <h2 id="what">它是什么</h2>
+                <p>
+                    qdrust 按 <a href="https://github.com/qd-today/qd" target="_blank">QD</a>（HTTP 请求定时任务自动执行框架）的路线重新设计，是一份<strong>独立的 Rust 实现</strong>：解析并执行旧 QD 的 HAR 模板，提供命令行工具、REST API、定时调度与 WebUI。
+                </p>
+                <p>
+                    一句话概括它的工作：<strong>把浏览器里抓到的 HTTP 请求（HAR）存成模板，按 cron 或固定间隔自动重放执行。</strong>典型用途是签到、监控、API 轮询这类需要周期性触发的 HTTP 任务；执行结果可通过 10 种渠道推送通知。
+                </p>
+
+                <h2 id="why">解决什么问题</h2>
+                <p>如果你曾经为了「每天自动签到」而写过脚本，大概率遇到过这些事：</p>
+                <ul>
+                    <li>抓包、抠 Cookie、处理签名参数，一次性的活儿却要写成长期维护的脚本；</li>
+                    <li>脚本散落在各处，没有统一的调度、日志和失败告警；</li>
+                    <li>站点改版后签名逻辑变了，纯 HTTP 请求跑不通，又不想为一个步骤引入整套爬虫框架。</li>
+                </ul>
+                <p>
+                    qdrust 的做法是把「请求」本身当成资产来管理：HAR 是标准格式，浏览器抓完直接导入；模板可变、可分组、可复用；调度、运行日志、步骤级回放和通知由服务端统一负责。而那些纯 HTTP 做不了的一步（JS 生成签名、验证码、多步表单），交给可选的 <code>api://browser/*</code> 无头浏览器插件补齐，其余步骤仍走普通 HTTP——这是刻意保持的最小设计。
+                </p>
+
+                <h2 id="features">核心特性</h2>
+                <ul>
+                    <li><strong>旧 QD HAR 兼容</strong>：导入、校验、保留原始 HAR JSON，并重放执行。兼容样本位于 <code>tests/fixtures</code>。</li>
+                    <li><strong>可视化 HAR 编辑器</strong>：在 WebUI 里直接编辑请求、变量与断言，无需手写 JSON。</li>
+                    <li><strong>双后端数据库</strong>：SQLite（开箱即用）与 MySQL（按 <code>DATABASE_URL</code> 自动选择）。</li>
+                    <li><strong>完整通知体系</strong>：Webhook + Email + 8 种推送渠道，共 <strong>10 种</strong>。</li>
+                    <li><strong>模板表达式</strong>：minijinja 驱动的 Jinja2 语法，37 个全局函数与 51 个过滤器，外加 <code>api://util/*</code> 内置工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / OCR）。</li>
+                    <li><strong>无头浏览器插件</strong>（可选）：<code>api://browser/*</code> 通过 CDP 驱动远程无头浏览器，支持跨步骤存活的会话复用与 <code>type</code> / <code>click</code> DOM 操作。</li>
+                    <li><strong>任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。</li>
+                    <li><strong>运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流。</li>
+                    <li><strong>安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验。</li>
+                    <li><strong>运维友好</strong>：Docker 镜像（amd64 / arm64）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。</li>
+                </ul>
+
+                <h2 id="vs-qd">与 QD 的关系</h2>
+                <p>
+                    qdrust 是<strong>独立、干净重写的 Rust 实现</strong>：不继承 QD 的代码、不导入其数据库、不复用其 Cookie，仅对齐核心 HAR 兼容契约与 <code>api://util</code> 工具语义。
+                </p>
+
+                <h3 id="compat">兼容范围</h3>
+                <ul>
+                    <li><strong>兼容</strong>：旧 QD 的 HAR 模板（这是核心兼容契约）、<code>api://util/*</code> 工具语义、Jinja2 表达式写法。</li>
+                    <li><strong>不兼容</strong>：旧 QD 数据库、旧登录 Cookie、旧 URL / 旧 API、任意 Python 动态表达式。</li>
+                </ul>
+
+                <h3 id="diffs">两处刻意差异</h3>
+                <ul>
+                    <li><strong>单进程异步模型</strong>：采用 <code>axum::serve</code> + Tokio，而非 Tornado 多进程；横向扩展靠 Docker 副本 + 反向代理。</li>
+                    <li><strong>非持久化本地队列</strong>：基于 SQLite 事务（<code>claim_run</code> + 租约恢复），保证单实例正确性与多实例不重复执行。</li>
+                </ul>
+
+                <h2 id="components">项目组成</h2>
+                <p>仓库是一个 Cargo workspace，加上一个独立的前端工程：</p>
+
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>组件</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>crates/qdrust-core</code></td><td>旧 QD HAR 解析、编译、变量求值与 HTTP 执行核心。</td></tr>
+                            <tr><td><code>crates/qdrust-cli</code></td><td>无需启动服务即可校验和执行 HAR。</td></tr>
+                            <tr><td><code>crates/qdrust-server</code></td><td>基于 Axum、SQLx 与 SQLite/MySQL 的 API、认证、调度与运行管理。</td></tr>
+                            <tr><td><code>crates/qdrust-plugin-browser</code></td><td>基于 chromiumoxide 的无头浏览器插件实现。</td></tr>
+                            <tr><td><code>webui</code></td><td>基于 Vue 3、TypeScript 与 Vite 的 Web 界面。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、模板（搜索/分组/分页、可视化 HAR 编辑器、公共发布审批 PushRequest、订阅仓库自动导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填）、运行记录与步骤、WebSocket 实时步骤流、租约恢复、插件系统、10 种通知渠道、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI。
+                </p>
+
+                <h2 id="quickstart">30 秒跑起来</h2>
+                <p>镜像已发布到 GitHub 容器注册表，直接拉取运行即可，无需本地构建：</p>
+                <pre><code># 最简启动：数据保存在命名卷 qdrust-data，监听 8923 端口
+docker run -d --name qdrust -p 8923:8923 \
+  -v qdrust-data:/data \
+  ghcr.io/callmelins/qdrust:latest</code></pre>
+                <p>然后访问 <code>http://localhost:8923/</code>，首次打开会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code>data/qd.db</code>。</p>
+
+                <div class="callout">
+                    <div class="callout-title">HTTPS 部署请注意</div>
+                    <p>走 HTTPS 反向代理后，必须把 <code>COOKIE_SECURE</code> 设为 <code>true</code>，否则安全 Cookie 不会被浏览器接受，表现为登录会话不生效 / 反复被登出。</p>
+                </div>
+
+                <h2 id="next">下一步</h2>
+                <div class="card-grid">
+                    <a href="deploy.html" class="wiki-card">
+                        <h4>部署与运维 →</h4>
+                        <p>Compose 生产配置、环境变量全表、数据库选型、备份与升级回滚。</p>
+                    </a>
+                    <a href="architecture.html" class="wiki-card">
+                        <h4>架构设计 →</h4>
+                        <p>运行时模型、执行链路、调度与租约队列、数据模型、安全策略与 API 一览。</p>
+                    </a>
+                    <a href="templates.html" class="wiki-card">
+                        <h4>模板与表达式 →</h4>
+                        <p>HAR 兼容契约、Template Schema v1、变量与断言、函数/过滤器、<code>api://util/*</code> 工具。</p>
+                    </a>
+                    <a href="browser.html" class="wiki-card">
+                        <h4>浏览器插件 →</h4>
+                        <p>纯 HTTP 跑不通时，如何用无头浏览器补齐签名、验证码与多步表单交互。</p>
+                    </a>
+                </div>
+
+                <h2 id="status">项目状态</h2>
+                <p>
+                    Phase 0–8 代码与容器已实现完成（Phase 8 状态为 <em>Implementation Complete</em>）：Docker 构建与非 root 运行、health/ready 探针、Compose 健康检查、SQLite 备份恢复脚本、amd64/arm64 多架构与 SBOM 流水线均已落地。发布前仍待完成的是浏览器主要工作流的人工验收与首个镜像的发布检查——这两项需要真实运行环境，项目选择不在未运行时标记为通过。
+                </p>
+
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-03</span>
+                </div>
+            </main>
+
+            <!-- On-page TOC -->
+            <aside class="wiki-toc">
+                <div class="wiki-toc-title">本页目录</div>
+                <nav id="toc"></nav>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="py-10 bg-gray-50 border-t border-gray-200">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
+            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p>
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+                <span class="text-gray-300 mx-2">·</span>
+                <a href="https://callmelins.github.io/" class="hover:text-gray-900">返回博客</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 从正文 h2/h3 生成本页目录，并跟随滚动高亮当前小节。
+        (function () {
+            var article = document.querySelector('.wiki-article');
+            var toc = document.getElementById('toc');
+            if (!article || !toc) return;
+
+            var headings = article.querySelectorAll('h2[id], h3[id]');
+            if (!headings.length) { toc.parentNode.style.display = 'none'; return; }
+
+            var links = [];
+            headings.forEach(function (heading) {
+                var link = document.createElement('a');
+                link.href = '#' + heading.id;
+                link.textContent = heading.textContent;
+                if (heading.tagName === 'H3') link.className = 'toc-h3';
+                toc.appendChild(link);
+                links.push(link);
+                heading.setAttribute('data-toc-id', heading.id);
+            });
+
+            var onScroll = function () {
+                var current = null;
+                headings.forEach(function (heading) {
+                    if (heading.getBoundingClientRect().top <= 120) current = heading.id;
+                });
+                if (!current && headings.length) current = headings[0].id;
+                links.forEach(function (link) {
+                    link.classList.toggle('is-current', link.getAttribute('href') === '#' + current);
+                });
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // 移动端侧边目录开关
+        (function () {
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('sidebar');
+            if (!toggle || !sidebar) return;
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('is-open');
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -11,7 +11,8 @@ See see yours —— 兴趣使然的无名小站。平时写些技术随笔与�
 
 ## 项目
 
-- **BaYin** —— 轻量音乐播放器，支持本地曲库播放，对接云端音乐资源。[访问](https://callmelins.github.io/bayin)
+- **BaYin** —— 轻量音乐播放器，支持本地曲库播放，对接云端音乐资源。[访问](https://callmelins.github.io/pages/bayin)
+- **qdrust** —— 用 Rust + Vue 3 重写的 QD 兼容 HTTP 定时任务框架，基于 HAR 模板与 Axum 服务。[访问](https://callmelins.github.io/pages/qdrust)
 - **pi-switch** —— A cross-platform CLI All-in-One assistant tool for Pi Agent。[GitHub](https://github.com/CallmeLins/pi-switch)
 
 ## 站点导航
