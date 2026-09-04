@@ -13,6 +13,7 @@ public/pages/qdrust/
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、util 工具
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
 ├── deploy.html         # 部署与运维：Docker / Compose、环境变量、数据库、通知渠道、备份回滚
+├── api.html            # API 接口：76 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
 ├── faq.html            # 常见问题
 └── README.md           # 本文档
 ```
@@ -41,7 +42,7 @@ npm run build
 
 ## 🛠 维护说明
 
-各页面**互相独立**、互不依赖，可单独打开预览。页面之间只共享同一份头部样式与侧边栏 HTML——修改导航或配色时需要同步改动所有 6 个文件。
+各页面**互相独立**、互不依赖，可单独打开预览。页面之间只共享同一份头部样式与侧边栏 HTML——修改导航或配色时需要同步改动所有 7 个文件。
 
 内容来源与对应关系：
 
@@ -52,9 +53,31 @@ npm run build
 | 模板与表达式 | `README.md` + `docs/template-schema-v1.md` + `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
 | 浏览器插件 | `README.md` 浏览器插件章节 + `crates/qdrust-plugin-browser/src/` |
 | 部署与运维 | `README.md` 部署 / 更新章节 + `.env.example` + `compose.yaml` |
+| API 接口 | `docs/openapi-v1.json` + `crates/qdrust-server/src/api.rs` 路由注册 + `docs/api-error-codes.md` |
 | 常见问题 | `README.md` 的 FAQ 章节 |
 
 > 表达式的函数 / 过滤器清单、`api://util/*` 工具清单、浏览器 action 清单均从源码核对得出，与 README 的概述性表述可能有出入时以源码为准。
+
+### API 页面的更新方式
+
+`api.html` 由脚本生成，**不要手改 HTML**——下次 qdrust 升级时会重新生成，手改内容会被覆盖：
+
+```bash
+# 默认读取 C:/UserData/WorkSpace/Learn/qdrust
+python scripts/gen-qdrust-api.py
+
+# 或指定仓库路径
+python scripts/gen-qdrust-api.py --qdrust D:/code/qdrust
+```
+
+脚本合并两份数据源，因为单看任一份都不完整：
+
+1. `crates/qdrust-server/src/api.rs` 的 `Router::new()` 路由注册 —— 给出「路径 + 方法 + handler」，并通过扫描 handler 函数体判断鉴权级别（调 `require_admin` 为管理员、调 `require_session` 为需登录、都没有则公开）。**OpenAPI 文档没有 security 描述，权限只能从源码拿。**
+2. `docs/openapi-v1.json` —— 给出参数、请求体、响应与 `components.schemas`。
+
+脚本会自动补两份数据的缺口并打印提示：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，也漏收了 `DELETE /api/v1/admin/users/{id}`。
+
+新增端点时只需在脚本的 `DESC` 字典补一条中文说明，`GROUPS` 列表调整分组规则，其余全部随源码自动更新。
 
 ## 🔗 相关链接
 

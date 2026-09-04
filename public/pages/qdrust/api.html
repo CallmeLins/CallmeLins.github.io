@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="qdrust 完整 REST API 参考：76 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
+    <title>API 接口 | qdrust Wiki</title>
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/api.html">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+        .smooth-transition { transition: all 0.2s ease; }
+
+        /* ---------- Wiki layout ---------- */
+        .wiki-shell { max-width: 1240px; margin: 0 auto; }
+        .wiki-grid { display: grid; grid-template-columns: 232px minmax(0, 1fr) 208px; gap: 40px; align-items: start; }
+        @media (max-width: 1100px) { .wiki-grid { grid-template-columns: 220px minmax(0, 1fr); } .wiki-toc { display: none; } }
+        @media (max-width: 860px) { .wiki-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+        .wiki-sidebar {
+            position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto;
+            padding-right: 8px;
+        }
+        @media (max-width: 860px) {
+            .wiki-sidebar {
+                position: static; max-height: none; overflow: visible; display: none;
+                border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 24px;
+            }
+            .wiki-sidebar.is-open { display: block; }
+        }
+        .wiki-nav-title {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            color: #9ca3af; margin: 20px 0 8px; padding-left: 10px;
+        }
+        .wiki-nav-title:first-child { margin-top: 0; }
+        .wiki-nav-link {
+            display: block; padding: 6px 10px; border-radius: 6px; font-size: 14px;
+            color: #4b5563; text-decoration: none; margin-bottom: 2px;
+        }
+        .wiki-nav-link:hover { background: #f3f4f6; color: #111827; }
+        .wiki-nav-link.is-active { background: #f3f4f6; color: #111827; font-weight: 600; }
+
+        .wiki-toc { position: sticky; top: 88px; max-height: calc(100vh - 112px); overflow-y: auto; }
+        .wiki-toc-title { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
+        .wiki-toc a {
+            display: block; font-size: 13px; color: #6b7280; text-decoration: none;
+            padding: 4px 0 4px 10px; border-left: 2px solid #e5e7eb; line-height: 1.5;
+        }
+        .wiki-toc a:hover { color: #111827; border-left-color: #9ca3af; }
+        .wiki-toc a.toc-h3 { padding-left: 22px; font-size: 12.5px; }
+        .wiki-toc a.is-current { color: #111827; border-left-color: #111827; font-weight: 500; }
+
+        /* ---------- Article typography ---------- */
+        .wiki-article { font-size: 15px; line-height: 1.85; color: #374151; }
+        .wiki-article h2 {
+            font-size: 24px; font-weight: 700; color: #111827; margin: 48px 0 16px;
+            padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; scroll-margin-top: 96px;
+        }
+        .wiki-article h2:first-child { margin-top: 0; }
+        .wiki-article h3 { font-size: 17px; font-weight: 600; color: #111827; margin: 32px 0 12px; scroll-margin-top: 96px; }
+        .wiki-article h4 { font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px; }
+        .wiki-article p { margin: 0 0 16px; }
+        .wiki-article ul, .wiki-article ol { margin: 0 0 16px; padding-left: 22px; }
+        .wiki-article ul { list-style: disc; }
+        .wiki-article ol { list-style: decimal; }
+        .wiki-article li { margin-bottom: 6px; }
+        .wiki-article strong { color: #111827; font-weight: 600; }
+        .wiki-article a { color: #111827; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: #d1d5db; }
+        .wiki-article a:hover { text-decoration-color: #111827; }
+        .wiki-article code:not(pre code) {
+            background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px;
+            padding: 1px 5px; font-size: 13px; color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-word;
+        }
+        .wiki-article pre {
+            background: #111827; color: #e5e7eb; border-radius: 10px; padding: 16px 18px;
+            overflow-x: auto; font-size: 13px; line-height: 1.7; margin: 0 0 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        .wiki-article pre code { white-space: pre; }
+        .wiki-article blockquote {
+            border-left: 3px solid #d1d5db; padding: 4px 0 4px 16px; margin: 0 0 20px; color: #4b5563;
+        }
+        .wiki-article table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; display: block; overflow-x: auto; }
+        .wiki-article thead { white-space: nowrap; }
+        .wiki-article th {
+            text-align: left; font-weight: 600; color: #111827; background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb; padding: 9px 12px;
+        }
+        .wiki-article td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .wiki-article tbody tr:hover { background: #fafafa; }
+
+        .callout {
+            border: 1px solid #e5e7eb; border-left: 3px solid #111827; background: #fafafa;
+            border-radius: 8px; padding: 14px 18px; margin: 0 0 20px; font-size: 14px;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout-title { font-weight: 600; color: #111827; margin-bottom: 6px; font-size: 13.5px; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+        .wiki-card {
+            border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff;
+            display: block; text-decoration: none; color: inherit;
+        }
+        .wiki-card:hover { border-color: #9ca3af; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+        .wiki-card h4 { margin: 0 0 6px; font-size: 15px; }
+        .wiki-card p { margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.65; }
+
+        .badge {
+            display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px;
+            background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; margin-right: 6px;
+        }
+        .badge-dark { background: #111827; color: #fff; border-color: #111827; }
+
+        .perm { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 5px; white-space: nowrap; font-weight: 500; }
+        .perm-public { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+        .perm-user { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .perm-admin { background: #111827; color: #fff; border: 1px solid #111827; }
+        .wiki-article code.m-get { color: #1d4ed8; }
+        .wiki-article code.m-post { color: #15803d; }
+        .wiki-article code.m-put { color: #b45309; }
+        .wiki-article code.m-del { color: #b91c1c; }
+        .wiki-article code.m-patch { color: #7c3aed; }
+
+        .wiki-meta {
+            margin-top: 56px; padding-top: 20px; border-top: 1px solid #e5e7eb;
+            font-size: 13px; color: #9ca3af; display: flex; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Top bar -->
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="wiki-shell px-6 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    </button>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
+                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
+                    </a>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="wiki-shell px-6 pt-28 pb-20">
+        <div class="wiki-grid">
+            <!-- Sidebar -->
+            <aside class="wiki-sidebar" id="sidebar">
+                <div class="wiki-nav-title">入门</div>
+                <a href="index.html" class="wiki-nav-link">总览</a>
+                <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
+
+                <div class="wiki-nav-title">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
+
+                <div class="wiki-nav-title">进阶</div>
+                <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
+
+                <div class="wiki-nav-title">参考</div>
+                <a href="api.html" class="wiki-nav-link is-active">API 接口</a>
+
+                <div class="wiki-nav-title">帮助</div>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
+
+                <div class="wiki-nav-title">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
+            </aside>
+
+            <!-- Article -->
+            <main class="wiki-article min-w-0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
+                <p class="text-lg text-gray-600 mb-6">
+                    qdrust 服务端的完整 REST 契约：<strong>76 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
+                </p>
+                <div class="mb-10">
+                    <span class="badge badge-dark">v0.1.4</span>
+                    <span class="badge">REST · JSON</span>
+                    <span class="badge">OpenAPI 3.1</span>
+                    <span class="badge">Cookie + CSRF</span>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">机器可读版本</div>
+                    <p>
+                        服务内嵌了同一份契约的 OpenAPI 3.1 文档，运行时可直接取用：<code>GET /api/v1/openapi.json</code>。
+                        把它丢进 Swagger UI 或导入 Postman 即可获得可交互的接口调试台。本页内容由该文档与 <code>crates/qdrust-server/src/api.rs</code> 共同核对生成。
+                    </p>
+                </div>
+
+                <h2 id="overview">概览</h2>
+                <p>
+                    所有业务接口挂在 <code>/api/v1</code> 下，请求与响应一律 <code>application/json</code>。
+                    非 <code>/api</code> 前缀的路径由前端静态资源兜底，因此拼错接口会先命中 SPA 的 <code>index.html</code>——只有带 <code>/api</code> 前缀却不存在时，才返回统一的 404 信封。
+                </p>
+                    <table>
+                        <thead><tr><th>资源</th><th>端点数</th><th>公开</th><th>需登录</th><th>需管理员</th></tr></thead>
+                        <tbody>
+                            <tr><td><a href="#ep-system">系统与监控</a></td><td>3</td><td>3</td><td>0</td><td>0</td></tr>
+                            <tr><td><a href="#ep-auth">认证与会话</a></td><td>11</td><td>6</td><td>5</td><td>0</td></tr>
+                            <tr><td><a href="#ep-templates">模板</a></td><td>10</td><td>1</td><td>9</td><td>0</td></tr>
+                            <tr><td><a href="#ep-tasks">任务</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
+                            <tr><td><a href="#ep-runs">运行记录</a></td><td>5</td><td>0</td><td>5</td><td>0</td></tr>
+                            <tr><td><a href="#ep-subscriptions">模板订阅</a></td><td>8</td><td>0</td><td>8</td><td>0</td></tr>
+                            <tr><td><a href="#ep-notifications">通知渠道与绑定</a></td><td>8</td><td>0</td><td>8</td><td>0</td></tr>
+                            <tr><td><a href="#ep-public">公共模板与发布申请</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
+                            <tr><td><a href="#ep-plugins">外部插件</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
+                            <tr><td><a href="#ep-admin">管理员</a></td><td>11</td><td>0</td><td>0</td><td>11</td></tr>
+                            <tr><td><strong>合计</strong></td><td><strong>76</strong></td><td><strong>10</strong></td><td><strong>55</strong></td><td><strong>11</strong></td></tr>
+                        </tbody>
+                    </table>
+
+                <h2 id="auth">认证与会话</h2>
+                <p>
+                    认证走 <strong>Cookie</strong>，不使用 Bearer Token。登录成功后服务端下发两个 Cookie：
+                </p>
+                    <table>
+                        <thead><tr><th>Cookie</th><th>属性</th><th>作用</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>qd_session</code></td><td><code>HttpOnly</code> · <code>SameSite=Strict</code></td><td>会话令牌，前端脚本读不到，服务端只存其 SHA-256</td></tr>
+                            <tr><td><code>qd_csrf</code></td><td><code>SameSite=Strict</code></td><td>CSRF 令牌，前端可读，需回写到请求头</td></tr>
+                        </tbody>
+                    </table>
+                <p>
+                    <strong>写操作需带 CSRF 头</strong>：<code>POST</code> / <code>PUT</code> / <code>PATCH</code> / <code>DELETE</code> 必须携带
+                    <code>x-csrf-token</code>，其值与 <code>qd_csrf</code> Cookie 完全一致。服务端会做两件事——比对 Cookie 与头是否相同，再校验其哈希是否与会话中记录的相符，任一不符即 <code>403 csrf_validation_failed</code>。比对用常量时间，不泄漏时序信息。
+                </p>
+                <pre><code># 浏览器里取出 CSRF Cookie 并回写
+curl -X POST http://localhost:5000/api/v1/tasks \
+  -b "qd_session=$SESSION; qd_csrf=$CSRF" \
+  -H "x-csrf-token: $CSRF" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"签到","cron":"0 9 * * *","url":"https://example.com"}'</code></pre>
+
+                <h3 id="auth-levels">三种权限级别</h3>
+                    <table>
+                        <thead><tr><th>级别</th><th>数量</th><th>判定方式</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="perm perm-public">公开</span></td><td>10</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
+                            <tr><td><span class="perm perm-user">登录</span></td><td>55</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
+                            <tr><td><span class="perm perm-admin">管理员</span></td><td>11</td><td>在会话有效的基础上再要求 <code>role == "admin"</code>，否则 <code>403 admin_required</code></td></tr>
+                        </tbody>
+                    </table>
+
+                <h2 id="conventions">通用约定</h2>
+
+                <h3 id="error-envelope">错误信封</h3>
+                <p>
+                    所有非 2xx 响应结构一致。<strong><code>code</code> 是稳定的错误键</strong>，前端据此做本地化，<code>message</code> 只是英文兜底文案；
+                    <code>field_errors</code> 给出逐字段的校验失败原因；<code>request_id</code> 用于对照服务端日志。内部异常细节只写日志，不出现在响应里。
+                </p>
+                <pre><code>{
+  "code": "validation_error",
+  "message": "cron expression is invalid",
+  "field_errors": { "cron": ["must be a valid cron expression"] },
+  "request_id": "7f3c1e9a2b8d4f6e"
+}</code></pre>
+                    <table>
+                        <thead><tr><th>Code</th><th>状态</th><th>含义</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>api_endpoint_not_found</code></td><td>404</td><td><code>/api</code> 下无此路由</td></tr>
+                            <tr><td><code>task_not_found</code></td><td>404</td><td>任务不存在</td></tr>
+                            <tr><td><code>run_not_found</code></td><td>404</td><td>运行不存在，或不属于当前用户</td></tr>
+                            <tr><td><code>template_not_found</code></td><td>404</td><td>模板不存在</td></tr>
+                            <tr><td><code>validation_error</code></td><td>422</td><td>请求体或领域校验失败，看 <code>field_errors</code></td></tr>
+                            <tr><td><code>authentication_required</code></td><td>401</td><td>会话缺失、过期、被吊销或账号已禁用</td></tr>
+                            <tr><td><code>invalid_credentials</code></td><td>401</td><td>用户名或密码不对</td></tr>
+                            <tr><td><code>csrf_validation_failed</code></td><td>403</td><td>CSRF 三元组（Cookie / 头 / 会话哈希）校验失败</td></tr>
+                            <tr><td><code>admin_required</code></td><td>403</td><td>需要管理员角色</td></tr>
+                            <tr><td><code>bootstrap_already_completed</code></td><td>409</td><td>首个管理员已存在，不可重复初始化</td></tr>
+                            <tr><td><code>login_rate_limited</code></td><td>429</td><td>该用户名登录失败过多，暂时限流</td></tr>
+                            <tr><td><code>internal_error</code></td><td>500</td><td>未预期的内部错误</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="pagination">分页与限流</h3>
+                <p>
+                    列表接口用<strong>游标分页</strong>而非 offset：<code>limit</code> 默认 50、上限 200，响应回 <code>next_cursor</code>，为 <code>null</code> 即末页。
+                    这样在频繁写入的场景下翻页不会漏项或重复。
+                </p>
+                <p>
+                    登录接口单独限流：同一用户名在窗口内失败超过阈值即返回 <code>429 login_rate_limited</code>，成功一次即清零。
+                    阈值与窗口由启动参数配置，目的是挡住针对固定用户名的暴力枚举。
+                </p>
+
+                <h2 id="endpoints">接口一览</h2>
+                <p>
+                    下表按资源分组列出全部 76 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
+                    路径参数写作 <code>{id}</code>。
+                </p>
+
+                <h3 id="ep-system">系统与监控 <span class="count">3</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/openapi.json</code></td><td><span class="perm perm-public">公开</span></td><td>内嵌的 OpenAPI 3.1 文档，可直接喂给 Swagger UI</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/health</code></td><td><span class="perm perm-public">公开</span></td><td>存活探针，固定返回服务标识，不检查依赖</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/ready</code></td><td><span class="perm perm-public">公开</span></td><td>就绪探针，额外检查数据库连通性</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-auth">认证与会话 <span class="count">11</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/bootstrap</code></td><td><span class="perm perm-public">公开</span></td><td>创建首个管理员账号；已有用户时返回 409，整个生命周期只能成功一次</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/csrf/rotate</code></td><td><span class="perm perm-user">登录</span></td><td>轮换 CSRF 令牌，返回新的 <code>qd_csrf</code></td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/forgot-password</code></td><td><span class="perm perm-public">公开</span></td><td>申请密码重置，向邮箱发送令牌</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/login</code></td><td><span class="perm perm-public">公开</span></td><td>登录并下发会话 Cookie；失败会计入限流窗口</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/logout</code></td><td><span class="perm perm-user">登录</span></td><td>注销当前会话并清除 Cookie</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/password</code></td><td><span class="perm perm-user">登录</span></td><td>修改当前用户密码（需校验旧密码）</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/register</code></td><td><span class="perm perm-public">公开</span></td><td>注册普通用户；首个用户请改用 bootstrap</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/resend-verification</code></td><td><span class="perm perm-user">登录</span></td><td>重发邮箱验证邮件</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/reset-password</code></td><td><span class="perm perm-public">公开</span></td><td>凭重置令牌设置新密码</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/auth/session</code></td><td><span class="perm perm-user">登录</span></td><td>获取当前登录用户、角色与邮箱验证状态</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/verify-email</code></td><td><span class="perm perm-public">公开</span></td><td>校验邮箱验证码</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-templates">模板 <span class="count">10</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/templates</code></td><td><span class="perm perm-user">登录</span></td><td>分页列出模板，支持关键词搜索、分组过滤与游标翻页</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates</code></td><td><span class="perm perm-user">登录</span></td><td>新建模板（Template Schema v1）</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates/import-qd-har</code></td><td><span class="perm perm-user">登录</span></td><td>导入旧 QD 的 HAR 生成模板并落库</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates/validate-qd-har</code></td><td><span class="perm perm-public">公开</span></td><td>只校验 HAR 能否导入，不写库；WebUI 用它做实时预检</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/templates/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取单个模板完整定义</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/templates/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新模板名称、描述、定义或分组</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/templates/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除模板</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates/{id}/publish</code></td><td><span class="perm perm-user">登录</span></td><td>提交发布申请，进入管理员审批队列</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/templates/{id}/publish</code></td><td><span class="perm perm-user">登录</span></td><td>撤回申请或从公共模板市场下架</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/templates/{id}/qd-har</code></td><td><span class="perm perm-user">登录</span></td><td>覆盖模板的 QD HAR 内容</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-tasks">任务 <span class="count">10</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/task-groups</code></td><td><span class="perm perm-user">登录</span></td><td>列出任务分组，用于 WebUI 侧边筛选</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks</code></td><td><span class="perm perm-user">登录</span></td><td>列出当前用户可见的任务</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks</code></td><td><span class="perm perm-user">登录</span></td><td>新建任务，绑定模板或直接配置 HTTP 请求</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks/batch</code></td><td><span class="perm perm-user">登录</span></td><td>批量执行启停、删除等操作，返回逐条结果</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取任务详情，含上次运行状态与错误</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新任务配置</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除任务</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks/{id}/run</code></td><td><span class="perm perm-user">登录</span></td><td>立即触发一次运行；已返回 202 表示入队，不等待执行完成</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}/runs</code></td><td><span class="perm perm-user">登录</span></td><td>列出该任务的运行历史</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/tasks/{id}/runs</code></td><td><span class="perm perm-user">登录</span></td><td>清空该任务的运行历史</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-runs">运行记录 <span class="count">5</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs</code></td><td><span class="perm perm-user">登录</span></td><td>清空当前用户的全部运行记录</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除单条运行记录</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/runs/{id}/cancel</code></td><td><span class="perm perm-user">登录</span></td><td>请求取消运行；由执行器在下一个可中断点停下</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/runs/{id}/steps</code></td><td><span class="perm perm-user">登录</span></td><td>列出一次运行的每个步骤：请求、响应与提取到的变量</td></tr>
+                            <tr><td><code class="m-get">WS</code></td><td><code>/api/v1/runs/{id}/steps/live</code></td><td><span class="perm perm-user">登录</span></td><td>WebSocket 实时推送步骤与状态变更</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-subscriptions">模板订阅 <span class="count">8</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions</code></td><td><span class="perm perm-user">登录</span></td><td>列出已订阅的模板仓库</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions</code></td><td><span class="perm perm-user">登录</span></td><td>新增模板订阅</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取单个订阅</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新订阅地址或启停状态</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除订阅</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/sync</code></td><td><span class="perm perm-user">登录</span></td><td>立即同步一次，异步执行</td></tr>
+                            <tr><td><code class="m-get">WS</code></td><td><code>/api/v1/subscriptions/{id}/sync/live</code></td><td><span class="perm perm-user">登录</span></td><td>WebSocket 推送同步进度</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/syncs</code></td><td><span class="perm perm-user">登录</span></td><td>列出同步历史与结果</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-notifications">通知渠道与绑定 <span class="count">8</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/notification-actions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>解除绑定</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/notification-channels</code></td><td><span class="perm perm-user">登录</span></td><td>列出通知渠道</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/notification-channels</code></td><td><span class="perm perm-user">登录</span></td><td>新建通知渠道</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取渠道配置</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新渠道配置</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除渠道，同时解除任务绑定</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}/notification-actions</code></td><td><span class="perm perm-user">登录</span></td><td>列出任务已绑定的通知渠道与触发时机</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks/{id}/notification-actions</code></td><td><span class="perm perm-user">登录</span></td><td>把渠道绑定到任务，指定在成功 / 失败 / 总是时推送</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-public">公共模板与发布申请 <span class="count">4</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/public-templates</code></td><td><span class="perm perm-user">登录</span></td><td>列出公共模板市场已通过审批的模板</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/public-templates/{id}/copy</code></td><td><span class="perm perm-user">登录</span></td><td>把公共模板复制到自己的模板库</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/push-requests</code></td><td><span class="perm perm-user">登录</span></td><td>列出我提交的发布申请及审批结果</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/push-requests</code></td><td><span class="perm perm-user">登录</span></td><td>提交发布申请，附说明给管理员</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-plugins">外部插件 <span class="count">6</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/plugins</code></td><td><span class="perm perm-user">登录</span></td><td>列出已注册的外部插件</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/plugins</code></td><td><span class="perm perm-user">登录</span></td><td>注册插件二进制与能力声明</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/plugins/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取插件配置</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/plugins/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新插件配置或启停</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/plugins/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除插件</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/plugins/{id}/invoke</code></td><td><span class="perm perm-user">登录</span></td><td>同步调用插件，返回其输出</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="ep-admin">管理员 <span class="count">11</span></h3>
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/admin/backup</code></td><td><span class="perm perm-admin">管理员</span></td><td>导出数据库备份</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/admin/logs</code></td><td><span class="perm perm-admin">管理员</span></td><td>按保留天数清理运行日志与审计日志</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/admin/push-requests</code></td><td><span class="perm perm-admin">管理员</span></td><td>列出待审批的公共模板发布申请</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/admin/push-requests/{id}/decision</code></td><td><span class="perm perm-admin">管理员</span></td><td>通过或驳回发布申请</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/admin/restore</code></td><td><span class="perm perm-admin">管理员</span></td><td>从备份恢复，覆盖现有数据</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/admin/settings</code></td><td><span class="perm perm-admin">管理员</span></td><td>列出站点级运行时设置</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/admin/settings/{key}</code></td><td><span class="perm perm-admin">管理员</span></td><td>读取单个设置项</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/admin/settings/{key}</code></td><td><span class="perm perm-admin">管理员</span></td><td>写入设置项，热生效无需重启</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/admin/users</code></td><td><span class="perm perm-admin">管理员</span></td><td>列出全部用户</td></tr>
+                            <tr><td><code class="m-patch">PATCH</code></td><td><code>/api/v1/admin/users/{id}</code></td><td><span class="perm perm-admin">管理员</span></td><td>修改角色或启禁用状态</td></tr>
+                            <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/admin/users/{id}</code></td><td><span class="perm perm-admin">管理员</span></td><td>删除用户及其数据</td></tr>
+                        </tbody>
+                    </table>
+
+                <h2 id="websocket">WebSocket 实时接口</h2>
+                <p>
+                    两个实时端点都用<strong>普通 HTTP 握手升级</strong>，因此仍走同一套 Cookie 鉴权——浏览器可直接连，非浏览器客户端带上 <code>qd_session</code> 即可。
+                    服务端以文本帧推送 JSON，客户端无需发送任何消息。
+                </p>
+                    <table>
+                        <thead><tr><th>端点</th><th>推送内容</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>/api/v1/runs/{id}/steps/live</code></td><td>该次运行的步骤明细与状态变更</td></tr>
+                            <tr><td><code>/api/v1/subscriptions/{id}/sync/live</code></td><td>模板订阅的同步进度</td></tr>
+                        </tbody>
+                    </table>
+                <p>
+                    帧体即 <code>RunEvent</code>：<code>type</code> 为 <code>status</code>（运行状态变更）、<code>step</code>（单个步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。
+                    <strong>先收 <code>snapshot</code> 再收增量</strong>，客户端就能在任意时刻接入而不丢数据。
+                </p>
+                <pre><code>{"type":"snapshot","run_id":42,"status":"running"}
+{"type":"step","run_id":42,"step":{"index":0,"url":"https://example.com","status":200}}
+{"type":"status","run_id":42,"status":"success"}</code></pre>
+
+                <h2 id="models">数据模型</h2>
+                <p>
+                    以下为接口间流转的主要对象，字段取自 OpenAPI 的 <code>components.schemas</code>。
+                </p>
+
+                <h3 id="model-task"><code>Task</code></h3>
+                <p>任务。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>cron</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>method</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>url</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>headers</code></td><td>object</td><td>是</td></tr>
+                            <tr><td><code>body</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>disabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>template_id</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>grp</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>timeout_seconds</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>retry_count</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>retry_interval_seconds</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>priority</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>timezone</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>random_delay_max_seconds</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>variables</code></td><td>['object', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>last_run_at</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>last_status</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>last_error</code></td><td>['string', 'null']</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-run"><code>Run</code></h3>
+                <p>一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>task_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>status</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>http_status</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>error</code></td><td>['string', 'null']</td><td>是</td></tr>
+                            <tr><td><code>log</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>started_at</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>finished_at</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>lease_owner</code></td><td>['string', 'null']</td><td>是</td></tr>
+                            <tr><td><code>lease_expires_at</code></td><td>['integer', 'null']</td><td>是</td></tr>
+                            <tr><td><code>attempt</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>cancel_requested</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>run_after</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>retry_of</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-template"><code>Template</code></h3>
+                <p>模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>description</code></td><td>['string', 'null']</td><td>是</td></tr>
+                            <tr><td><code>schema_version</code></td><td>int</td><td>是</td></tr>
+                            <tr><td><code>source_format</code></td><td>enum: native_v1, qd_har</td><td>是</td></tr>
+                            <tr><td><code>definition</code></td><td>object</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>qd_har</code></td><td>object</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>grp</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-user"><code>User</code></h3>
+                <p>用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>username</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>role</code></td><td>enum: admin, user</td><td>是</td></tr>
+                            <tr><td><code>disabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>email</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>email_verified</code></td><td>boolean</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-notificationchannel"><code>NotificationChannel</code></h3>
+                <p>通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 10 种渠道。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>kind</code></td><td>enum: webhook, email, bark, serverchan</td><td>是</td></tr>
+                            <tr><td><code>config</code></td><td>object</td><td>是</td></tr>
+                            <tr><td><code>enabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-notificationaction"><code>NotificationAction</code></h3>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>task_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>channel_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>event</code></td><td>enum: success, failure, always</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-pushrequest"><code>PushRequest</code></h3>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>owner_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>template_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>status</code></td><td>enum: pending, approved, rejected</td><td>是</td></tr>
+                            <tr><td><code>note</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>reviewed_by</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>reviewed_at</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-templatesubscription"><code>TemplateSubscription</code></h3>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>owner_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>url</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>enabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>last_synced_at</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>last_error</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-subscriptionsync"><code>SubscriptionSync</code></h3>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>subscription_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>status</code></td><td>enum: pending, running, succeeded, failed</td><td>是</td></tr>
+                            <tr><td><code>message</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>finished_at</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-plugin"><code>Plugin</code></h3>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>command</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>config</code></td><td>object</td><td>是</td></tr>
+                            <tr><td><code>enabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-runevent"><code>RunEvent</code></h3>
+                <p>WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>run_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>type</code></td><td>enum: status, step, snapshot</td><td>是</td></tr>
+                            <tr><td><code>status</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>step</code></td><td>any</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>error</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-apierror"><code>ApiError</code></h3>
+                <p>所有 4xx / 5xx 响应的统一信封。<code>code</code> 是稳定的错误键，前端据此做本地化；<code>message</code> 为英文兜底。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>code</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>message</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>field_errors</code></td><td>object</td><td>是</td></tr>
+                            <tr><td><code>request_id</code></td><td>string</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h2 id="examples">一次完整调用</h2>
+                <p>
+                    从初始化管理员到拿到运行结果，串起最小可用链路：
+                </p>
+                <pre><code># 1) 初始化首个管理员（只能成功一次）
+curl -c jar.txt -X POST http://localhost:5000/api/v1/auth/bootstrap \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"a-long-enough-password"}'
+
+# 2) 取出 CSRF Cookie
+CSRF=$(grep qd_csrf jar.txt | awk '{print $7}')
+
+# 3) 导入一份旧 QD 的 HAR 模板
+curl -b jar.txt -X POST http://localhost:5000/api/v1/templates/import-qd-har \
+  -H "x-csrf-token: $CSRF" -H "Content-Type: application/json" \
+  -d '{"name":"每日签到","har":{/* 抓包得到的 HAR */}}'
+
+# 4) 建任务，绑定模板并配 cron
+curl -b jar.txt -X POST http://localhost:5000/api/v1/tasks \
+  -H "x-csrf-token: $CSRF" -H "Content-Type: application/json" \
+  -d '{"name":"签到","cron":"0 9 * * *","template_id":1,"timezone":"Asia/Shanghai"}'
+
+# 5) 立刻跑一次（202 表示已入队，不等待执行）
+curl -b jar.txt -X POST http://localhost:5000/api/v1/tasks/1/run \
+  -H "x-csrf-token: $CSRF"
+
+# 6) 查运行结果
+curl -b jar.txt http://localhost:5000/api/v1/tasks/1/runs
+
+# 7) 看某个 run 的每一步
+curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
+                <div class="callout">
+                    <div class="callout-title">注意 202 与 200 的区别</div>
+                    <p>
+                        触发运行返回 <strong>202 Accepted</strong> 只表示已入队。要确认执行结果，得再去查
+                        <code>/api/v1/tasks/{id}/runs</code> 或订阅 <code>/steps/live</code>——这是异步执行框架的典型约定，别把 202 当成执行成功。
+                    </p>
+                </div>
+
+                <h2 id="notes">与 OpenAPI 文档的差异</h2>
+                <p>
+                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准。比对内嵌文档后发现一处遗漏：
+                </p>
+                <ul>
+                    <li><code>DELETE /api/v1/admin/users/{id}</code> —— 源码已注册（handler <code>admin_delete_user</code>），但 OpenAPI 文档未收录。本页已补上。</li>
+                </ul>
+                <p>若你用文档生成客户端 SDK，这个端点需要手动补。</p>
+
+                <div class="wiki-meta">
+                    <span>基于 qdrust v0.1.4 服务端路由与 OpenAPI 3.1 文档整理</span>
+                    <span>共 76 个端点</span>
+                </div>
+            </main>
+
+            <!-- On-page TOC -->
+            <aside class="wiki-toc">
+                <div class="wiki-toc-title">本页目录</div>
+                <nav id="toc"></nav>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="py-10 bg-gray-50 border-t border-gray-200">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
+            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p>
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 从正文 h2/h3 生成本页目录，并跟随滚动高亮当前小节。
+        (function () {
+            var article = document.querySelector('.wiki-article');
+            var toc = document.getElementById('toc');
+            if (!article || !toc) return;
+
+            var headings = article.querySelectorAll('h2[id], h3[id]');
+            if (!headings.length) { toc.parentNode.style.display = 'none'; return; }
+
+            var links = [];
+            headings.forEach(function (heading) {
+                var link = document.createElement('a');
+                link.href = '#' + heading.id;
+                link.textContent = heading.textContent;
+                if (heading.tagName === 'H3') link.className = 'toc-h3';
+                toc.appendChild(link);
+                links.push(link);
+                heading.setAttribute('data-toc-id', heading.id);
+            });
+
+            var onScroll = function () {
+                var current = null;
+                headings.forEach(function (heading) {
+                    if (heading.getBoundingClientRect().top <= 120) current = heading.id;
+                });
+                if (!current && headings.length) current = headings[0].id;
+                links.forEach(function (link) {
+                    link.classList.toggle('is-current', link.getAttribute('href') === '#' + current);
+                });
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // 移动端侧边目录开关
+        (function () {
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('sidebar');
+            if (!toggle || !sidebar) return;
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('is-open');
+            });
+        })();
+    </script>
+</body>
+</html>
