@@ -1,0 +1,180 @@
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">模板与表达式</h1>
+                <p class="text-lg text-gray-600 mb-10">
+                    HAR 兼容契约、Template Schema v1、变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。
+                </p>
+
+                <h2 id="two-forms">两种模板形态</h2>
+                <p>
+                    qdrust 里「模板」有两种来源，它们共享同一套执行引擎，但形态不同：
+                </p>
+                <ul>
+                    <li><strong>旧 QD HAR</strong>——从 QD 导出的 <code>*.har.json</code>，核心兼容契约，导入时校验并<strong>保留原始 HAR JSON</strong>。绝大多数已有资产走这条路。</li>
+                    <li><strong>Template Schema v1</strong>——qdrust 原生的版本化 JSON 模板，步骤模型更规整，支持条件与循环。</li>
+                </ul>
+                <p>
+                    两者都是<strong>声明式 JSON，不执行 Python 或任意代码</strong>。这是 qdrust 与旧 QD 最重要的安全边界：模板描述「发什么请求、怎么判定、提取什么」，而不是一段可执行的程序。
+                </p>
+
+                <h2 id="qd-har">旧 QD HAR</h2>
+                <p>
+                    一个 HAR 模板是标准的 HAR 结构，额外的规则挂在每个 entry 上：
+                </p>
+                <pre><code>{
+  "log": {
+    "entries": [
+      {
+        "request": {
+          "method": "POST",
+          "url": "https://example.com/api/checkin",
+          "headers": [...],
+          "postData": { "mimeType": "application/json", "text": "{\"sig\":\"{{sig}}\"}" }
+        },
+        "success_asserts":   [{ "re": "签到成功", "from": "content" }],
+        "failed_asserts":    [{ "re": "已签到", "from": "content" }],
+        "extract_variables": [{ "name": "token", "re": "token=(.+)", "from": "content" }]
+      }
+    ]
+  }
+}</code></pre>
+
+                <h3 id="rules">三类规则</h3>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>字段</th><th>作用</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><code>extract_variables</code></td>
+                                <td>提取变量</td>
+                                <td>用 <code>re</code> 正则从响应中抽取，命名后供后续步骤以 <code>{{name}}</code> 引用。<code>re</code> 是对<strong>整个返回体文本</strong>做匹配。</td>
+                            </tr>
+                            <tr>
+                                <td><code>success_asserts</code></td>
+                                <td>成功断言</td>
+                                <td>命中任一规则即判定该步骤成功。</td>
+                            </tr>
+                            <tr>
+                                <td><code>failed_asserts</code></td>
+                                <td>失败断言</td>
+                                <td>命中任一规则即判定该步骤失败，优先于成功断言。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <code>from</code> 可选三个取值：<code>content</code>（响应体）、<code>status</code>（HTTP 状态码）、<code>header</code>（响应头）。
+                </p>
+
+                <h3 id="import">导入与校验</h3>
+                <p>在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code>*.har.json</code> 即可。也可以用命令行先校验：</p>
+                <pre><code>cargo run -p qdrust-cli -- validate ./template.har.json
+
+# 执行 HAR，传入变量与整体超时
+cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60</code></pre>
+                <div class="callout">
+                    <div class="callout-title">CLI 的网络策略更严格</div>
+                    <p>CLI 默认拒绝私网地址、localhost 与无效 TLS 证书，不像旧 QD 那样宽松。如果你在调试本机服务时被拒绝，这是刻意行为；服务端执行不受此限制。</p>
+                </div>
+
+                <h2 id="schema-v1">Template Schema v1</h2>
+                <p>qdrust 原生模板要求顶层包含 <code>version: 1</code>、非空 <code>name</code> 和 <code>steps</code>：</p>
+                <pre><code>{
+  "version": 1,
+  "name": "Health check",
+  "variables": { "base_url": "https://example.com" },
+  "steps": [
+    {
+      "type": "request",
+      "name": "Fetch health",
+      "method": "GET",
+      "url": "{{base_url}}/health",
+      "headers": { "accept": "application/json" }
+    },
+    {
+      "type": "extract",
+      "name": "Read status",
+      "source": "status",
+      "selector": "",
+      "target": "status",
+      "required": true
+    }
+  ]
+}</code></pre>
+                <p>步骤类型共五种：<code>request</code>、<code>extract</code>、<code>if</code>、<code>for_each</code>、<code>delay</code>；请求 body 支持 <code>json</code>、<code>text</code> 与 <code>form</code>。</p>
+                <p>
+                    <strong>硬性限制</strong>：最多 1000 个静态步骤、最多 16 层嵌套、单次 delay 最长 5 分钟。运行时还会独立限制请求数、循环次数、响应体大小与总时长——防止一个写错的模板把服务拖垮。
+                </p>
+
+                <h2 id="variables">变量</h2>
+                <p>变量有三个来源，按优先级覆盖：</p>
+                <ol>
+                    <li><strong>创建任务时预填</strong>：WebUI 支持在创建任务时为模板变量填默认值，避免每次运行手输。</li>
+                    <li><strong>运行期提取</strong>：由 <code>extract_variables</code> 在步骤执行后写入，供<strong>后续</strong>步骤引用。</li>
+                    <li><strong>CLI 传入</strong>：<code>--var key=value</code>。</li>
+                </ol>
+                <p>
+                    变量的引用语法是 <code>{{name}}</code>，求值发生在<strong>请求发送之前</strong>，且可以嵌套表达式（见下节）。注意执行是顺序的——在某一步里引用后面才提取的变量只会拿到空值。
+                </p>
+
+                <h2 id="expressions">表达式</h2>
+                <p>
+                    模板变量与步骤请求支持 Jinja2 语法，由 <a href="https://github.com/mitsuhiko/minijinja" target="_blank">minijinja</a> 驱动。qdrust 注册了 <strong>37 个全局函数</strong>与 <strong>51 个过滤器</strong>。
+                </p>
+                <p>
+                    其中 26 个（下表中带 ● 标记）<strong>同时注册为函数和过滤器</strong>。这复刻了 QD 的行为：QD 把 <code>jinja_globals</code> 同时写进 globals 和 filters，所以 <code>{{ password|md5 }}</code> 与 <code>{{ md5(password) }}</code> 两种写法都成立。
+                </p>
+
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>类别</th><th>名称</th></tr></thead>
+                        <tbody>
+                            <tr><td>类型转换</td><td><code>int</code> ● · <code>float</code> ● · <code>bool</code> ● · <code>is_num</code> ● · <code>type_debug</code> ● · <code>list</code> · <code>len</code></td></tr>
+                            <tr><td>编码 / 进制</td><td><code>b64encode</code> ● · <code>b64decode</code> ● · <code>a2b_base64</code> ● · <code>b2a_base64</code> ● · <code>a2b_hex</code> ● · <code>a2b_qp</code> ● · <code>a2b_uu</code> ● · <code>b2a_uu</code> ● · <code>unicode</code> ● · <code>urlencode</code> ● · <code>url_encode</code> · <code>url_decode</code> · <code>quote_chinese</code> · <code>utf8</code></td></tr>
+                            <tr><td>哈希 / 校验</td><td><code>md5</code> ● · <code>sha1</code> ● · <code>crc32</code> ●</td></tr>
+                            <tr><td>时间 / 随机</td><td><code>timestamp</code> ● · <code>date_time</code> ● · <code>strftime</code> · <code>random</code> ● · <code>random_int</code> · <code>random_float</code></td></tr>
+                            <tr><td>算术</td><td><code>add</code> ● · <code>sub</code> ● · <code>multiply</code> ● · <code>divide</code> ●</td></tr>
+                            <tr><td>文本 / 假数据</td><td><code>regex_escape</code> ● · <code>fake</code> · <code>lipsum</code></td></tr>
+                            <tr><td>仅过滤器</td><td><code>abs</code> · <code>capitalize</code> · <code>d</code> · <code>default</code> · <code>endswith</code> · <code>first</code> · <code>fromjson</code> · <code>join</code> · <code>last</code> · <code>lower</code> · <code>max</code> · <code>min</code> · <code>replace</code> · <code>reverse</code> · <code>round</code> · <code>sort</code> · <code>split</code> · <code>startswith</code> · <code>strip</code> · <code>sum</code> · <code>title</code> · <code>tojson</code> · <code>trim</code> · <code>unique</code> · <code>upper</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500">● = 同时可作为函数调用（<code>{{ md5(x) }}</code>）与过滤器使用（<code>{{ x|md5 }}</code>）。<code>d</code> 是 QD 中 <code>default</code> 的短别名。</p>
+
+                <h2 id="util-tools"><code>api://util/*</code> 内置工具</h2>
+                <p>
+                    当步骤 URL 以 <code>api://</code> 开头时，executor 在<strong>进程内</strong>计算并返回结果，<strong>不发起真实 HTTP 请求</strong>。这意味着「取时间戳」「算个签名哈希」这类步骤零网络开销、无出站风险。
+                </p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>工具</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>delay</code></td><td>固定 / 随机延迟</td></tr>
+                            <tr><td><code>timestamp</code></td><td>当前时间戳（多种格式）</td></tr>
+                            <tr><td><code>unicode</code> / <code>urlencode</code> / <code>urldecode</code></td><td>编码转换</td></tr>
+                            <tr><td><code>gb2312</code></td><td>GB2312 百分号编码（<code>urllib.quote</code> 语义）</td></tr>
+                            <tr><td><code>base64</code></td><td>Base64 编码 / 解码</td></tr>
+                            <tr><td><code>hash</code></td><td>md5 / sha1 / sha256 / sha512</td></tr>
+                            <tr><td><code>uuid</code> / <code>random</code></td><td>随机值（UUID / 浮点数）</td></tr>
+                            <tr><td><code>regex</code></td><td>正则提取（findall）与替换（replace）</td></tr>
+                            <tr><td><code>string/replace</code></td><td>正则替换，支持组引用与文本模式</td></tr>
+                            <tr><td><code>rsa</code></td><td>PKCS1 v1.5 加解密</td></tr>
+                            <tr><td><code>json</code></td><td>parse / stringify / pretty</td></tr>
+                            <tr><td><code>dddd/*</code></td><td>OCR / 验证码识别，转发到外部 DdddOCR 服务</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    这套工具已与 QD 的核心语义对齐。旧 QD 的 <em>toolbox</em> 与 <em>notepad</em> 属于 Web 工具箱页面，不在模板 API 范围内，qdrust 未移植。
+                </p>
+
+                <h2 id="external-plugins">外部插件二进制</h2>
+                <p>
+                    除了内置的 <code>util</code> 与 <code>browser</code>，qdrust 还支持外挂插件二进制：通过子进程 JSON 协议调用，需带 manifest、通过 API 版本校验，并声明所需能力（<code>network</code> / <code>read_file</code> / <code>write_file</code> / <code>environment</code>）。WebUI 提供插件管理页。
+                </p>
+                <p>
+                    能力声明是可审计的边界——一个声明了 <code>network</code> 的插件和不声明的插件，在 review 时是两个风险等级。
+                </p>
+
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-03</span>
+                </div>

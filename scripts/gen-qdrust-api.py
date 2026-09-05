@@ -173,20 +173,73 @@ MODEL_NOTES = {
 # ==========================================================================
 # 1. 从源码解析路由与鉴权
 # ==========================================================================
-def parse_routes(api_rs: str) -> dict[tuple[str, str], tuple[str, str]]:
-    """返回 {(方法, 路径): (权限, handler)}。"""
-    start = api_rs.index("Router::new()")
-    end = api_rs.index(".with_state(AppState")
-    router = api_rs[start:end]
+def _router_segments(api_rs: str) -> list[str]:
+    """切出路由注册区间。
 
+    路由注册在源码里分成两段，都要扫：
+      - inner：API + SPA，从首个 ``Router::new()`` 到 ``let state = AppState {``
+      - root ：``/health``、``/ready`` 探针，从 ``let mut root = Router::new()``
+        到 ``root.with_state``。这两个探针被刻意留在根路径，不受
+        ``QDRUST_BASE_PATH`` 影响，因此不在 inner 里。
+    """
+    specs = [
+        ("Router::new()", ["let state = AppState {", ".with_state(AppState"]),
+        ("let mut root = Router::new()", ["root.with_state", ".with_state(AppState"]),
+    ]
+    segments = []
+    for start_anchor, end_anchors in specs:
+        start = api_rs.find(start_anchor)
+        if start < 0:
+            print(f"  ! 跳过路由段：未找到起始锚点 {start_anchor!r}")
+            continue
+        end = -1
+        for anchor in end_anchors:
+            pos = api_rs.find(anchor, start + len(start_anchor))
+            if pos > 0:
+                end = pos
+                break
+        if end < 0:
+            print(f"  ! 跳过路由段：未找到结束锚点 {end_anchors}")
+            continue
+        segments.append(api_rs[start:end])
+    return segments
+
+
+def _parse_route_calls(router_src: str) -> list[tuple[str, str, str]]:
+    """扫出 ``(路径, 方法, handler)``。
+
+    用括号平衡取出 ``.route()`` 的第二个参数，而不是靠行尾 lookahead——
+    路由注册是多行链式调用，结尾形态不一（``;``、``.`` 续行、``if`` 块），
+    lookahead 容易漏掉最后一条。
+    """
     entries = []
-    for m in re.finditer(
-        r'\.route\(\s*"([^"]+)"\s*,\s*(.*?)\)\s*(?=\n\s*\.(?:route|fallback_service|with_state)|\n\s*\)\s*$)',
-        router, re.S,
-    ):
-        path, spec = m.group(1), m.group(2)
+    for m in re.finditer(r'\.route\(\s*"([^"]+)"\s*,', router_src):
+        path = m.group(1)
+        # 起点已位于 .route( 的参数列表内，故初始深度为 1——
+        # 否则 get(x).put(y).delete(z) 这类链式注册会在第一个 ) 处提前收尾。
+        depth = 1
+        end = m.end()
+        for j in range(m.end(), len(router_src)):
+            ch = router_src[j]
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    end = j
+                    break
+        spec = router_src[m.end() - 1:end + 1]
         for mm in re.finditer(r"(?:axum::routing::)?(get|post|put|patch|delete)\((\w+)\)", spec):
             entries.append((path, mm.group(1).upper(), mm.group(2)))
+    return entries
+
+
+def parse_routes(api_rs: str) -> dict[tuple[str, str], tuple[str, str]]:
+    """返回 {(方法, 路径): (权限, handler)}。"""
+
+    entries = []
+    for segment in _router_segments(api_rs):
+        entries.extend(_parse_route_calls(segment))
 
     def fn_body(name: str) -> str:
         m = re.search(r"\n(?:async )?fn " + re.escape(name) + r"\s*\(", api_rs)

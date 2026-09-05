@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、调度精度、CLI 网络策略、模板沙箱与浏览器插件。">
-    <title>常见问题 | qdrust Wiki</title>
-    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/faq.html">
+    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志与 CLI。">
+    <title>使用指南 | qdrust Wiki</title>
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,7 +164,7 @@
                 <div class="wiki-nav-title">入门</div>
                 <a href="index.html" class="wiki-nav-link">总览</a>
                 <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
-                <a href="usage.html" class="wiki-nav-link">使用指南</a>
+                <a href="usage.html" class="wiki-nav-link is-active">使用指南</a>
 
                 <div class="wiki-nav-title">核心概念</div>
                 <a href="architecture.html" class="wiki-nav-link">架构设计</a>
@@ -177,7 +177,7 @@
                 <a href="api.html" class="wiki-nav-link">API 接口</a>
 
                 <div class="wiki-nav-title">帮助</div>
-                <a href="faq.html" class="wiki-nav-link is-active">常见问题</a>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
 
                 <div class="wiki-nav-title">外部链接</div>
                 <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
@@ -186,121 +186,88 @@
 
             <!-- Article -->
             <main class="wiki-article min-w-0">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">常见问题</h1>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    部署、迁移、调度、插件相关的高频疑问。若这里没有答案，欢迎到 GitHub Issues 提问。
+                    从初始化管理员到跑起第一个任务：导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
                 </p>
 
-                <h2 id="session">部署与会话</h2>
+                <h2 id="first-run">首次启动与管理员</h2>
+                <ol>
+                    <li>启动服务后访问 <code>http://localhost:8923/</code>（或你配置的域名 / 二级目录）。</li>
+                    <li>首次打开会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。</li>
+                    <li>管理员可在「设置 / 管理员」中管理用户、站点设置、日志清理、备份与恢复。</li>
+                </ol>
+                <p class="text-sm text-gray-500">还没部署？先看<a href="deploy.html">部署与运维</a>。</p>
 
-                <h3 id="cookie-secure">HTTPS 部署后登录会话不生效 / 一直被登出？</h3>
-                <p>生产环境必须把 <code>COOKIE_SECURE</code> 设为 <code>true</code>，否则安全 Cookie 不会被浏览器接受。</p>
-
-                <h3 id="smtp">邮件相关功能（重置密码、邮箱验证、Email 渠道）用不了？</h3>
-                <p>
-                    需要先配置 <code>QDRUST_SMTP_*</code> 系列环境变量，并确认 <code>QDRUST_BASE_URL</code> 指向对外可访问的地址（邮件里的链接以此拼接）。
-                </p>
-                <p>
-                    若启用了 <code>REQUIRE_EMAIL_VERIFICATION</code>，新用户必须验证邮箱才能登录——SMTP 没配好时会表现为「注册成功但登不进去」。
-                </p>
-
-                <h3 id="multi-instance">多实例 / 横向扩展怎么弄？</h3>
-                <p>
-                    单实例基于 SQLite 事务 + 租约保证不重复执行；多实例共享数据库时同样由租约机制保证。推荐 <code>docker compose up --scale qdrust=N</code> 加反向代理。Redis 仅用于会话缓存加速，非必需。
-                </p>
-                <p>需要注意的是，无头浏览器会话是<strong>进程内状态</strong>，不跨实例共享。</p>
-
-                <h2 id="migration">迁移与升级</h2>
-
-                <h3 id="rollback">数据库升级后还能回退到旧版本吗？</h3>
-                <p>
-                    迁移是<strong>前向 only</strong> 的。仅回退镜像而不恢复数据库<strong>不被支持</strong>；回退请同时用备份恢复数据库，再启动旧镜像 digest。
-                </p>
-
-                <h3 id="compat-scope">能直接导入旧 QD 的数据吗？</h3>
-                <p>
-                    qdrust <strong>不导入旧 QD 数据库</strong>、不复用旧登录 Cookie、不承诺兼容旧 URL / 旧 API / 任意 Python 动态表达式。<strong>旧 QD 的 HAR 模板是唯一的核心兼容契约</strong>——在 WebUI 里导入 <code>*.har.json</code> 即可，导入时会校验并保留原始 HAR JSON。
-                </p>
-
-                <h3 id="util-missing">插件 / <code>api://util</code> 工具不全？</h3>
-                <p>
-                    <code>api://util/*</code> 已对齐 QD 的核心工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / GB2312 / 字符串替换 / OCR）。
-                </p>
-                <p>
-                    旧 QD 的 <em>toolbox</em> 与 <em>notepad</em> 属于 Web 工具箱页面，不在模板 API 范围内，<strong>未移植</strong>。
-                </p>
-
-                <h2 id="scheduling">调度与运行</h2>
-
-                <h3 id="scheduler-precision">调度好像没按我设的时间跑？</h3>
-                <p>
-                    <code>SCHEDULER_INTERVAL_SECONDS</code>（默认 15 秒）是调度器轮询间隔，任务触发精度受其影响。如需更精确请相应调小——代价是更频繁的数据库轮询。
-                </p>
-
-                <h3 id="log-retention">运行记录越来越多，能自动清理吗？</h3>
-                <p>设置 <code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留），系统每小时清理超出天数的已完成运行。也可以在任务详情页手动清空某个任务的运行历史。</p>
-
-                <h3 id="random-delay">为什么需要「随机延迟」？</h3>
-                <p>
-                    它让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。对于签到类任务，这是一个实用而非装饰性的功能。可视化调度器里直接开启即可。
-                </p>
-
-                <h2 id="network">网络与安全</h2>
-
-                <h3 id="cli-network">CLI 报网络被拒绝（私网 / localhost / 证书）？</h3>
-                <p>
-                    这是<strong>刻意的安全策略</strong>——CLI 默认拒绝私网、localhost 和无效 TLS 证书，不像旧 QD 那样宽松。服务端执行不受此限制，所以把模板放进服务端运行即可正常工作。
-                </p>
-
-                <h3 id="template-sandbox">模板里能写 Python 吗？</h3>
-                <p>
-                    不能。qdrust 模板是<strong>声明式 JSON，不执行 Python 或任意代码</strong>。动态能力来自 Jinja2 表达式（minijinja）与 <code>api://util/*</code> 内置工具。
-                </p>
-                <p>
-                    同时有硬性上限：最多 1000 个静态步骤、16 层嵌套、单次 delay 最长 5 分钟，运行期另外限制请求数、循环次数、响应体大小与总时长。
-                </p>
-
-                <h2 id="browser">浏览器插件</h2>
-
-                <h3 id="browser-signature">站点要 JS 生成签名 / 过验证码，纯 HAR 跑不了怎么办？</h3>
-                <p>
-                    用 <code>api://browser/*</code> 无头浏览器插件。配置 <code>QDRUST_BROWSER_URL</code> 后启用，模板里插入 <code>api://browser/eval</code>（执行 JS 取 token / 签名）、<code>api://browser/content</code>（抓渲染后 HTML）或 <code>api://browser/screenshot</code>（截图），再用 <code>extract_variables</code> 把结果提成变量回填。详见 <a href="browser.html">浏览器插件</a>。
-                </p>
-
-                <h3 id="browser-multistep">浏览器插件能自动跑多步页面交互（点按钮、填表单）吗？</h3>
-                <p>
-                    可以。用 <code>start</code> 开一个会话，对同一 <code>session</code> 跨步骤执行 <code>type</code>（输入）/ <code>click</code>（点击）/ <code>content</code>（取渲染后状态），把会话 id 提出来后用 <code>{{var}}</code> 复用于后续步骤；流程结束用 <code>end</code> 关会话。
-                </p>
-                <p>
-                    会话在 server 内存中跨调用存活（空闲 30 分钟 / 最长 24 小时回收），所以<strong>中途可以停下等人</strong>——比如让人工过完验证码再继续。会话里的 <code>#</code> 等选择器要 URL 编码（<code>#id</code> → <code>%23id</code>）。
-                </p>
-
-                <h3 id="browser-fail">浏览器步骤失败会中断整个任务吗？</h3>
-                <p>
-                    不会。未配置 <code>QDRUST_BROWSER_URL</code>、连接失败、找不到元素或会话、参数缺失等都会返回 <strong>502 信封</strong>，可用 <code>success_asserts</code> / <code>failed_asserts</code> 感知——<strong>不会静默降级，也不会中断整个任务</strong>。
-                </p>
-
-                <h3 id="browser-restart">服务重启后浏览器会话还在吗？</h3>
-                <p>
-                    不在。会话存于 server 内存，进程重启即全部清空，向导需要重新 <code>start</code>。这是单进程模型的取舍：换来的是 DOM 状态可以在多次独立调用间存活。
-                </p>
-
-                <h2 id="misc">其他</h2>
-
-                <h3 id="project-status">项目目前处于什么状态？</h3>
-                <p>
-                    Phase 0–8 代码与容器已实现完成。首次 GHCR 标签发布与浏览器主要工作流的人工验收需要外部环境执行，项目选择<strong>不在未运行时标记为通过</strong>。
-                </p>
-
-                <h3 id="contribute">如何反馈问题？</h3>
+                <h2 id="import-har">导入 QD HAR 模板</h2>
                 <ul>
-                    <li><a href="https://github.com/CallmeLins/qdrust/issues" target="_blank">GitHub Issues</a></li>
-                    <li><a href="https://github.com/CallmeLins/qdrust" target="_blank">源码仓库</a></li>
+                    <li>在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code>*.har.json</code>。</li>
+                    <li>导入时会校验并<strong>保留原始 HAR JSON</strong>，兼容样本见仓库的 <code>tests/fixtures</code>。</li>
+                    <li>也可以用命令行先校验再导入：</li>
+                </ul>
+                <pre><code>cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
+                <p>模板的字段含义与两种形态见<a href="templates.html#qd-har">模板与表达式 · 旧 QD HAR</a>。</p>
+
+                <h2 id="tasks">创建与运行任务</h2>
+                <ol>
+                    <li>新建模板或导入 HAR 后，<strong>基于模板创建任务</strong>并填写变量。</li>
+                    <li>配置 cron / 间隔调度，或手动「立即运行」。</li>
+                    <li>在运行记录中查看每一步的<strong>请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
+                    <li>订阅仓库的任务会<strong>按仓库自动导入并同步</strong>；公共模板经 PushRequest 审批后发布。</li>
+                </ol>
+                <p class="text-sm text-gray-500">变量、断言与表达式写法见<a href="templates.html#variables">模板与表达式</a>。</p>
+
+                <h2 id="har-editor">可视化 HAR 编辑器</h2>
+                <p>
+                    WebUI 提供可视化编辑器，可直接增删改请求、设置<strong>请求头 / 表单 / 鉴权</strong>、编写
+                    <code>success_asserts</code> 与 <code>extract_variables</code>，无需手改 JSON。
+                </p>
+
+                <h2 id="scheduling">调度与随机延迟</h2>
+                <ul>
+                    <li><strong>两种调度</strong>：固定间隔与 cron，都在可视化调度器中配置。</li>
+                    <li><strong>随机延迟</strong>：让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。</li>
+                    <li><strong>变量预填</strong>：模板变量支持在创建任务时预填默认值。</li>
+                </ul>
+
+                <h3 id="timezone">时区与夏令时</h3>
+                <p>cron 按<strong>每个任务各自的 IANA 时区</strong>（<code>timezone</code> 字段）求值，<strong>DST 感知</strong>：</p>
+                <ul>
+                    <li>设 <code>America/New_York</code> 的任务，<code>0 9 * * *</code> 会全年在当地 09:00 触发，<strong>无需</strong>为冬令 / 夏令手动改 cron。</li>
+                    <li>任务未设 <code>timezone</code> 时，使用服务端 <code>QDRUST_DEFAULT_TIMEZONE</code>（默认 <code>Asia/Shanghai</code>）。</li>
+                    <li>WebUI 中任务列表与运行历史的「上次运行 / 开始时间」也按该任务时区展示；未设时区则用查看者浏览器本地时区。</li>
+                </ul>
+                <p class="text-sm text-gray-500">服务端默认时区的设置方式见<a href="deploy.html#env">部署与运维 · 环境变量</a>。</p>
+
+                <h2 id="logs">运行日志与历史</h2>
+                <ul>
+                    <li>每次运行会记录 <strong>QD 风格的文本日志</strong>。</li>
+                    <li>任务详情页可查看该任务的运行历史，并支持<strong>清空</strong>历史记录。</li>
+                    <li>活跃运行的步骤通过 <strong>WebSocket</strong> 实时推送。</li>
+                    <li>已完成记录的保留天数由 <code>LOG_RETENTION_DAYS</code> 控制，<code>0</code> 表示永久保留。</li>
+                </ul>
+                <p class="text-sm text-gray-500">WebSocket 的端点与消息格式见<a href="api.html#websocket">API 接口 · WebSocket 实时接口</a>。</p>
+
+                <h2 id="cli">命令行（CLI）</h2>
+                <p>校验旧 QD HAR：</p>
+                <pre><code>cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
+                <p>执行 HAR，并传入变量和整体超时：</p>
+                <pre><code>cargo run -p qdrust-cli -- run .\template.har.json --var token=abc --timeout 60</code></pre>
+                <div class="callout">
+                    <div class="callout-title">CLI 的网络策略更严格</div>
+                    <p>CLI 默认<strong>拒绝私网、localhost 和无效 TLS 证书</strong>，不继承旧 QD 的宽松网络策略。用它调试本地服务时会因此需要额外放行。</p>
+                </div>
+
+                <h2 id="next">下一步</h2>
+                <ul>
+                    <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。</li>
+                    <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
+                    <li><a href="api.html">API 接口</a> —— 76 个 REST 端点的完整契约，适合做外部集成。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-03</span>
+                    <span>最后更新：2026-09-05</span>
                 </div>
             </main>
 
