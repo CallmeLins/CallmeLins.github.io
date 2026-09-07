@@ -110,10 +110,16 @@ QDRUST_BASE_PATH=/qd
                             <tr><td><code>GA_KEY</code></td><td>空</td><td>注入 WebUI 的 Google Analytics 密钥</td></tr>
                             <tr><td><code>REDIS_URL</code></td><td>空</td><td>可选 Redis 会话缓存</td></tr>
                             <tr><td><code>QDRUST_CONFIG_FILE</code></td><td>空</td><td>运行时可调配置的 JSON 文件路径（热更新站点设置）</td></tr>
+                            <tr><td><code>QDRUST_AUTH_MODE</code></td><td><code>local</code></td><td>认证模式：<code>local</code> / <code>hybrid</code> / <code>oidc</code>。<code>oidc</code> 会关闭本地登录入口，需保留应急入口时另设 <code>QDRUST_LOCAL_LOGIN_ENABLED=true</code></td></tr>
+                            <tr><td><code>QDRUST_OIDC_ENABLED</code><br><code>QDRUST_HEADER_AUTH_ENABLED</code></td><td><code>false</code></td><td>外部登录的独立开关，与 <code>QDRUST_AUTH_MODE</code> 叠加生效</td></tr>
                             <tr><td><code>QDRUST_BROWSER_URL</code></td><td>空</td><td>浏览器插件的 CDP 端点，配置后启用 <code>api://browser/*</code>（客户端为进程内 chromiumoxide，<strong>无需</strong>额外子进程）。取值形如 <code>http://localhost:9222</code> / <code>ws://localhost:3000</code> / <code>wss://chrome.browserless.io?token=...</code>，详见<a href="browser.html#endpoints">端点后端三选一</a></td></tr>
                         </tbody>
                     </table>
                 </div>
+                <p>
+                    OIDC 与反向代理 Header 认证各自还有一组变量（issuer、client secret、trusted proxies、组到角色的映射等），
+                    完整清单与配置示例见<a href="usage.html#external-login">使用指南 · 第三方登录</a>。
+                </p>
                 <p>
                     <code>QDRUST_CONFIG_FILE</code> 支持在运行期热更新的键：<code>bind</code>、<code>port</code>、<code>database_url</code>、<code>scheduler_interval_seconds</code>、<code>request_timeout_seconds</code>、<code>log_retention_days</code>、<code>ga_key</code>、<code>require_email_verification</code>。其余变量仍需重启生效。
                 </p>
@@ -188,5 +194,5 @@ npm --prefix webui run build</code></pre>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-05</span>
+                    <span>最后更新：2026-09-07</span>
                 </div>

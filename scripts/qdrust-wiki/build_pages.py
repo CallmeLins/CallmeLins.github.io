@@ -75,7 +75,6 @@ PAGES = [
     },
 ]
 
-MAIN_OPEN = '<main class="wiki-article min-w-0">'
 MAIN_CLOSE = "</main>"
 
 
@@ -108,7 +107,11 @@ def build(shell: str, page: dict, part: str) -> str:
     out = re.sub(r'<a href="([a-z-]+\.html)" class="wiki-nav-link[^"]*">', fix_nav, out)
 
     # 5. article body
-    start = out.index(MAIN_OPEN) + len(MAIN_OPEN)
+    # 用正则而非固定字符串：外壳的 <main> 可能被编辑器注入额外属性
+    m = re.search(r"<main[^>]*>", out)
+    if not m:
+        raise ValueError("index.html 外壳里找不到 <main> 标记")
+    start = m.end()
     end = out.index(MAIN_CLOSE, start)
     out = out[:start] + "\n" + part.rstrip("\n") + "\n            " + out[end:]
 
@@ -117,7 +120,7 @@ def build(shell: str, page: dict, part: str) -> str:
 
 def main() -> int:
     shell = SHELL.read_text(encoding="utf-8")
-    if MAIN_OPEN not in shell or MAIN_CLOSE not in shell:
+    if not re.search(r"<main[^>]*>", shell) or MAIN_CLOSE not in shell:
         print("ERROR: main markers not found in index.html", file=sys.stderr)
         return 1
 

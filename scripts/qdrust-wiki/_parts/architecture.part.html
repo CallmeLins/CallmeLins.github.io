@@ -104,7 +104,7 @@ success_asserts / failed_asserts → 判定成败
 
                 <h2 id="security">安全模型</h2>
                 <ul>
-                    <li><strong>认证</strong>：开放注册、bootstrap 初始管理员、忘记/重置密码、可选邮箱验证（<code>REQUIRE_EMAIL_VERIFICATION</code>）。登录有独立限流（默认 5 次 / 60 秒）。</li>
+                    <li><strong>认证</strong>：本地为开放注册、bootstrap 初始管理员、忘记/重置密码、可选邮箱验证（<code>REQUIRE_EMAIL_VERIFICATION</code>）；登录有独立限流（默认 5 次 / 60 秒）。自托管还可叠加外部身份提供方（OIDC 授权码 + PKCE，或反向代理 Header 认证），本地账号密码能力始终保留，详见<a href="usage.html#external-login">使用指南 · 第三方登录</a>。</li>
                     <li><strong>会话</strong>：<code>SESSION_TTL_SECONDS</code> 默认 7 天；<strong>CSRF 令牌轮换</strong>；HTTPS 下必须开启 <code>COOKIE_SECURE</code>。可选 Redis 会话缓存（仅加速，非必需）。</li>
                     <li><strong>归属校验</strong>：所有用户资源（模板、任务、运行、通知渠道）均在服务端执行归属校验，而不是依赖前端过滤。</li>
                     <li><strong>SSRF 防护</strong>：CLI 默认拒绝私网地址、localhost 与无效 TLS 证书——这是刻意区别于旧 QD 宽松策略的一点。服务端执行不受此限制。</li>
@@ -148,5 +148,5 @@ success_asserts / failed_asserts → 判定成败
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-03</span>
+                    <span>最后更新：2026-09-07</span>
                 </div>

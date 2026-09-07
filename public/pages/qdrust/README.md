@@ -14,7 +14,7 @@ public/pages/qdrust/
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全、API
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、util 工具
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
-├── api.html            # API 接口：76 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
+├── api.html            # API 接口：79 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
 ├── faq.html            # 常见问题
 └── README.md           # 本文档
 ```
@@ -102,7 +102,7 @@ python scripts/gen-qdrust-api.py --qdrust D:/code/qdrust
    路由注册在源码里分两段，脚本都扫：inner（`Router::new()` 到 `let state = AppState {`，含 API 与 SPA）与 root（`let mut root = Router::new()` 到 `root.with_state`，只含 `/health`、`/ready` 探针——它们刻意留在根路径，不受 `QDRUST_BASE_PATH` 影响）。
 2. `docs/openapi-v1.json` —— 给出参数、请求体、响应与 `components.schemas`。
 
-脚本会自动补两份数据的缺口并打印提示：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，也漏收了 `DELETE /api/v1/admin/users/{id}`。
+脚本会自动补两份数据的缺口：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，源码里已注册却未进文档的端点也会一并补入（当前 4 处：`DELETE /admin/users/{id}` 与 3 个 OIDC 登录端点），并在页面末尾的「与 OpenAPI 文档的差异」列出——这部分是**动态生成**的，不用手改。
 
 新增端点时只需在脚本的 `DESC` 字典补一条中文说明，`GROUPS` 列表调整分组规则，其余全部随源码自动更新。
 

@@ -55,6 +55,9 @@ DESC = {
     ("POST", "/api/v1/auth/verify-email"): "校验邮箱验证码",
     ("POST", "/api/v1/auth/resend-verification"): "重发邮箱验证邮件",
     ("POST", "/api/v1/auth/csrf/rotate"): "轮换 CSRF 令牌，返回新的 <code>qd_csrf</code>",
+    ("GET", "/api/v1/auth/config"): "读取服务端认证策略：<code>auth_mode</code>、<code>local_login_enabled</code>、<code>oidc_enabled</code>、<code>oidc_provider_name</code>、<code>header_auth_enabled</code>。WebUI 据此决定渲染哪些登录入口",
+    ("GET", "/api/v1/auth/oidc/start"): "发起 OIDC 授权码 + PKCE 流程：发现 IdP 后生成 state 与 PKCE verifier，落一条一次性记录并重定向到 IdP",
+    ("GET", "/api/v1/auth/oidc/callback"): "OIDC 回调端点：校验 state 与 PKCE 后建档或登录并下发会话。<strong>需在 IdP 侧登记为回调地址</strong>",
 
     ("GET", "/api/v1/templates"): "分页列出模板，支持关键词搜索、分组过滤与游标翻页",
     ("POST", "/api/v1/templates"): "新建模板（Template Schema v1）",
@@ -333,8 +336,10 @@ def load_openapi(doc: dict, perms: dict) -> tuple[list[dict], dict]:
             "responses": [{"code": "200", "desc": "OpenAPI document", "schema": None}],
         })
 
-    # 文档漏收但源码已注册的端点，按源码补入（例如 DELETE /admin/users/{id}）
+    # 文档漏收但源码已注册的端点，按源码补入（例如 DELETE /admin/users/{id}、
+    # OIDC 登录相关端点）。补入清单会渲染到页面末尾的「与 OpenAPI 文档的差异」。
     known = {(o["method"], o["path"]) for o in ops}
+    patched = []
     for (method, path), (perm, handler) in perms.items():
         if (method, path) in known:
             continue
@@ -347,7 +352,8 @@ def load_openapi(doc: dict, perms: dict) -> tuple[list[dict], dict]:
             "perm": perm, "handler": handler, "params": params, "body": None,
             "responses": [{"code": "204", "desc": "Success", "schema": None}],
         })
-    return ops, doc.get("components", {}).get("schemas", {})
+        patched.append((method, path, handler))
+    return ops, doc.get("components", {}).get("schemas", {}), patched
 
 
 # ==========================================================================
@@ -405,7 +411,8 @@ def group_of(path: str) -> str:
     return "system"
 
 
-def build_part(ops: list[dict], schemas: dict, version: str) -> str:
+def build_part(ops: list[dict], schemas: dict, version: str,
+               patched: list[tuple[str, str, str]]) -> str:
     buckets: dict[str, list] = {key: [] for key, _, _ in GROUPS}
     for op in ops:
         buckets.setdefault(group_of(op["path"]), []).append(op)
@@ -467,6 +474,29 @@ def build_part(ops: list[dict], schemas: dict, version: str) -> str:
     )
 
     n = len(ops)
+    if patched:
+        items = "\n".join(
+            f'                    <li><code>{esc(m)} {esc(p)}</code> —— 源码已注册'
+            f'（handler <code>{esc(h)}</code>），但 OpenAPI 文档未收录。本页已补上。</li>'
+            for m, p, h in sorted(patched)
+        )
+        notes_body = (
+            "                <p>\n"
+            "                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准。"
+            f"比对内嵌文档后发现 <strong>{len(patched)} 处</strong>遗漏：\n"
+            "                </p>\n"
+            "                <ul>\n" + items + "\n"
+            "                </ul>\n"
+            "                <p>若你用文档生成客户端 SDK，这些端点需要手动补。</p>"
+        )
+    else:
+        notes_body = (
+            "                <p>\n"
+            "                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准，"
+            "与内嵌 OpenAPI 文档比对后<strong>没有发现遗漏</strong>。\n"
+            "                </p>"
+        )
+
     return f"""                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
                     qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
@@ -645,14 +675,7 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
                 </div>
 
                 <h2 id="notes">与 OpenAPI 文档的差异</h2>
-                <p>
-                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准。比对内嵌文档后发现一处遗漏：
-                </p>
-                <ul>
-                    <li><code>DELETE /api/v1/admin/users/{{id}}</code> —— 源码已注册（handler <code>admin_delete_user</code>），但 OpenAPI 文档未收录。本页已补上。</li>
-                </ul>
-                <p>若你用文档生成客户端 SDK，这个端点需要手动补。</p>
-
+{notes_body}
                 <div class="wiki-meta">
                     <span>基于 qdrust v{version} 服务端路由与 OpenAPI 3.1 文档整理</span>
                     <span>共 {n} 个端点</span>
@@ -663,17 +686,18 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
 # ==========================================================================
 # 4. 套壳生成最终页面
 # ==========================================================================
-MAIN_OPEN = '<main class="wiki-article min-w-0">'
 MAIN_CLOSE = "</main>"
 TITLE = "API 接口 | qdrust Wiki"
-DESCRIPTION = ("qdrust 完整 REST API 参考：76 个端点的路径、权限与用途，Cookie 与 CSRF 认证、"
+# {n} 在生成时替换为实际端点数，避免端点增减后描述失真
+DESCRIPTION = ("qdrust 完整 REST API 参考：{n} 个端点的路径、权限与用途，Cookie 与 CSRF 认证、"
                "错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。")
 
 
-def build_page(shell: str, part: str) -> str:
+def build_page(shell: str, part: str, endpoint_count: int) -> str:
+    desc = DESCRIPTION.format(n=endpoint_count)
     out = re.sub(r"<title>.*?</title>", f"<title>{TITLE}</title>", shell, count=1)
     out = re.sub(r'(<meta name="description" content=")[^"]*(")',
-                 lambda m: m.group(1) + DESCRIPTION + m.group(2), out, count=1)
+                 lambda m: m.group(1) + desc + m.group(2), out, count=1)
     out = re.sub(r'(<link rel="canonical" href=")[^"]*(")',
                  lambda m: m.group(1) + "https://callmelins.github.io/pages/qdrust/api.html" + m.group(2),
                  out, count=1)
@@ -684,7 +708,11 @@ def build_page(shell: str, part: str) -> str:
         return f'<a href="{href}" class="{cls}">'
 
     out = re.sub(r'<a href="([a-z-]+\.html)" class="wiki-nav-link[^"]*">', fix_nav, out)
-    start = out.index(MAIN_OPEN) + len(MAIN_OPEN)
+    # 用正则而非固定字符串：外壳的 <main> 可能被编辑器注入额外属性
+    m = re.search(r"<main[^>]*>", out)
+    if not m:
+        raise ValueError("index.html 外壳里找不到 <main> 标记")
+    start = m.end()
     end = out.index(MAIN_CLOSE, start)
     return out[:start] + "\n" + part.rstrip("\n") + "\n            " + out[end:]
 
@@ -705,15 +733,15 @@ def main() -> int:
     source = api_rs.read_text(encoding="utf-8")
     perms = parse_routes(source)
     doc = json.loads(openapi.read_text(encoding="utf-8"))
-    ops, schemas = load_openapi(doc, perms)
+    ops, schemas, patched = load_openapi(doc, perms)
     version = doc.get("info", {}).get("version", "0.0.0")
 
     missing = [f"{m} {p}" for (m, p) in perms if not any(o["method"] == m and o["path"] == p for o in ops)]
     if missing:
         print("WARN: 源码有、文档无（已按源码补入）:", missing)
 
-    part = build_part(ops, schemas, version)
-    html = build_page(SHELL.read_text(encoding="utf-8"), part)
+    part = build_part(ops, schemas, version, patched)
+    html = build_page(SHELL.read_text(encoding="utf-8"), part, len(ops))
     TARGET.write_text(html, encoding="utf-8")
 
     counts = Counter(op["perm"] for op in ops)

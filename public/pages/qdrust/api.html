@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 完整 REST API 参考：76 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
+    <meta name="description" content="qdrust 完整 REST API 参考：79 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
     <title>API 接口 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/api.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -188,10 +188,10 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>76 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>79 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.4</span>
+                    <span class="badge badge-dark">v0.1.5</span>
                     <span class="badge">REST · JSON</span>
                     <span class="badge">OpenAPI 3.1</span>
                     <span class="badge">Cookie + CSRF</span>
@@ -214,7 +214,7 @@
                         <thead><tr><th>资源</th><th>端点数</th><th>公开</th><th>需登录</th><th>需管理员</th></tr></thead>
                         <tbody>
                             <tr><td><a href="#ep-system">系统与监控</a></td><td>3</td><td>3</td><td>0</td><td>0</td></tr>
-                            <tr><td><a href="#ep-auth">认证与会话</a></td><td>11</td><td>6</td><td>5</td><td>0</td></tr>
+                            <tr><td><a href="#ep-auth">认证与会话</a></td><td>14</td><td>9</td><td>5</td><td>0</td></tr>
                             <tr><td><a href="#ep-templates">模板</a></td><td>10</td><td>1</td><td>9</td><td>0</td></tr>
                             <tr><td><a href="#ep-tasks">任务</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
                             <tr><td><a href="#ep-runs">运行记录</a></td><td>5</td><td>0</td><td>5</td><td>0</td></tr>
@@ -223,7 +223,7 @@
                             <tr><td><a href="#ep-public">公共模板与发布申请</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
                             <tr><td><a href="#ep-plugins">外部插件</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-admin">管理员</a></td><td>11</td><td>0</td><td>0</td><td>11</td></tr>
-                            <tr><td><strong>合计</strong></td><td><strong>76</strong></td><td><strong>10</strong></td><td><strong>55</strong></td><td><strong>11</strong></td></tr>
+                            <tr><td><strong>合计</strong></td><td><strong>79</strong></td><td><strong>13</strong></td><td><strong>55</strong></td><td><strong>11</strong></td></tr>
                         </tbody>
                     </table>
 
@@ -253,7 +253,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     <table>
                         <thead><tr><th>级别</th><th>数量</th><th>判定方式</th></tr></thead>
                         <tbody>
-                            <tr><td><span class="perm perm-public">公开</span></td><td>10</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
+                            <tr><td><span class="perm perm-public">公开</span></td><td>13</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
                             <tr><td><span class="perm perm-user">登录</span></td><td>55</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
                             <tr><td><span class="perm perm-admin">管理员</span></td><td>11</td><td>在会话有效的基础上再要求 <code>role == "admin"</code>，否则 <code>403 admin_required</code></td></tr>
                         </tbody>
@@ -302,7 +302,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 
                 <h2 id="endpoints">接口一览</h2>
                 <p>
-                    下表按资源分组列出全部 76 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
+                    下表按资源分组列出全部 79 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
                     路径参数写作 <code>{id}</code>。
                 </p>
 
@@ -316,15 +316,18 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-auth">认证与会话 <span class="count">11</span></h3>
+                <h3 id="ep-auth">认证与会话 <span class="count">14</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/bootstrap</code></td><td><span class="perm perm-public">公开</span></td><td>创建首个管理员账号；已有用户时返回 409，整个生命周期只能成功一次</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/auth/config</code></td><td><span class="perm perm-public">公开</span></td><td>读取服务端认证策略：<code>auth_mode</code>、<code>local_login_enabled</code>、<code>oidc_enabled</code>、<code>oidc_provider_name</code>、<code>header_auth_enabled</code>。WebUI 据此决定渲染哪些登录入口</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/csrf/rotate</code></td><td><span class="perm perm-user">登录</span></td><td>轮换 CSRF 令牌，返回新的 <code>qd_csrf</code></td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/forgot-password</code></td><td><span class="perm perm-public">公开</span></td><td>申请密码重置，向邮箱发送令牌</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/login</code></td><td><span class="perm perm-public">公开</span></td><td>登录并下发会话 Cookie；失败会计入限流窗口</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/logout</code></td><td><span class="perm perm-user">登录</span></td><td>注销当前会话并清除 Cookie</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/auth/oidc/callback</code></td><td><span class="perm perm-public">公开</span></td><td>OIDC 回调端点：校验 state 与 PKCE 后建档或登录并下发会话。<strong>需在 IdP 侧登记为回调地址</strong></td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/auth/oidc/start</code></td><td><span class="perm perm-public">公开</span></td><td>发起 OIDC 授权码 + PKCE 流程：发现 IdP 后生成 state 与 PKCE verifier，落一条一次性记录并重定向到 IdP</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/password</code></td><td><span class="perm perm-user">登录</span></td><td>修改当前用户密码（需校验旧密码）</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/register</code></td><td><span class="perm perm-public">公开</span></td><td>注册普通用户；首个用户请改用 bootstrap</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/resend-verification</code></td><td><span class="perm perm-user">登录</span></td><td>重发邮箱验证邮件</td></tr>
@@ -715,16 +718,18 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
 
                 <h2 id="notes">与 OpenAPI 文档的差异</h2>
                 <p>
-                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准。比对内嵌文档后发现一处遗漏：
+                    本页以 <code>crates/qdrust-server/src/api.rs</code> 的路由注册为准。比对内嵌文档后发现 <strong>4 处</strong>遗漏：
                 </p>
                 <ul>
                     <li><code>DELETE /api/v1/admin/users/{id}</code> —— 源码已注册（handler <code>admin_delete_user</code>），但 OpenAPI 文档未收录。本页已补上。</li>
+                    <li><code>GET /api/v1/auth/config</code> —— 源码已注册（handler <code>auth_config</code>），但 OpenAPI 文档未收录。本页已补上。</li>
+                    <li><code>GET /api/v1/auth/oidc/callback</code> —— 源码已注册（handler <code>oidc_login_callback</code>），但 OpenAPI 文档未收录。本页已补上。</li>
+                    <li><code>GET /api/v1/auth/oidc/start</code> —— 源码已注册（handler <code>oidc_login_start</code>），但 OpenAPI 文档未收录。本页已补上。</li>
                 </ul>
-                <p>若你用文档生成客户端 SDK，这个端点需要手动补。</p>
-
+                <p>若你用文档生成客户端 SDK，这些端点需要手动补。</p>
                 <div class="wiki-meta">
-                    <span>基于 qdrust v0.1.4 服务端路由与 OpenAPI 3.1 文档整理</span>
-                    <span>共 76 个端点</span>
+                    <span>基于 qdrust v0.1.5 服务端路由与 OpenAPI 3.1 文档整理</span>
+                    <span>共 79 个端点</span>
                 </div>
             </main>
 

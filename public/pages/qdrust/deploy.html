@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="VJTDGWO69PN7QBeinzyB2A">
-<head data-page-node-id="Vlin4mCj1VUxemyr6Zjq6P">
-    <meta charset="UTF-8" data-page-node-id="XsxEp3VZpkh6oZWfiMZhzQ">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="btPOuFJ3j44FxLeLrZrGPy">
-    <meta name="description" content="qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、10 种通知渠道、备份与升级回滚。" data-page-node-id="JMndyQVgMwhfGwDLlvRrOD">
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、10 种通知渠道、备份与升级回滚。">
     <title>部署与运维 | qdrust Wiki</title>
-    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/deploy.html" data-page-node-id="y0KseBoC6eh56swPnnBj18">
-    <link rel="icon" href="https://callmelins.github.io/favicon.svg" data-page-node-id="40qpWCEJVDNzrWVD8o3VHF">
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/deploy.html">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="rjyewmD1uCA3c3bOPxy8zR">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="1HK16cGK2dtNbZdFa9oCQl">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" data-page-node-id="lJnBBPHfedGvfvEFB2g3U0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -136,80 +136,80 @@
         }
     </style>
 </head>
-<body class="bg-white text-gray-900" data-page-node-id="sNf1fGGHFPJe81X21flK6E">
+<body class="bg-white text-gray-900">
     <!-- Top bar -->
-    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200" data-page-node-id="HIZW5RNgdFBfgT3CjwxBCf">
-        <div class="wiki-shell px-6 py-3.5" data-page-node-id="GMJDXDddp0qBS9t46HD9OK">
-            <div class="flex items-center justify-between gap-4" data-page-node-id="jSS6LqLxvZwQXCoqjB2kDq">
-                <div class="flex items-center gap-3 min-w-0" data-page-node-id="XX8mRtPVVEWT4rTHlgGsyk">
-                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录" data-page-node-id="GmBCxfZDCc7paWv9H8JmbI">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="Wy7C9tISFMHElUlEqrub6T"><path d="M3 6h18M3 12h18M3 18h18" data-page-node-id="hz1hct3Y92kicFulyZMGXR"/></svg>
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="wiki-shell px-6 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     </button>
-                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0" data-page-node-id="4auQucvAGeRVGjXwa7bHYz">
-                        <span class="text-lg font-semibold tracking-tight" data-page-node-id="sQKiGNuqEkMhTEE7BNHY39">qdrust</span>
-                        <span class="text-xs text-gray-400 hidden sm:inline" data-page-node-id="EndlZJQ6DIltsfs5Bn5ocf">Wiki</span>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
+                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
                     </a>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0" data-page-node-id="6dpxZPDrzrHcn7B1DYr0dj">
-                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200" data-page-node-id="wzljVAg7VM9XN3Ly2xvgyl">GitHub</a>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="wiki-shell px-6 pt-28 pb-20" data-page-node-id="zfbiA8tfHJofadLV1fKJ1C">
-        <div class="wiki-grid" data-page-node-id="dJl4Nbf0CX4YLvfpT7UuAP">
+    <div class="wiki-shell px-6 pt-28 pb-20">
+        <div class="wiki-grid">
             <!-- Sidebar -->
-            <aside class="wiki-sidebar" id="sidebar" data-page-node-id="d8XRyZoV3NE9aPCKlSVtLH">
-                <div class="wiki-nav-title" data-page-node-id="fxaMJ0dFAp7gRdJucdcBGZ">入门</div>
-                <a href="index.html" class="wiki-nav-link" data-page-node-id="2SwOMjeQFFX9CTYXOvMY91">总览</a>
-                <a href="deploy.html" class="wiki-nav-link is-active" data-page-node-id="TUB7MRCZseIkvzLRojbaO4">部署与运维</a>
-                <a href="usage.html" class="wiki-nav-link" data-page-node-id="aD5TamHUw5zvTEYr8keeDG">使用指南</a>
+            <aside class="wiki-sidebar" id="sidebar">
+                <div class="wiki-nav-title">入门</div>
+                <a href="index.html" class="wiki-nav-link">总览</a>
+                <a href="deploy.html" class="wiki-nav-link is-active">部署与运维</a>
+                <a href="usage.html" class="wiki-nav-link">使用指南</a>
 
-                <div class="wiki-nav-title" data-page-node-id="vKsghd692iH59ETNyA9bTC">核心概念</div>
-                <a href="architecture.html" class="wiki-nav-link" data-page-node-id="HnMUMlBPkziIs71qeLzbZd">架构设计</a>
-                <a href="templates.html" class="wiki-nav-link" data-page-node-id="NX3P56Hir9ek2Gbgvfn8rz">模板与表达式</a>
+                <div class="wiki-nav-title">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
 
-                <div class="wiki-nav-title" data-page-node-id="Hys14eazhUdyw2dBDgSGKm">进阶</div>
-                <a href="browser.html" class="wiki-nav-link" data-page-node-id="fFm5Z4JBF6VPyQYRP6F7a6">浏览器插件</a>
+                <div class="wiki-nav-title">进阶</div>
+                <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
 
-                <div class="wiki-nav-title" data-page-node-id="JMsZucVNdaP70DcBsQD1EP">参考</div>
-                <a href="api.html" class="wiki-nav-link" data-page-node-id="YHithtYeGrIweJY2p7INGJ">API 接口</a>
+                <div class="wiki-nav-title">参考</div>
+                <a href="api.html" class="wiki-nav-link">API 接口</a>
 
-                <div class="wiki-nav-title" data-page-node-id="Qdm5JKBvaOeQwhCHGijZXn">帮助</div>
-                <a href="faq.html" class="wiki-nav-link" data-page-node-id="4g68O5KABt3OyCAH5UVNfb">常见问题</a>
+                <div class="wiki-nav-title">帮助</div>
+                <a href="faq.html" class="wiki-nav-link">常见问题</a>
 
-                <div class="wiki-nav-title" data-page-node-id="zPiHBMaWQE3sQlJHmbF1BV">外部链接</div>
-                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link" data-page-node-id="MiAxJuF6vyk7v8PVK5VlIt">源码仓库 ↗</a>
-                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link" data-page-node-id="skSlL552Y5h1bGndxIiIlu">QD 原项目 ↗</a>
+                <div class="wiki-nav-title">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
             </aside>
 
             <!-- Article -->
-            <main class="wiki-article min-w-0" data-page-node-id="NkLCItXRNIOOPH9ASvC7K6">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3" data-page-node-id="VgIBN7DAyl1Jmy4GGhXGla">部署与运维</h1>
-                <p class="text-lg text-gray-600 mb-10" data-page-node-id="NLbHuEdIQAY2MNQh34r4Cm">
+            <main class="wiki-article min-w-0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">部署与运维</h1>
+                <p class="text-lg text-gray-600 mb-10">
                     Docker 快速启动、生产 Compose 配置、反向代理到二级目录、环境变量全表、数据库选型、通知渠道，以及备份与升级回滚。
                 </p>
 
-                <h2 id="requirements" data-page-node-id="DKYVVygBiFbhDCTmJIRlm3">环境要求</h2>
-                <ul data-page-node-id="Oj878lcXX57Zr3igHnrc4p">
-                    <li data-page-node-id="9RW9kHgai3SyCzQi2v8bn7"><strong data-page-node-id="v0iU1y3FYlrMoEuLX8gFdx">Rust 1.85+</strong>（项目使用 Rust 2024 edition）——仅从源码构建时需要。</li>
-                    <li data-page-node-id="fWYxay0xm1wqQnAIhETq73"><strong data-page-node-id="nNIDkeen1BzpnS8SSpXeZk">Node.js 24 + npm</strong>——仅本地构建 WebUI 时需要；Docker 镜像已内置前端产物。</li>
-                    <li data-page-node-id="uF4q16rk61w9HabXaV6Uuj"><strong data-page-node-id="AkEgPGnwFFDFjsqLAd0PPx">Docker</strong>——推荐用于生产部署。</li>
+                <h2 id="requirements">环境要求</h2>
+                <ul>
+                    <li><strong>Rust 1.85+</strong>（项目使用 Rust 2024 edition）——仅从源码构建时需要。</li>
+                    <li><strong>Node.js 24 + npm</strong>——仅本地构建 WebUI 时需要；Docker 镜像已内置前端产物。</li>
+                    <li><strong>Docker</strong>——推荐用于生产部署。</li>
                 </ul>
 
-                <h2 id="docker" data-page-node-id="D2OEQcJkD5WhTxCcUrI8nj">Docker 快速启动</h2>
-                <p data-page-node-id="Bhri9BbUwPXfYym0xnRXG2">镜像已发布到 GitHub 容器注册表（GHCR），直接拉取运行，无需本地构建：</p>
-                <pre data-page-node-id="AAHKVkIfaDsU6CYbspKDGx"><code data-page-node-id="Jkbr06Ak33fICULh495tFM">docker pull ghcr.io/callmelins/qdrust:latest
+                <h2 id="docker">Docker 快速启动</h2>
+                <p>镜像已发布到 GitHub 容器注册表（GHCR），直接拉取运行，无需本地构建：</p>
+                <pre><code>docker pull ghcr.io/callmelins/qdrust:latest
 
 # 最简启动：数据保存在命名卷 qdrust-data，监听 8923
 docker run -d --name qdrust -p 8923:8923 \
   -v qdrust-data:/data \
   ghcr.io/callmelins/qdrust:latest</code></pre>
-                <p data-page-node-id="eTAQdo1qgGR5yxbCesB5XG">服务默认监听 <code data-page-node-id="5DDTb5vDCO9psZsvCKEAuz">http://localhost:8923</code>。首次打开 WebUI 会引导创建<strong data-page-node-id="94vWlQRvjHsSPNZYygcgM6">初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code data-page-node-id="Hor7yRnq9QkJVNbqE8AZHo">data/qd.db</code>。</p>
+                <p>服务默认监听 <code>http://localhost:8923</code>。首次打开 WebUI 会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code>data/qd.db</code>。</p>
 
-                <h2 id="compose" data-page-node-id="rEdvCV2HZLlnqaGpm5ru3f">生产 Compose 配置</h2>
-                <pre data-page-node-id="F9Of7sx9OSegxBt5WyGRmV"><code data-page-node-id="gIGr7qw4EDqwxv5BwOtXXM"># docker-compose.yml
+                <h2 id="compose">生产 Compose 配置</h2>
+                <pre><code># docker-compose.yml
 services:
   qdrust:
     image: ghcr.io/callmelins/qdrust:latest
@@ -231,168 +231,174 @@ services:
 
 volumes:
   qdrust-data:</code></pre>
-                <pre data-page-node-id="Ardff3U2Hj83cBkHQMEukH"><code data-page-node-id="t6ikfOCIAw09HPty88jFmr">docker compose up -d
+                <pre><code>docker compose up -d
 docker compose logs -f qdrust   # 查看日志
 docker compose down             # 停止</code></pre>
-                <p class="text-sm text-gray-500" data-page-node-id="UzcCQcFJz7CGTePGnVVNMT">从源码构建（贡献代码时自测）：仓库自带 <code data-page-node-id="LsUs4pniNrbsTQWoExpbZ1">compose.yaml</code>，执行 <code data-page-node-id="jDWdE8HYkR7EdsZCS65xdz">docker compose up --build -d</code> 会构建本地 <code data-page-node-id="uPzBqsNPxv7WXNq21mkiNm">qdrust:local</code> 镜像。</p>
+                <p class="text-sm text-gray-500">从源码构建（贡献代码时自测）：仓库自带 <code>compose.yaml</code>，执行 <code>docker compose up --build -d</code> 会构建本地 <code>qdrust:local</code> 镜像。</p>
 
-                <h2 id="subpath" data-page-node-id="MnK7WXalIkk56u89KPTr5V">反向代理到二级目录（sub-path）</h2>
-                <p data-page-node-id="tlEmCX5as29TGklcNGjFdQ">
-                    站点默认伺服在根路径，适合<strong data-page-node-id="vhZQDEywNElM38xaAlsCmn">二级域名</strong>（<code data-page-node-id="jYft3QxkFJ9fX0ipb9V6qz">https://qd.your.domain</code>）或裸域名。若想反代到<strong data-page-node-id="LohjmBDY0YO8raNOxVJrkO">二级目录</strong>（如
-                    <code data-page-node-id="94NGd7GJWkotz4omyHTYhR">https://your.domain/qd</code>）——少一条 DNS 记录，且路径对中间人不可见——按下面三步配置。
+                <h2 id="subpath">反向代理到二级目录（sub-path）</h2>
+                <p>
+                    站点默认伺服在根路径，适合<strong>二级域名</strong>（<code>https://qd.your.domain</code>）或裸域名。若想反代到<strong>二级目录</strong>（如
+                    <code>https://your.domain/qd</code>）——少一条 DNS 记录，且路径对中间人不可见——按下面三步配置。
                 </p>
-                <ol data-page-node-id="FwAlxuDlNPI4mupye3GG8e">
-                    <li data-page-node-id="QFuea0itdZZ8sK6jmN9l1r">
-                        <strong data-page-node-id="JNhxJJevJ3vgQ2g8JBKi4D">前端自适应，无需重建。</strong> WebUI 以<strong data-page-node-id="DGN4Gi3JqJnnKrSZM0yxBZ">相对 base</strong> 构建，API 前缀在<strong data-page-node-id="cnnJPHClhERmqGrlUjnSgt">运行时</strong>从当前页面 URL 推导（见
-                        <code data-page-node-id="wwAL4z2on6BlWx8OOQ3FGA">webui/src/api.ts</code> 的 <code data-page-node-id="G04lhnjM8q1qo6P5JmmAbY">detectUrlPrefix</code>）。因此<strong data-page-node-id="QTT7AhlEzqep8pPQWftVdL">同一份镜像</strong>既能在根路径用，也能在任意二级目录用，
+                <ol>
+                    <li>
+                        <strong>前端自适应，无需重建。</strong> WebUI 以<strong>相对 base</strong> 构建，API 前缀在<strong>运行时</strong>从当前页面 URL 推导（见
+                        <code>webui/src/api.ts</code> 的 <code>detectUrlPrefix</code>）。因此<strong>同一份镜像</strong>既能在根路径用，也能在任意二级目录用，
                         不必为每个前缀重新构建前端。
                     </li>
-                    <li data-page-node-id="1Rlm8DqQUIESEuelEsMqR6">
-                        <strong data-page-node-id="1gQI2d7pCKgVhZ6Co6NwXX">后端设置前缀。</strong> 将 <code data-page-node-id="ILG2zEOAavKTQlQjHy0JNd">QDRUST_BASE_PATH</code> 设为实际反代前缀，后端会在该目录下伺服静态资源与 SPA。
-                        <code data-page-node-id="3o6wifqrBrJS1ipHvOudtK">/health</code>、<code data-page-node-id="9OepgxPt4SDrr3IXs3iWc1">/ready</code> 探针仍留在根路径，供健康检查使用。
+                    <li>
+                        <strong>后端设置前缀。</strong> 将 <code>QDRUST_BASE_PATH</code> 设为实际反代前缀，后端会在该目录下伺服静态资源与 SPA。
+                        <code>/health</code>、<code>/ready</code> 探针仍留在根路径，供健康检查使用。
                     </li>
-                    <li data-page-node-id="TdzfBKEtjETMSzdOMXK2Lt"><strong data-page-node-id="kjRvE2obVSod81yb5YT5rq">反向代理原样转发，不要剥离前缀。</strong></li>
+                    <li><strong>反向代理原样转发，不要剥离前缀。</strong></li>
                 </ol>
-                <pre data-page-node-id="2ZCE38mcSu686UFi7bbLLB"><code data-page-node-id="JL0qbWzyf1lFbWyRCx87aG"># nginx
+                <pre><code># nginx
 location /qd/ {
     proxy_pass http://127.0.0.1:8923;   # 不剥离 /qd
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-Proto $scheme;
 }</code></pre>
-                <p data-page-node-id="vWGIYWrhCYJy4Bx2h3hmdI">完整配置示例（目标地址 <code data-page-node-id="M43mVAKmGazAiH652siKvB">https://your.domain/qd</code>）：</p>
-                <pre data-page-node-id="dSF8pbliOhjJAhYEZT5s4A"><code data-page-node-id="f3XWuiFzkWjkWgD8A04ir0"># 后端
+                <p>完整配置示例（目标地址 <code>https://your.domain/qd</code>）：</p>
+                <pre><code># 后端
 QDRUST_BASE_PATH=/qd
 
 # nginx：location /qd/ 原样转发到 8923（见上）</code></pre>
-                <p data-page-node-id="YdFdj3fVG6fubcVWgbBNYx">访问 <code data-page-node-id="1nx9CDcKd099WNPSnJhRXf">https://your.domain/qd/</code>（注意<strong data-page-node-id="IOioub1r2PHQpqGu9eAb4w">末尾斜杠</strong>）即可，浏览器按相对路径自动解析静态资源与 API 请求。</p>
-                <div class="callout" data-page-node-id="esNDuM8ayT0GD2YusbvjQ7">
-                    <div class="callout-title" data-page-node-id="AkLfY6n6nZZWkw1qklUZG9">两种需要避开的用法</div>
-                    <p data-page-node-id="7wbhgS9kWIMyv2rlUNuBIT">
-                        <strong data-page-node-id="7mFKJw3uv0lmEH2RwwzU0z">① 剥离前缀式反代不兼容。</strong> <code data-page-node-id="30KoFn0huHG0V7rRQ8lUim">proxy_pass http://127.0.0.1:8923/;</code> 配 URL 改写会把前缀吃掉，与运行时推导方案冲突——请改用上面的「原样转发」。<br data-page-node-id="Izk564VtwdqkxdDrubQGCb">
-                        <strong data-page-node-id="5eMYK5eg015rGc0SOW98EG">② 编译期固定前缀（旧用法，可选）。</strong> 若确实想把前缀在构建时写死，可用 <code data-page-node-id="xWVvsZJyXvzmsdciVBOUWS">VITE_BASE_PATH=/qd npm run build</code>（Docker 用
-                        <code data-page-node-id="unpe7fdaGj5GaeP4tIPhur">--build-arg VITE_BASE_PATH=/qd</code>）得到绝对 base 的 UI，仍受支持，但通常没必要。
+                <p>访问 <code>https://your.domain/qd/</code>（注意<strong>末尾斜杠</strong>）即可，浏览器按相对路径自动解析静态资源与 API 请求。</p>
+                <div class="callout">
+                    <div class="callout-title">两种需要避开的用法</div>
+                    <p>
+                        <strong>① 剥离前缀式反代不兼容。</strong> <code>proxy_pass http://127.0.0.1:8923/;</code> 配 URL 改写会把前缀吃掉，与运行时推导方案冲突——请改用上面的「原样转发」。<br>
+                        <strong>② 编译期固定前缀（旧用法，可选）。</strong> 若确实想把前缀在构建时写死，可用 <code>VITE_BASE_PATH=/qd npm run build</code>（Docker 用
+                        <code>--build-arg VITE_BASE_PATH=/qd</code>）得到绝对 base 的 UI，仍受支持，但通常没必要。
                     </p>
                 </div>
-                <p class="text-sm text-gray-500" data-page-node-id="9KKZy0X6l7tUmUT0nrD47H">置空 <code data-page-node-id="029bfnx8MOenHyvSJXUCZE">QDRUST_BASE_PATH</code> 即回到根路径，二级域名 / 裸域名场景不受影响。</p>
+                <p class="text-sm text-gray-500">置空 <code>QDRUST_BASE_PATH</code> 即回到根路径，二级域名 / 裸域名场景不受影响。</p>
 
-                <h2 id="env" data-page-node-id="MvWgZMPOailv2O8nTvc2Dm">环境变量</h2>
-                <p data-page-node-id="dlwL6NlWYSDOZKt1pKBzjR">复制 <code data-page-node-id="bqroLLvaZ596AgCZjZQu5c">.env.example</code> 为 <code data-page-node-id="xxok0WYstXOflUS3Z7GFaD">.env</code> 后按需修改。关键变量：</p>
-                <div class="overflow-x-auto mb-6" data-page-node-id="Hif8Gx7xp0h7IQnsJk8rzX">
-                    <table data-page-node-id="Mi0Hf2BKxFCtP4H9fdL2n0">
-                        <thead data-page-node-id="fK47Tead7EWmgAt1JBnu4j"><tr data-page-node-id="MYma5XQH74tT1dEyXci9qO"><th data-page-node-id="4HWtqfiQ3lam3PKV0WSUcu">变量</th><th data-page-node-id="LTiHjiTDarpITD6sCrzRgh">默认值</th><th data-page-node-id="f5u69FZozrqTwKifRuQkCJ">说明</th></tr></thead>
-                        <tbody data-page-node-id="iVUAwxkmQBbYq3MCF7FOAN">
-                            <tr data-page-node-id="DclfXONjDHxBtMKURFCJMH"><td data-page-node-id="wx7RVw3WsL2igPOkFL0YZJ"><code data-page-node-id="rmYEsJZErdAapwM2MvQinJ">BIND</code> / <code data-page-node-id="RRFgcikKPRUxxQ0xolj9fL">PORT</code></td><td data-page-node-id="0Oho0TENowghEaAwq2jg7m"><code data-page-node-id="GWg6SZKS9BK4iQdfOg50A1">0.0.0.0</code> / <code data-page-node-id="UBqMErNGZEaIA1vbp9Z0St">8923</code></td><td data-page-node-id="rSXcRG2JIrJ8OaGb3zZSx1">监听地址与端口</td></tr>
-                            <tr data-page-node-id="I6qEZKriPkIWpoQGAa7eWd"><td data-page-node-id="vPgXweDFqYWQTx0zVIvDMD"><code data-page-node-id="SpcVvljkScjNnKLXOFPdmz">DATABASE_URL</code></td><td data-page-node-id="YcT6x2qqMSvJKy22f68BT9"><code data-page-node-id="G5CF82zCy5M7PipB2BRCdr">sqlite://data/qd.db</code></td><td data-page-node-id="d4NLXBYXcNx5B8kOiDrVSc">数据库；MySQL 用 <code data-page-node-id="XD90vfGrqJ6ud4TS6AeZNN">mysql://user:pass@host:3306/qdrust</code></td></tr>
-                            <tr data-page-node-id="fygeKH069VEfXO8xq9fAB8"><td data-page-node-id="kDPC7BRni5Bi6OD2LytBog"><code data-page-node-id="FosvA0JGN9i98fn1TfPgW3">DATABASE_MIN_CONNECTIONS</code><br data-page-node-id="TveUYUMmF9IiOELbAOAnkp"><code data-page-node-id="X3EbqXV1Itg4vzYMiYVvi1">DATABASE_MAX_CONNECTIONS</code></td><td data-page-node-id="NHcN8a7ed0NAhkBYlK1Fpq"><code data-page-node-id="Yt2f1lnb5QZ73fOwH8CNTn">1</code> / <code data-page-node-id="bxnCutyDs5dqvUBIDJqVJS">8</code></td><td data-page-node-id="4Bt1ozIXe1COmvDDa0NDCL">连接池上下限</td></tr>
-                            <tr data-page-node-id="OnAmmpyl5mfSh4YMRYz6wi"><td data-page-node-id="rnm6HQhKasm55ObROnbCTD"><code data-page-node-id="UttQpDvhKxNC6ZNWj0Zjxb">SCHEDULER_INTERVAL_SECONDS</code></td><td data-page-node-id="xBVZmLQBzr7Yitdjll78s8"><code data-page-node-id="UVJ0RnEDmz19YPWPEa7XpC">15</code></td><td data-page-node-id="SxNFB3Jbadtl6kIajUIReR">调度器轮询间隔，影响任务触发精度</td></tr>
-                            <tr data-page-node-id="8X3x97RwOHJgcIrwCg5Q2z"><td data-page-node-id="TCbPdyRHK4OdznbgVqPh5T"><code data-page-node-id="JkesBgdyuKqekkPnzH5OUM">REQUEST_TIMEOUT_SECONDS</code></td><td data-page-node-id="BDcGyWqmTB18FJIkwCrGWR"><code data-page-node-id="Ak2ic2DvumFk7XVD2R7Dkn">30</code></td><td data-page-node-id="zc8OnPLeSH7VhBhBFeGm5f">单步 HTTP 请求超时</td></tr>
-                            <tr data-page-node-id="lmtB5wh2sUlmwvcpERwVwA"><td data-page-node-id="ZOwBCvCmfkRBZCgudt57xG"><code data-page-node-id="sMFH38Q0bROhDqJB3ACogL">SESSION_TTL_SECONDS</code></td><td data-page-node-id="LGq9ZirTmnHmwGu7zQ8TQC"><code data-page-node-id="nQQMM3mPdhUnHFmwIHFZha">604800</code></td><td data-page-node-id="SUIEBp2hYCsuqGBAVof8Mu">会话有效期（7 天）</td></tr>
-                            <tr data-page-node-id="rPilr7DtxftlMQt28V7qF9"><td data-page-node-id="XspEhdJARBNzSsDex1Tv0v"><code data-page-node-id="x9N0TMPtKk0F25VeUNGgDR">COOKIE_SECURE</code></td><td data-page-node-id="jJfIWKDJT7HAEO6XoZ7Ll4"><code data-page-node-id="twDHHHGVPsprELtwRAVEQ1">false</code></td><td data-page-node-id="Wh0kHcjg8OdXTQtD5WWqrT"><strong data-page-node-id="Mp9QhWnOoPWGdAoDYOKRgg">HTTPS 下必须设为 <code data-page-node-id="0VJT9EEkC2QH86Ty49HsV9">true</code></strong></td></tr>
-                            <tr data-page-node-id="a3AXZGhoIhNwRoNGLdqczp"><td data-page-node-id="spJclcC7NjXBmGggLxOjPn"><code data-page-node-id="HUmrSZx6NGGcagvUakbWMD">LOGIN_RATE_LIMIT_ATTEMPTS</code><br data-page-node-id="JQkb0hTbyMOQpA643ozN82"><code data-page-node-id="tyeGv21fpOEUEjwg7vcNmm">LOGIN_RATE_LIMIT_WINDOW_SECONDS</code></td><td data-page-node-id="lqopXuuYxQcVDCJSF6UDeW"><code data-page-node-id="pPEKpj25JEOfTJnFG2Y4yy">5</code> / <code data-page-node-id="rhdK4AaWP7v8mAw8V5EcS2">60</code></td><td data-page-node-id="CiTyG3REEsefr4VQdWhSc3">登录限流</td></tr>
-                            <tr data-page-node-id="3x6SBwAX0o7jd1WNXim9lu"><td data-page-node-id="e2N4G9oaZ4YrIqawtwLFEd"><code data-page-node-id="xgAOkcAqrzBAB46b2EITER">LOG_RETENTION_DAYS</code></td><td data-page-node-id="1zwr0pHgQ0PY7wmIj6Qplg"><code data-page-node-id="aZFriTM449IhrOx4NNd2Nn">0</code></td><td data-page-node-id="GCwYyOXqiUE7d5vQAB65Lj">已完成运行记录保留天数（<code data-page-node-id="LjtYCLTxfbR8wEdBxp7QKU">0</code> = 永久）</td></tr>
-                            <tr data-page-node-id="jj9ZLn71WhjQB4DhW4MuyJ"><td data-page-node-id="vPzCHZC5BGKilI7AIZfIuQ"><code data-page-node-id="SAFVgctm9mAQWLV6I05vj1">QDRUST_DEFAULT_TIMEZONE</code></td><td data-page-node-id="xNmHUUSsAVuv7fzDBBoCAk"><code data-page-node-id="NmrSpX0Z4oCeWaxbjJIxfc">Asia/Shanghai</code></td><td data-page-node-id="oIEegpUuL9neoHRi5ze0AY">未显式设时区的任务按此时区求值 cron（<strong data-page-node-id="90L40DAsL9634pcG6nVaiw">DST 感知</strong>）。欧美部署可设如 <code data-page-node-id="bYG2gil8nN7qJdxC4xjGi1">America/New_York</code>。详见<a href="usage.html#timezone" data-page-node-id="N1rL8qXChuCURGqHFED85o">时区与夏令时</a></td></tr>
-                            <tr data-page-node-id="WpQAeu459kwGT2BC3ioKO3"><td data-page-node-id="XBuq0gNnyrLObeWShQzOTy"><code data-page-node-id="LdOHa2ZMjeJ3GlowRMlMYR">QDRUST_BASE_PATH</code></td><td data-page-node-id="dP15q3ZQbxoMvuP2enoUFl">空</td><td data-page-node-id="rUNdIDiq0Wnr4aIrAp4vAh">反代到二级目录时设为该前缀（如 <code data-page-node-id="HZ4RTXcbIc0TGhLU09WYHY">/qd</code>，伺服 <code data-page-node-id="JKz5ZWcKKzyAZoAEEfazMC">https://host/qd</code>）。WebUI 以相对 base 构建、运行时自适应，<strong data-page-node-id="D35LYDXEn7YSACHIoVCerE">无需</strong>为每个前缀重建。置空 = 根路径。详见<a href="#subpath" data-page-node-id="z0QrPl0uHXEW81bESIkwG7">反向代理到二级目录</a></td></tr>
-                            <tr data-page-node-id="HHTVa97W6BJjHsvAWwDmHP"><td data-page-node-id="NwtbZOThzMj1iCZdBxgIHp"><code data-page-node-id="QWJ89oZnuCHjimilwzRrHe">QDRUST_SMTP_*</code></td><td data-page-node-id="wvbO0v0DLej8wvfRgqzwRO">空</td><td data-page-node-id="PZDIbiGnhVmfLznHndRD5H">邮件发送（重置密码 / 邮箱验证 / Email 渠道）：<code data-page-node-id="6dNQV2keiB6JH6XvcHMVPh">_HOST</code> <code data-page-node-id="EJfFZnoJ356FeZAeJC811O">_PORT</code> <code data-page-node-id="t2tbtq2GkukiuS9ooYin82">_USERNAME</code> <code data-page-node-id="rPk7Vl7RNMsFcLqLWsDfnn">_PASSWORD</code> <code data-page-node-id="7fuVoGPGABr33MdFDaAi9t">_FROM</code></td></tr>
-                            <tr data-page-node-id="YKgYf4fMgkSLpd85cFBfWE"><td data-page-node-id="Fwt5Y397azXIHYjqZ6BEEK"><code data-page-node-id="N5lrCMaYMgygaCjEKQ2cai">QDRUST_BASE_URL</code></td><td data-page-node-id="z6StNVXqbamPeAWaSbFI8z"><code data-page-node-id="M1ygWxeuiecrnTa1qUe9pJ">http://localhost:8923</code></td><td data-page-node-id="NLzPUOvCY5iAgqF9l6hVaG">密码重置 / 邮箱验证邮件中的链接基址</td></tr>
-                            <tr data-page-node-id="q22bAo9v8ffnbFtxZBu754"><td data-page-node-id="X21kk0yHyWYG54nrIVhyp3"><code data-page-node-id="Fvp2spwR9xQLoE3XwtZMwg">REQUIRE_EMAIL_VERIFICATION</code></td><td data-page-node-id="GKgLWcq0XuY45TGBzHUnUr"><code data-page-node-id="dJRaBPgvJj2YPxlC2gCvF7">false</code></td><td data-page-node-id="Yu7usI9j3xmomqOjQ8EQs4">新用户登录前必须验证邮箱</td></tr>
-                            <tr data-page-node-id="a6L8HlgG9m8LVMd1rjrezr"><td data-page-node-id="cBTvrw1gqVvRZpzXwAeH6z"><code data-page-node-id="4J7uq21sNaIFCuQhpTF9IX">GA_KEY</code></td><td data-page-node-id="biBoO1NhhtXhBk6gHGBYWd">空</td><td data-page-node-id="lPwC8gGutDtSKPcUQboOkF">注入 WebUI 的 Google Analytics 密钥</td></tr>
-                            <tr data-page-node-id="8FkxGi7Sn9Zq08iSNZPseT"><td data-page-node-id="KlSLiv7ubnx6NEA0BTBaiI"><code data-page-node-id="FTbIcOv9PJVbTwWuOh8Ifd">REDIS_URL</code></td><td data-page-node-id="mqgTqMbE0rWBiN9xHd2e1G">空</td><td data-page-node-id="mGZCUNTsSELrVVDXYb7a1K">可选 Redis 会话缓存</td></tr>
-                            <tr data-page-node-id="7YH0U6UFNHSsY0vSBhNfAb"><td data-page-node-id="HDEDGOfN2B5CsvzH25EuAb"><code data-page-node-id="HRvBJij95mmASccvGeg0gn">QDRUST_CONFIG_FILE</code></td><td data-page-node-id="aVpy0utKRqb2KNN4ZYhNwA">空</td><td data-page-node-id="EUMWY8CJA5k0ah1LnYNdzm">运行时可调配置的 JSON 文件路径（热更新站点设置）</td></tr>
-                            <tr data-page-node-id="40SU0zH85h0AcHxruQs7RU"><td data-page-node-id="G0hizN9ViP8F8wUMCrnXV1"><code data-page-node-id="Dw1TOy545fLY6W9xsiw4yP">QDRUST_BROWSER_URL</code></td><td data-page-node-id="3GioWoapMwTdBNb9wE6BHw">空</td><td data-page-node-id="RSVjbiHw4mw2Gxh1GMKX7o">浏览器插件的 CDP 端点，配置后启用 <code data-page-node-id="YldyZCzeCUelhEOkYMHn37">api://browser/*</code>（客户端为进程内 chromiumoxide，<strong data-page-node-id="jlG2LaKOYloGniDUsmPOjJ">无需</strong>额外子进程）。取值形如 <code data-page-node-id="ci7ChKFV9aLzFDK7qHlUiF">http://localhost:9222</code> / <code data-page-node-id="YGTIsH5WuCUednHPCs1Yok">ws://localhost:3000</code> / <code data-page-node-id="zTWXKz0w3iTd3jeUjuh8oG">wss://chrome.browserless.io?token=...</code>，详见<a href="browser.html#endpoints" data-page-node-id="1OjEcLNtFBHU0eNRvS3T6C">端点后端三选一</a></td></tr>
+                <h2 id="env">环境变量</h2>
+                <p>复制 <code>.env.example</code> 为 <code>.env</code> 后按需修改。关键变量：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>变量</th><th>默认值</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>BIND</code> / <code>PORT</code></td><td><code>0.0.0.0</code> / <code>8923</code></td><td>监听地址与端口</td></tr>
+                            <tr><td><code>DATABASE_URL</code></td><td><code>sqlite://data/qd.db</code></td><td>数据库；MySQL 用 <code>mysql://user:pass@host:3306/qdrust</code></td></tr>
+                            <tr><td><code>DATABASE_MIN_CONNECTIONS</code><br><code>DATABASE_MAX_CONNECTIONS</code></td><td><code>1</code> / <code>8</code></td><td>连接池上下限</td></tr>
+                            <tr><td><code>SCHEDULER_INTERVAL_SECONDS</code></td><td><code>15</code></td><td>调度器轮询间隔，影响任务触发精度</td></tr>
+                            <tr><td><code>REQUEST_TIMEOUT_SECONDS</code></td><td><code>30</code></td><td>单步 HTTP 请求超时</td></tr>
+                            <tr><td><code>SESSION_TTL_SECONDS</code></td><td><code>604800</code></td><td>会话有效期（7 天）</td></tr>
+                            <tr><td><code>COOKIE_SECURE</code></td><td><code>false</code></td><td><strong>HTTPS 下必须设为 <code>true</code></strong></td></tr>
+                            <tr><td><code>LOGIN_RATE_LIMIT_ATTEMPTS</code><br><code>LOGIN_RATE_LIMIT_WINDOW_SECONDS</code></td><td><code>5</code> / <code>60</code></td><td>登录限流</td></tr>
+                            <tr><td><code>LOG_RETENTION_DAYS</code></td><td><code>0</code></td><td>已完成运行记录保留天数（<code>0</code> = 永久）</td></tr>
+                            <tr><td><code>QDRUST_DEFAULT_TIMEZONE</code></td><td><code>Asia/Shanghai</code></td><td>未显式设时区的任务按此时区求值 cron（<strong>DST 感知</strong>）。欧美部署可设如 <code>America/New_York</code>。详见<a href="usage.html#timezone">时区与夏令时</a></td></tr>
+                            <tr><td><code>QDRUST_BASE_PATH</code></td><td>空</td><td>反代到二级目录时设为该前缀（如 <code>/qd</code>，伺服 <code>https://host/qd</code>）。WebUI 以相对 base 构建、运行时自适应，<strong>无需</strong>为每个前缀重建。置空 = 根路径。详见<a href="#subpath">反向代理到二级目录</a></td></tr>
+                            <tr><td><code>QDRUST_SMTP_*</code></td><td>空</td><td>邮件发送（重置密码 / 邮箱验证 / Email 渠道）：<code>_HOST</code> <code>_PORT</code> <code>_USERNAME</code> <code>_PASSWORD</code> <code>_FROM</code></td></tr>
+                            <tr><td><code>QDRUST_BASE_URL</code></td><td><code>http://localhost:8923</code></td><td>密码重置 / 邮箱验证邮件中的链接基址</td></tr>
+                            <tr><td><code>REQUIRE_EMAIL_VERIFICATION</code></td><td><code>false</code></td><td>新用户登录前必须验证邮箱</td></tr>
+                            <tr><td><code>GA_KEY</code></td><td>空</td><td>注入 WebUI 的 Google Analytics 密钥</td></tr>
+                            <tr><td><code>REDIS_URL</code></td><td>空</td><td>可选 Redis 会话缓存</td></tr>
+                            <tr><td><code>QDRUST_CONFIG_FILE</code></td><td>空</td><td>运行时可调配置的 JSON 文件路径（热更新站点设置）</td></tr>
+                            <tr><td><code>QDRUST_AUTH_MODE</code></td><td><code>local</code></td><td>认证模式：<code>local</code> / <code>hybrid</code> / <code>oidc</code>。<code>oidc</code> 会关闭本地登录入口，需保留应急入口时另设 <code>QDRUST_LOCAL_LOGIN_ENABLED=true</code></td></tr>
+                            <tr><td><code>QDRUST_OIDC_ENABLED</code><br><code>QDRUST_HEADER_AUTH_ENABLED</code></td><td><code>false</code></td><td>外部登录的独立开关，与 <code>QDRUST_AUTH_MODE</code> 叠加生效</td></tr>
+                            <tr><td><code>QDRUST_BROWSER_URL</code></td><td>空</td><td>浏览器插件的 CDP 端点，配置后启用 <code>api://browser/*</code>（客户端为进程内 chromiumoxide，<strong>无需</strong>额外子进程）。取值形如 <code>http://localhost:9222</code> / <code>ws://localhost:3000</code> / <code>wss://chrome.browserless.io?token=...</code>，详见<a href="browser.html#endpoints">端点后端三选一</a></td></tr>
                         </tbody>
                     </table>
                 </div>
-                <p data-page-node-id="xgF6Zl2Nlfe9piSRiHxK6a">
-                    <code data-page-node-id="jr1YkpvI1Ho81rIopMGNFH">QDRUST_CONFIG_FILE</code> 支持在运行期热更新的键：<code data-page-node-id="SplHtt7ydZ8L0O1jV0CeWN">bind</code>、<code data-page-node-id="0AlsemEqt8qNEfzkFJ590G">port</code>、<code data-page-node-id="5v2oDQfuGrRoD2vBzlvNb9">database_url</code>、<code data-page-node-id="zIE2jZoBoU1nRCWMfFHzUS">scheduler_interval_seconds</code>、<code data-page-node-id="L680cMrS8HbrTbctpsKh5U">request_timeout_seconds</code>、<code data-page-node-id="oyOQEMNmhJQ3pcXbAYShEs">log_retention_days</code>、<code data-page-node-id="mNxG0TrC6ulN9AHTeDelia">ga_key</code>、<code data-page-node-id="3encNuNb1gEEpStqyCGZLy">require_email_verification</code>。其余变量仍需重启生效。
+                <p>
+                    OIDC 与反向代理 Header 认证各自还有一组变量（issuer、client secret、trusted proxies、组到角色的映射等），
+                    完整清单与配置示例见<a href="usage.html#external-login">使用指南 · 第三方登录</a>。
+                </p>
+                <p>
+                    <code>QDRUST_CONFIG_FILE</code> 支持在运行期热更新的键：<code>bind</code>、<code>port</code>、<code>database_url</code>、<code>scheduler_interval_seconds</code>、<code>request_timeout_seconds</code>、<code>log_retention_days</code>、<code>ga_key</code>、<code>require_email_verification</code>。其余变量仍需重启生效。
                 </p>
 
-                <h2 id="database" data-page-node-id="p0j3QZ9ILVIPrZeERJRFfh">数据库</h2>
-                <ul data-page-node-id="6RCVynceHe2R9hegt20aud">
-                    <li data-page-node-id="lihpaOCZKAF9J6HHgQGSlF"><strong data-page-node-id="g2XnM6SJUYEIfvHms7VhXP">SQLite</strong>：默认，零配置，文件位于 <code data-page-node-id="D0aqhQQErwCGG5NWBEjvlt">DATABASE_URL</code> 指向的路径。适合绝大多数单机与小规模部署。</li>
-                    <li data-page-node-id="oy6Z9W9krI2LYvqYIlotnm"><strong data-page-node-id="suPOFW97x0K9dSOfAWSJy0">MySQL</strong>：设置 <code data-page-node-id="iT0JTFYWRp7hvEZKCEddTC">DATABASE_URL=mysql://...</code> 即自动切换；迁移脚本位于 <code data-page-node-id="SxGmmBeIQEsfZ4LoidLS6H">migrations-mysql/</code>。</li>
-                    <li data-page-node-id="RHflhBAPalHAIZjqhj4HqV"><strong data-page-node-id="JWbtvNsPUcqfjgMYPABvlv">迁移是前向 only（forward-only）</strong>：升级前务必备份数据库——不存在「降级迁移」，回滚只能靠备份还原。</li>
+                <h2 id="database">数据库</h2>
+                <ul>
+                    <li><strong>SQLite</strong>：默认，零配置，文件位于 <code>DATABASE_URL</code> 指向的路径。适合绝大多数单机与小规模部署。</li>
+                    <li><strong>MySQL</strong>：设置 <code>DATABASE_URL=mysql://...</code> 即自动切换；迁移脚本位于 <code>migrations-mysql/</code>。</li>
+                    <li><strong>迁移是前向 only（forward-only）</strong>：升级前务必备份数据库——不存在「降级迁移」，回滚只能靠备份还原。</li>
                 </ul>
 
-                <h2 id="notify" data-page-node-id="N49YbgIhyN9zVFWddbFRKm">通知渠道</h2>
-                <p data-page-node-id="2J8JeOwQY8RcjNX8My9PDU">任务成功或失败时可推送提醒。系统共支持 <strong data-page-node-id="GaBJG0HQpZWgP9jQpmJOSY">10 种</strong>渠道，在「通知」页新建渠道并绑定到任务即可。</p>
-                <div class="overflow-x-auto mb-6" data-page-node-id="cij0SIr3HgyWSPJT4UxGkz">
-                    <table data-page-node-id="YyMhWFINC7ECtKhO8YOsDK">
-                        <thead data-page-node-id="vtHtaqiOW3NtXsWDnjDX07"><tr data-page-node-id="yaLk9u3bPZkmSCLCYktIQH"><th data-page-node-id="LkbYetGhKIS0GEydJBaKBu">渠道</th><th data-page-node-id="b1DCiBjJJWdUrdERDsFgxO">所需配置</th><th data-page-node-id="lLmfhn6Oz1HjcJSNH5UkzW">说明</th></tr></thead>
-                        <tbody data-page-node-id="NooEqT5tcdT41yqNzeICZf">
-                            <tr data-page-node-id="g7gczpWpkA6XFfqNmsMHD4"><td data-page-node-id="DmiIi6etWO1s3U1LBAajaw"><strong data-page-node-id="Pxutwdt0gFXfxx3i0lAReU">Webhook</strong></td><td data-page-node-id="Kl0udzW31nL6UjDfR4eKWe"><code data-page-node-id="S0cQFJaHmLbAhKGMPYured">url</code></td><td data-page-node-id="RtiZ0uLLifaVKbtodXTXtu">向该 URL <code data-page-node-id="22KZ1DH8DNNdENBwNCRAki">POST</code> JSON（含 <code data-page-node-id="2SIF3tSGNpD0879lcajlOi">event</code> / <code data-page-node-id="UHJY4dGqJv3YE9VcXHJBi1">task_name</code> / <code data-page-node-id="9brShMD2IqEGa1iVuVsIhi">run_id</code> / <code data-page-node-id="DuOzDKUPZaC6kGyzx1cWh9">http_status</code> / <code data-page-node-id="pHR0QwEPmqgrsH3WXZCDzn">error</code>）</td></tr>
-                            <tr data-page-node-id="qm9CbCEj2SrkGRPAHQvbsx"><td data-page-node-id="63aptOGnEJnisJqfez8uz1"><strong data-page-node-id="H5Viji46u1CNokoA3hyH0D">Email</strong></td><td data-page-node-id="ulV3rLLzPJufAzkc68wdqC"><code data-page-node-id="Dg3Ueps8i2yvHT4nxnMLuY">to</code></td><td data-page-node-id="ekl9cfD4CpMOAd10JUmuMJ">经 SMTP 发送，需先配置 <code data-page-node-id="SdIZF9dSrCg7YElKTDgKjI">QDRUST_SMTP_*</code></td></tr>
-                            <tr data-page-node-id="wWSDK0FFGESX6h4H4QtCWY"><td data-page-node-id="xTxqq5plY59CfP4CKSbIBc"><strong data-page-node-id="ZGSHDzeoayIE7ZWpUm3n2z">Bark</strong></td><td data-page-node-id="JXAxwF3wHvRnIv34UJsIYH"><code data-page-node-id="BNc1wbiU00uL4tAIk9sH4W">url</code></td><td data-page-node-id="Aw25NcHfZATerYRuPA9BoH">iOS 推送，形如 <code data-page-node-id="BO93WCWWg3FEd6dt7eLdRm">https://api.day.app/你的Key</code></td></tr>
-                            <tr data-page-node-id="FUVfrcwKg8X4Dx7aDKDWrA"><td data-page-node-id="Q8fl9EOBaaakQcPdjcBeOq"><strong data-page-node-id="t2nfnd9k83465WuDa9OIlH">Server 酱</strong></td><td data-page-node-id="2af6h1NITrK6fs0ZDJHiNJ"><code data-page-node-id="Ey1KkTUACVAV0wNSOoG9Ag">sendkey</code></td><td data-page-node-id="ZNJj9G9rDbHhIkjIMrxb27">微信推送 SendKey</td></tr>
-                            <tr data-page-node-id="3E2uGpGOrzgjTyi1ModVYy"><td data-page-node-id="gOE87U4t18ogVBk7VuzYze"><strong data-page-node-id="LgoWeTCxsfGjjtGeccIG0U">Telegram</strong></td><td data-page-node-id="YXrHWK9EuBxJIpajZZA4GN"><code data-page-node-id="mOkqsqptQaGIJ6EgH1tlAp">token</code>, <code data-page-node-id="3DtvhuvMy5dDS50kQOzbc6">chat_id</code>, <code data-page-node-id="tvxdhx7PNEpR5n0GQPELGr">host</code>(可选)</td><td data-page-node-id="lPyfJbZ6h7DHUQcAXSv6P7">机器人；<code data-page-node-id="bQW3uaPpKtnXZppbuIy0aA">host</code> 可指定自建 API 域名</td></tr>
-                            <tr data-page-node-id="beVqOGkEmApM69Y7QN4hFd"><td data-page-node-id="yaDIfxnNnvs3RHF0LbcrDY"><strong data-page-node-id="bBT1rcU2yYDpo3VkLtr21i">钉钉机器人</strong></td><td data-page-node-id="gEDaafCcWmLt9bSVDGPkvp"><code data-page-node-id="fat2GVtJ0pCbmVo7mg0SIm">access_token</code></td><td data-page-node-id="gF8cmsokUh6NH1Ch3i9kNI">自定义机器人 access_token</td></tr>
-                            <tr data-page-node-id="q9TlNWtvpZaKyfE0bjXeEZ"><td data-page-node-id="EhBnxunP7L48oGiSaoAd53"><strong data-page-node-id="t5CK5fDiQ1aGDcfdlhHb2P">WxPusher</strong></td><td data-page-node-id="vdVRxqXpgrJARo38OQ3pmO"><code data-page-node-id="9IvGAOQfqEZvekSyh4yrCJ">app_token</code>, <code data-page-node-id="MaeN5s3VEuzpoHbUeCTZsH">uid</code></td><td data-page-node-id="DG2wOCIMEt31BcdrgDU25P">应用 token 与目标 UID</td></tr>
-                            <tr data-page-node-id="AFB6NHk0vJXKN9aSBWVRqX"><td data-page-node-id="QdIyaUT0Jf6L9qCxdGwzbd"><strong data-page-node-id="iKzYsy8f0e1DYYNHbP8HzB">WxPusher SPT</strong></td><td data-page-node-id="sNWAP4kEhd2nbQ7Z2Fvxk5"><code data-page-node-id="sGeZQOPHAJfkuEqY2wSENb">spt</code></td><td data-page-node-id="o3wwoIsdFL5BO1m63HhWIH">主题推送码（逗号分隔可多个）</td></tr>
-                            <tr data-page-node-id="BSauxqaFqNDGdD65HEICew"><td data-page-node-id="4cTpkiuVK3dHi2zPnGXVCO"><strong data-page-node-id="gzGGkZ9JQdA8x0ZoRhU9Qa">企业微信应用</strong></td><td data-page-node-id="zRkLCCJ9sVM2gXIhYx6an3"><code data-page-node-id="M4krPWLxuk2DIHsnsD7AcR">corpid</code>, <code data-page-node-id="7nGn2gJTr6hPOxDEBB9GEg">secret</code>, <code data-page-node-id="9W2AMdxH25r7Oorl06ceXR">agentid</code>, <code data-page-node-id="yuDDrjPNdhjgWfRsV42cbc">to_user</code>, <code data-page-node-id="DsrSqMurlWCNHp8bGwug1C">proxy</code>(可选)</td><td data-page-node-id="FcnD3RyfsoExojWiDcFgGl">自建应用消息；<code data-page-node-id="vrrdW3Xwjd00KQzDrML7bx">to_user</code> 默认 <code data-page-node-id="bixT7FS7AL8UxGHeVgyYtr">@all</code></td></tr>
-                            <tr data-page-node-id="osOHy2IqOHySWjqDLzWRfz"><td data-page-node-id="5kCN7J1GcODX9LF0y9ZxaF"><strong data-page-node-id="jfB3Iriwzm5vi5XswA73u4">企业微信群机器人</strong></td><td data-page-node-id="A2Do1v7HRFEfyGT5tUnC4x"><code data-page-node-id="AYkYZGSuEGa0CEgyz986dy">key</code></td><td data-page-node-id="Y6HWcGnBZKKPap3X7pLTQn">群机器人 webhook key</td></tr>
+                <h2 id="notify">通知渠道</h2>
+                <p>任务成功或失败时可推送提醒。系统共支持 <strong>10 种</strong>渠道，在「通知」页新建渠道并绑定到任务即可。</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>渠道</th><th>所需配置</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Webhook</strong></td><td><code>url</code></td><td>向该 URL <code>POST</code> JSON（含 <code>event</code> / <code>task_name</code> / <code>run_id</code> / <code>http_status</code> / <code>error</code>）</td></tr>
+                            <tr><td><strong>Email</strong></td><td><code>to</code></td><td>经 SMTP 发送，需先配置 <code>QDRUST_SMTP_*</code></td></tr>
+                            <tr><td><strong>Bark</strong></td><td><code>url</code></td><td>iOS 推送，形如 <code>https://api.day.app/你的Key</code></td></tr>
+                            <tr><td><strong>Server 酱</strong></td><td><code>sendkey</code></td><td>微信推送 SendKey</td></tr>
+                            <tr><td><strong>Telegram</strong></td><td><code>token</code>, <code>chat_id</code>, <code>host</code>(可选)</td><td>机器人；<code>host</code> 可指定自建 API 域名</td></tr>
+                            <tr><td><strong>钉钉机器人</strong></td><td><code>access_token</code></td><td>自定义机器人 access_token</td></tr>
+                            <tr><td><strong>WxPusher</strong></td><td><code>app_token</code>, <code>uid</code></td><td>应用 token 与目标 UID</td></tr>
+                            <tr><td><strong>WxPusher SPT</strong></td><td><code>spt</code></td><td>主题推送码（逗号分隔可多个）</td></tr>
+                            <tr><td><strong>企业微信应用</strong></td><td><code>corpid</code>, <code>secret</code>, <code>agentid</code>, <code>to_user</code>, <code>proxy</code>(可选)</td><td>自建应用消息；<code>to_user</code> 默认 <code>@all</code></td></tr>
+                            <tr><td><strong>企业微信群机器人</strong></td><td><code>key</code></td><td>群机器人 webhook key</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <p data-page-node-id="p0bBSBPGedirmiUgDdQ4le">通知标题与正文由调度器统一渲染，在 Email 与推送渠道间共享；<strong data-page-node-id="hH13YV2TlCHKWqBXIRiLbW">单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
+                <p>通知标题与正文由调度器统一渲染，在 Email 与推送渠道间共享；<strong>单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
 
-                <h2 id="backup" data-page-node-id="fJEoIcpZKSxwDFN6CHCp4v">备份、升级与回滚</h2>
-                <p data-page-node-id="V8z7cgpdapBOn84wZlAfad">qdrust 使用不可变语义版本镜像标签。升级步骤：</p>
-                <ol data-page-node-id="pzkDIWFkqpmGDjBznPCFCy">
-                    <li data-page-node-id="y6GPmlYPJ6tVs2AVDrMCgG">
-                        <strong data-page-node-id="beAALNa9Jc2XzQlflug5Qd">停止写入并备份数据库</strong>（迁移前向 only，回滚必须连同数据库一起恢复）：
-                        <pre data-page-node-id="tj1P1yHlt2ekg8OoRqPmfq"><code data-page-node-id="YaTBML6dDhHlqkuYcLWnec">pwsh -File scripts/backup-db.ps1 -Database data/qdrust.db \
+                <h2 id="backup">备份、升级与回滚</h2>
+                <p>qdrust 使用不可变语义版本镜像标签。升级步骤：</p>
+                <ol>
+                    <li>
+                        <strong>停止写入并备份数据库</strong>（迁移前向 only，回滚必须连同数据库一起恢复）：
+                        <pre><code>pwsh -File scripts/backup-db.ps1 -Database data/qdrust.db \
   -Output backups/qdrust-$(Get-Date -Format yyyyMMdd-HHmmss).db</code></pre>
                     </li>
-                    <li data-page-node-id="uSlbx2AktOwI6QQj7tXVAP">
+                    <li>
                         记录当前镜像 digest，拉取目标版本并以相同的数据卷启动：
-                        <pre data-page-node-id="rW15XpgNaxOYBWz0kTXDhs"><code data-page-node-id="ZZq9e9G1zj6qP1LPsRq8nA">docker compose pull && docker compose up -d
+                        <pre><code>docker compose pull && docker compose up -d
 # 或锁定到具体版本：docker pull ghcr.io/callmelins/qdrust:v0.1.0</code></pre>
                     </li>
-                    <li data-page-node-id="eBGJASTuHK4Hdl4jRv13ct">验证 <code data-page-node-id="6HlXTyPB0FlszJf0JV0ky4">/health</code>、<code data-page-node-id="ECqLmYSKXA8R2A39ZaIvhA">/ready</code>、登录与至少一个只读流程。</li>
+                    <li>验证 <code>/health</code>、<code>/ready</code>、登录与至少一个只读流程。</li>
                 </ol>
-                <div class="callout" data-page-node-id="MCbbqDE168zqTYesPgDfbS">
-                    <div class="callout-title" data-page-node-id="kwuMDpzGQxm2TTNLY6Cbr0">健康检查失败怎么办</div>
-                    <p data-page-node-id="YxIrkgX359jE6HV1bQwtuB">停新容器 → 恢复升级前的数据库备份 → 启动记录的上一镜像 digest。仅回退镜像而不恢复数据库<strong data-page-node-id="NWM8aA2uboYkgX1HTABGuQ">不被支持</strong>。详见仓库内的 <code data-page-node-id="iPVrfMbqNwn8DhH0xnSFR3">docs/phase8/OPERATIONS.md</code> 与 <code data-page-node-id="rsIVxUOVvZhJzO9x8BAOAh">docs/phase8/RELEASE_CHECKLIST.md</code>。</p>
+                <div class="callout">
+                    <div class="callout-title">健康检查失败怎么办</div>
+                    <p>停新容器 → 恢复升级前的数据库备份 → 启动记录的上一镜像 digest。仅回退镜像而不恢复数据库<strong>不被支持</strong>。详见仓库内的 <code>docs/phase8/OPERATIONS.md</code> 与 <code>docs/phase8/RELEASE_CHECKLIST.md</code>。</p>
                 </div>
 
-                <h2 id="local-dev" data-page-node-id="ExjVnwCgFkAMwjwauDqi3m">本地开发运行</h2>
-                <p data-page-node-id="rPzzTieHLLu1zyUoAY1pGF">安装前端依赖并构建 WebUI：</p>
-                <pre data-page-node-id="Oly0bfN2hN9R2uW365AhiH"><code data-page-node-id="1kbGfj14z0JlHbWXtd4cvQ">npm --prefix webui ci --cache .npm-cache
+                <h2 id="local-dev">本地开发运行</h2>
+                <p>安装前端依赖并构建 WebUI：</p>
+                <pre><code>npm --prefix webui ci --cache .npm-cache
 npm --prefix webui run generate:api
 npm --prefix webui run build</code></pre>
-                <p data-page-node-id="kej0dVIXcjRV8eLPucJJDk">准备配置并启动服务：</p>
-                <pre data-page-node-id="CtaieOKEpcFGDPqPjWV3ON"><code data-page-node-id="GcB8997kJzZZZW3gs2BFEg">Copy-Item .env.example .env
+                <p>准备配置并启动服务：</p>
+                <pre><code>Copy-Item .env.example .env
 cargo run -p qdrust-server</code></pre>
-                <p data-page-node-id="F49Wog4HV6cgQJmqqFTxc1">前后端分开开发时，同时起两个进程：</p>
-                <pre data-page-node-id="nMrsg9hBopMVloDEcD8aKI"><code data-page-node-id="RquubJGGrKcAz9fhZYIgFI">cargo run -p qdrust-server      # API，:8923
+                <p>前后端分开开发时，同时起两个进程：</p>
+                <pre><code>cargo run -p qdrust-server      # API，:8923
 npm --prefix webui run dev      # Vite，:5173，API 请求代理到 Rust 服务</code></pre>
 
-                <h2 id="verify" data-page-node-id="IchKRXir8lcSKPnpUJoA71">验证清单</h2>
-                <pre data-page-node-id="887775Sp3G8oLDNB3CGGuN"><code data-page-node-id="MRCpPYWNb39KVLhYLGy6hy">cargo fmt --all -- --check
+                <h2 id="verify">验证清单</h2>
+                <pre><code>cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace --all-targets
 npm --prefix webui run lint
 npm --prefix webui run test
 npm --prefix webui run build</code></pre>
 
-                <div class="wiki-meta" data-page-node-id="jGLmpMZiX1EuZFO6NQmtPr">
-                    <span data-page-node-id="3pOnIftS89NyVaGHFMr9Sm">MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span data-page-node-id="wiCbs4EVxY7y1aZsQWB5v8">最后更新：2026-09-05</span>
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-07</span>
                 </div>
             </main>
 
             <!-- On-page TOC -->
-            <aside class="wiki-toc" data-page-node-id="872KEVZURGCHUJBYmfebV1">
-                <div class="wiki-toc-title" data-page-node-id="RlYsBB3KTZlLmr9ukISAMh">本页目录</div>
-                <nav id="toc" data-page-node-id="2zTxvBS5q0bzwfsbqQkCDG"></nav>
+            <aside class="wiki-toc">
+                <div class="wiki-toc-title">本页目录</div>
+                <nav id="toc"></nav>
             </aside>
         </div>
     </div>
 
-    <footer class="py-10 bg-gray-50 border-t border-gray-200" data-page-node-id="E9xvPwABitsYpw5EsVwIKY">
-        <div class="wiki-shell px-6 text-center text-gray-600 text-sm" data-page-node-id="uqmL4QUtVoolmD1ZZA46H6">
-            <p class="mb-1" data-page-node-id="6Ov3uBasEc6TUAWPWHfZWp">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
-            <p data-page-node-id="Q9ZMTZeTWkzXiFkgNjsvI2">
-                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900" data-page-node-id="b5DBFFV7IHWZY8Furyz8Rx">@CallmeLins</a>
+    <footer class="py-10 bg-gray-50 border-t border-gray-200">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
+            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p>
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
             </p>
         </div>
     </footer>

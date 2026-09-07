@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志与 CLI。">
+<html lang="zh-CN" data-page-node-id="mT0OGyqHTw37CnIMtVpf4p">
+<head data-page-node-id="8SEo3svXPF1kd10JKorlD3">
+    <meta charset="UTF-8" data-page-node-id="mYe1oBCLKXGsHPGC9HLlFF">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="AYJ9qGheic6m2fRQH8un29">
+    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志与 CLI。" data-page-node-id="yJfjotFNJvO1asKl5F687A">
     <title>使用指南 | qdrust Wiki</title>
-    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html">
-    <link rel="icon" href="https://callmelins.github.io/favicon.svg">
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html" data-page-node-id="4DCxU0dGWE47TmIrbPRhGU">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg" data-page-node-id="E4p97AjIjlgdBUkGLl47js">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="CNXPMH62gPwHkHmvQ8sZjv">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="DfmNugOW6zlp982nTAJQ9I">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" data-page-node-id="mR6IGFYrCP5BPFID7D8uap">
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -136,154 +136,231 @@
         }
     </style>
 </head>
-<body class="bg-white text-gray-900">
+<body class="bg-white text-gray-900" data-page-node-id="OOK9w7POTZ5SMPYLnBdYMn">
     <!-- Top bar -->
-    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200">
-        <div class="wiki-shell px-6 py-3.5">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3 min-w-0">
-                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200" data-page-node-id="F7vLyrwFIbwkvPRvLEI6Ax">
+        <div class="wiki-shell px-6 py-3.5" data-page-node-id="lPWNobh2vrHvuGHJvjVWFq">
+            <div class="flex items-center justify-between gap-4" data-page-node-id="xnNnWcpqE9DGa2nYMlEnDH">
+                <div class="flex items-center gap-3 min-w-0" data-page-node-id="7LGR99trVgk0F0xkxlZCeO">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录" data-page-node-id="ffgWpMKLoFwEJikG8JJ0On">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="IHw8gxpWcaWqms4MXepI9z"><path d="M3 6h18M3 12h18M3 18h18" data-page-node-id="ZbW0AOE9GciTCzoE8aQAqW"/></svg>
                     </button>
-                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0">
-                        <span class="text-lg font-semibold tracking-tight">qdrust</span>
-                        <span class="text-xs text-gray-400 hidden sm:inline">Wiki</span>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0" data-page-node-id="n3ufVut3AwXKRwmTNeSUJO">
+                        <span class="text-lg font-semibold tracking-tight" data-page-node-id="RbqUCbEb1NUzFt428Kq34M">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline" data-page-node-id="8MXfzSBN90paEaWf8ZDC0g">Wiki</span>
                     </a>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200">GitHub</a>
+                <div class="flex items-center gap-2 flex-shrink-0" data-page-node-id="0Hkbnublwui9VC3bBgAUWw">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200" data-page-node-id="gwTmxOvZ97u1lpqTi8CSII">GitHub</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="wiki-shell px-6 pt-28 pb-20">
-        <div class="wiki-grid">
+    <div class="wiki-shell px-6 pt-28 pb-20" data-page-node-id="ku0somhMPBHC9L5G4phbBO">
+        <div class="wiki-grid" data-page-node-id="kD8COkz7x7VZlZaFXh33AU">
             <!-- Sidebar -->
-            <aside class="wiki-sidebar" id="sidebar">
-                <div class="wiki-nav-title">入门</div>
-                <a href="index.html" class="wiki-nav-link">总览</a>
-                <a href="deploy.html" class="wiki-nav-link">部署与运维</a>
-                <a href="usage.html" class="wiki-nav-link is-active">使用指南</a>
+            <aside class="wiki-sidebar" id="sidebar" data-page-node-id="oM8WXacwIRXRjnafHXGsVO">
+                <div class="wiki-nav-title" data-page-node-id="g8x61p1nlTgPyD6udZKoUq">入门</div>
+                <a href="index.html" class="wiki-nav-link" data-page-node-id="NOhcWtDmIwJIKf785raGHu">总览</a>
+                <a href="deploy.html" class="wiki-nav-link" data-page-node-id="sjEi5oTEa9GBCEO1UHmeND">部署与运维</a>
+                <a href="usage.html" class="wiki-nav-link is-active" data-page-node-id="6UiqiIJDtpvNSZDIxhQ37U">使用指南</a>
 
-                <div class="wiki-nav-title">核心概念</div>
-                <a href="architecture.html" class="wiki-nav-link">架构设计</a>
-                <a href="templates.html" class="wiki-nav-link">模板与表达式</a>
+                <div class="wiki-nav-title" data-page-node-id="HVBwJ0fM5vEn6iiBhnHFeJ">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link" data-page-node-id="8kFW5hkfrJtOO2Rx0wZdkD">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link" data-page-node-id="aJW9S8wBxiXGQF4ckjHAPE">模板与表达式</a>
 
-                <div class="wiki-nav-title">进阶</div>
-                <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
+                <div class="wiki-nav-title" data-page-node-id="CkIEZwCjsNmeZBEN5mGlCs">进阶</div>
+                <a href="browser.html" class="wiki-nav-link" data-page-node-id="yy25O10pkWwhhCexE2JbD6">浏览器插件</a>
 
-                <div class="wiki-nav-title">参考</div>
-                <a href="api.html" class="wiki-nav-link">API 接口</a>
+                <div class="wiki-nav-title" data-page-node-id="tiD5HXnGmCaoMZMMC1a2YM">参考</div>
+                <a href="api.html" class="wiki-nav-link" data-page-node-id="LD7L6imf2CJoK9RPnUhBCw">API 接口</a>
 
-                <div class="wiki-nav-title">帮助</div>
-                <a href="faq.html" class="wiki-nav-link">常见问题</a>
+                <div class="wiki-nav-title" data-page-node-id="xENA0jFm4PmYWRQGRCp0bX">帮助</div>
+                <a href="faq.html" class="wiki-nav-link" data-page-node-id="fHBHXZHRynMRkWI0VfCWAu">常见问题</a>
 
-                <div class="wiki-nav-title">外部链接</div>
-                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link">源码仓库 ↗</a>
-                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link">QD 原项目 ↗</a>
+                <div class="wiki-nav-title" data-page-node-id="oCVa820OXrxsFhzAu304Tf">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link" data-page-node-id="Bbko0clk8zNRpiIHE8qzv9">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link" data-page-node-id="jNOLKBNHDHeYK912iQMjoo">QD 原项目 ↗</a>
             </aside>
 
             <!-- Article -->
-            <main class="wiki-article min-w-0">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
-                <p class="text-lg text-gray-600 mb-10">
-                    从初始化管理员到跑起第一个任务：导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
+            <main class="wiki-article min-w-0" data-page-node-id="w7nzhPDL1n7KCEQqAItAZ9">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3" data-page-node-id="GCAfpL6GRfoqNQ5ajFIthC">使用指南</h1>
+                <p class="text-lg text-gray-600 mb-10" data-page-node-id="bKcVxHthfSpnVDZetBBORW">
+                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
                 </p>
 
-                <h2 id="first-run">首次启动与管理员</h2>
-                <ol>
-                    <li>启动服务后访问 <code>http://localhost:8923/</code>（或你配置的域名 / 二级目录）。</li>
-                    <li>首次打开会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。</li>
-                    <li>管理员可在「设置 / 管理员」中管理用户、站点设置、日志清理、备份与恢复。</li>
+                <h2 id="first-run" data-page-node-id="MeYMbOOJHJSrXxP2T2MapQ">首次启动与管理员</h2>
+                <ol data-page-node-id="6s2SPG8GYF4yJAfChC6RHv">
+                    <li data-page-node-id="UHobyMtKe8ArLvCJUD7SET">启动服务后访问 <code data-page-node-id="nU8puwBdHHf4g962lEtyg3">http://localhost:8923/</code>（或你配置的域名 / 二级目录）。</li>
+                    <li data-page-node-id="CBvRC3OKUHs7nHgsdzaTA7">首次打开会引导创建<strong data-page-node-id="pqHNW36MHWH1DL0vOlGhBz">初始管理员账号</strong>；之后其他用户走开放注册流程。</li>
+                    <li data-page-node-id="T7uTNFWH89Q7sNdH2Gr6j1">管理员可在「设置 / 管理员」中管理用户、站点设置、日志清理、备份与恢复。</li>
                 </ol>
-                <p class="text-sm text-gray-500">还没部署？先看<a href="deploy.html">部署与运维</a>。</p>
+                <p class="text-sm text-gray-500" data-page-node-id="cjdenSEorIImjf0W8mGpNJ">还没部署？先看<a href="deploy.html" data-page-node-id="v2D93kEeWfVCHf99sJazFl">部署与运维</a>。</p>
 
-                <h2 id="import-har">导入 QD HAR 模板</h2>
-                <ul>
-                    <li>在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code>*.har.json</code>。</li>
-                    <li>导入时会校验并<strong>保留原始 HAR JSON</strong>，兼容样本见仓库的 <code>tests/fixtures</code>。</li>
-                    <li>也可以用命令行先校验再导入：</li>
+                <h2 id="external-login" data-page-node-id="Y8NzbWJDr4eVDpfEPFA1Wf">第三方登录（OIDC / 反向代理 Header）</h2>
+                <p data-page-node-id="1lYzzQmRBA8gJA6drPMjsD">自托管部署可选择通过外部身份提供方（IdP）登录，<strong data-page-node-id="Z3DinXHemts2J3ubs7ZD2r">本地账号密码能力始终保留</strong>。</p>
+
+                <h3 id="auth-mode" data-page-node-id="HBN8yzrg3YplgbMiAzu4Y3">认证模式与开关</h3>
+                <p data-page-node-id="nRpA1aBp8fmdZjUsuSEAQB">默认 <code data-page-node-id="R9vLcqAalvqYSWAA7mmXsq">local</code>，严格后向兼容：</p>
+                <ul data-page-node-id="5HgxHgFuvhyGHwOxFt2Mkn">
+                    <li data-page-node-id="NVoKHj3iFe2cdBiu0Uu5CU">
+                        <code data-page-node-id="KwdSeZuaxe9UHU9ArMaiSB">QDRUST_AUTH_MODE</code>：<code data-page-node-id="35qYnz0OG8IBTpdWwwg7a1">local</code> | <code data-page-node-id="ObLRChBvXshwykThNgwRw9">hybrid</code> | <code data-page-node-id="tFFp0tAYtZkNMtdtWftjFC">oidc</code>。
+                        <code data-page-node-id="C23w3AuatOtbxjxSKdbDAD">oidc</code> 模式下本地登录入口默认关闭；若想保留一个本地管理员应急入口，同时设
+                        <code data-page-node-id="4uCKwiWcWDgZU9814wge9F">QDRUST_LOCAL_LOGIN_ENABLED=true</code>。
+                    </li>
+                    <li data-page-node-id="No0cRL7CkCBR2Y253IsLDI">外部提供方通过<strong data-page-node-id="rHemogq9t9uClhjICV82gr">独立开关</strong>叠加：<code data-page-node-id="5zGPbrRE2s2VDc65jrzYbk">QDRUST_OIDC_ENABLED</code> / <code data-page-node-id="veXr4Ptm8ULfTycSDstAEq">QDRUST_HEADER_AUTH_ENABLED</code>。</li>
                 </ul>
-                <pre><code>cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
-                <p>模板的字段含义与两种形态见<a href="templates.html#qd-har">模板与表达式 · 旧 QD HAR</a>。</p>
+                <p class="text-sm text-gray-500" data-page-node-id="4OgY83EpCVT4yryCf6hvyK">WebUI 登录页按 <code data-page-node-id="pBDOB5TpREvnHd0KqDp5vd">GET /api/v1/auth/config</code> 返回的策略渲染入口，详见<a href="api.html#ep-auth" data-page-node-id="XrPiHecg9DxTSEo0gbk6nT">API 接口 · 认证与会话</a>。</p>
 
-                <h2 id="tasks">创建与运行任务</h2>
-                <ol>
-                    <li>新建模板或导入 HAR 后，<strong>基于模板创建任务</strong>并填写变量。</li>
-                    <li>配置 cron / 间隔调度，或手动「立即运行」。</li>
-                    <li>在运行记录中查看每一步的<strong>请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
-                    <li>订阅仓库的任务会<strong>按仓库自动导入并同步</strong>；公共模板经 PushRequest 审批后发布。</li>
-                </ol>
-                <p class="text-sm text-gray-500">变量、断言与表达式写法见<a href="templates.html#variables">模板与表达式</a>。</p>
-
-                <h2 id="har-editor">可视化 HAR 编辑器</h2>
-                <p>
-                    WebUI 提供可视化编辑器，可直接增删改请求、设置<strong>请求头 / 表单 / 鉴权</strong>、编写
-                    <code>success_asserts</code> 与 <code>extract_variables</code>，无需手改 JSON。
+                <h3 id="oidc" data-page-node-id="IVM11WB5AXJJbOFz9ia2sl">OIDC（Authorization Code + PKCE）</h3>
+                <p data-page-node-id="GmU07S74KOlSI9FF388A1h">对接 authentik / authelia / keycloak / pocket-id：</p>
+                <pre data-page-node-id="U6WEZqbLiwvcmJ7SOFNblE"><code data-page-node-id="pqfxoGsHpUgXKzylRVLJd5">QDRUST_AUTH_MODE=hybrid          # 或 oidc（纯 IdP，关本地入口）
+QDRUST_OIDC_ENABLED=true
+QDRUST_OIDC_PROVIDER_NAME=Authentik   # SSO 按钮上显示的名称
+QDRUST_OIDC_ISSUER=https://auth.example.com/application/o/qdrust/
+QDRUST_OIDC_CLIENT_ID=qdrust
+QDRUST_OIDC_CLIENT_SECRET=...
+# QDRUST_OIDC_REDIRECT_URI 留空则由服务端在请求时按反代前缀推导
+QDRUST_OIDC_SCOPES="openid profile email"
+QDRUST_OIDC_AUTO_CREATE_USERS=true    # 首登自动建档（哨兵口令，本地无法登录该外部账号）
+QDRUST_OIDC_DEFAULT_ROLE=user         # 未命中 admin 组的建档角色
+QDRUST_OIDC_ADMIN_GROUPS=qdrust-admins # 命中则首次建档为 admin
+QDRUST_OIDC_GROUPS_CLAIM=groups       # ID token 中携带组成员身份的 claim 名（默认 groups）</code></pre>
+                <p data-page-node-id="iNOnyLKx0dAxIwXVsG8gpM">在 IdP 侧把回调地址登记为 <code data-page-node-id="KJ1ZNE4hFLwH2LJ10PiphD">https://你的域名[/&lt;base_path&gt;]/api/v1/auth/oidc/callback</code>。</p>
+                <p data-page-node-id="EQDjeoSzeS5PqXALdfgjIx">
+                    OIDC 首登按 <strong data-page-node-id="7nwJFbcqn2zTzUA8SYCCPG">ID token 里的 <code data-page-node-id="IX5RoYRBHw0s0mo4NAWIGO">groups</code> claim</strong>（可通过 <code data-page-node-id="z8GCaLANf831eMq7RPhjB5">QDRUST_OIDC_GROUPS_CLAIM</code>
+                    换成 IdP 实际使用的 claim 名，如某些 Keycloak 映射后的 <code data-page-node-id="c8WiG0k8mjb02F06MjWaJl">roles</code>）解析角色：claim 命中
+                    <code data-page-node-id="AFEk1rYoier1thtMp2zYgL">QDRUST_OIDC_ADMIN_GROUPS</code> 中任一成员则建档为 <code data-page-node-id="S2okGq2PnisLUqXb4b84tM">admin</code>，否则落
+                    <code data-page-node-id="PeUfN8euaQmDsMe6AA2MpD">QDRUST_OIDC_DEFAULT_ROLE</code>。若 IdP 不在 ID token 内下发组（部分 IdP 只在 userinfo 返回），
+                    则保持 claim 缺失、统一落 <code data-page-node-id="R5TxmtEc3uXucIjYsmKruL">default_role</code>，再让管理员手动调整。
                 </p>
 
-                <h2 id="scheduling">调度与随机延迟</h2>
-                <ul>
-                    <li><strong>两种调度</strong>：固定间隔与 cron，都在可视化调度器中配置。</li>
-                    <li><strong>随机延迟</strong>：让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。</li>
-                    <li><strong>变量预填</strong>：模板变量支持在创建任务时预填默认值。</li>
-                </ul>
-
-                <h3 id="timezone">时区与夏令时</h3>
-                <p>cron 按<strong>每个任务各自的 IANA 时区</strong>（<code>timezone</code> 字段）求值，<strong>DST 感知</strong>：</p>
-                <ul>
-                    <li>设 <code>America/New_York</code> 的任务，<code>0 9 * * *</code> 会全年在当地 09:00 触发，<strong>无需</strong>为冬令 / 夏令手动改 cron。</li>
-                    <li>任务未设 <code>timezone</code> 时，使用服务端 <code>QDRUST_DEFAULT_TIMEZONE</code>（默认 <code>Asia/Shanghai</code>）。</li>
-                    <li>WebUI 中任务列表与运行历史的「上次运行 / 开始时间」也按该任务时区展示；未设时区则用查看者浏览器本地时区。</li>
-                </ul>
-                <p class="text-sm text-gray-500">服务端默认时区的设置方式见<a href="deploy.html#env">部署与运维 · 环境变量</a>。</p>
-
-                <h2 id="logs">运行日志与历史</h2>
-                <ul>
-                    <li>每次运行会记录 <strong>QD 风格的文本日志</strong>。</li>
-                    <li>任务详情页可查看该任务的运行历史，并支持<strong>清空</strong>历史记录。</li>
-                    <li>活跃运行的步骤通过 <strong>WebSocket</strong> 实时推送。</li>
-                    <li>已完成记录的保留天数由 <code>LOG_RETENTION_DAYS</code> 控制，<code>0</code> 表示永久保留。</li>
-                </ul>
-                <p class="text-sm text-gray-500">WebSocket 的端点与消息格式见<a href="api.html#websocket">API 接口 · WebSocket 实时接口</a>。</p>
-
-                <h2 id="cli">命令行（CLI）</h2>
-                <p>校验旧 QD HAR：</p>
-                <pre><code>cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
-                <p>执行 HAR，并传入变量和整体超时：</p>
-                <pre><code>cargo run -p qdrust-cli -- run .\template.har.json --var token=abc --timeout 60</code></pre>
-                <div class="callout">
-                    <div class="callout-title">CLI 的网络策略更严格</div>
-                    <p>CLI 默认<strong>拒绝私网、localhost 和无效 TLS 证书</strong>，不继承旧 QD 的宽松网络策略。用它调试本地服务时会因此需要额外放行。</p>
+                <h3 id="header-auth" data-page-node-id="XVp2L5ue5e6B160IbxL03D">反向代理 Header 认证（forward-auth）</h3>
+                <p data-page-node-id="7NRLB5CDl91Z1IIK9y7TCB">
+                    对接 nginx <code data-page-node-id="mczRfjTWcW2ADCRsLz00DY">auth_request</code> / authelia forward-auth / authentik proxy：反代在<strong data-page-node-id="nPevkDfZwUR4x3us4vgBvv">每个请求</strong>注入身份头，
+                    服务端<strong data-page-node-id="P8aL8Jd3CTClJokjtNQV4c">仅在源 IP 属于可信代理时才信任</strong>：
+                </p>
+                <pre data-page-node-id="56dyEF7PJJbgzfeli4hupJ"><code data-page-node-id="FdA35b6CVEMkryEsI23ts9">QDRUST_HEADER_AUTH_ENABLED=true
+QDRUST_HEADER_TRUSTED_PROXIES=127.0.0.1,10.0.0.1   # 必须显式配置
+QDRUST_HEADER_TRUSTED_PROXY_REQUIRED=true           # 默认 true：无可信代理则拒绝启动
+QDRUST_HEADER_USER_HEADER=Remote-User
+QDRUST_HEADER_EMAIL_HEADER=Remote-Email
+QDRUST_HEADER_GROUPS_HEADER=Remote-Groups
+QDRUST_HEADER_GROUPS_SEPARATOR=,
+QDRUST_HEADER_AUTO_CREATE_USERS=false               # 默认 false：仅已建档用户可登录
+QDRUST_HEADER_DEFAULT_ROLE=user
+QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
+                <p data-page-node-id="MTAldXgwuzDBR1KQQdMza0">
+                    Header 认证<strong data-page-node-id="bawvENgHhRYYHdCTJNOcoJ">不每次建会话</strong>：仅当无有效会话、或头身份与会话用户不一致时才会建/刷新
+                    （身份漂移会撤销旧会话）。登出只清除 qdrust 自身会话。被隔离到 <code data-page-node-id="IrjzjY3ADD9jIIpsneP6dq">/api/v1/auth/*</code> 之外的
+                    普通 API 与 SPA 均由该中间件兜底。
+                </p>
+                <p data-page-node-id="Fy9royNRGvuGXS7UAxpLOW">反代需放行真实源 IP（Header 认证要读 <code data-page-node-id="6YRgKyAz4ETygKbTQMYBaM">ConnectInfo</code> 源地址）。示例 nginx——在 <code data-page-node-id="AeXgBvwPvT37LlCMOg96mz">location /</code> 里把已认证的用户身份注入并转发给 8923：</p>
+                <pre data-page-node-id="iPetPlLfDY1CLRHXhSSdoZ"><code data-page-node-id="8IaUvJrgRSJb0ZNjfEWkiA">location / {
+    proxy_pass http://127.0.0.1:8923;
+    proxy_set_header Host $host;
+    # authelia/authentik 校验通过后注入；务必去掉客户端可能伪造的同名头
+    proxy_set_header Remote-User   $remote_user;     # 或取自 auth_request 变量
+    proxy_set_header Remote-Email  $upstream_http_remote_email;
+    proxy_set_header Remote-Groups $upstream_http_remote_groups;
+}</code></pre>
+                <div class="callout" data-page-node-id="OLeYFNIqSoy4PuEU6KCYzB">
+                    <div class="callout-title" data-page-node-id="vHW6v779I0EZoHWjsCeiqB">角色在首次建档时写死</div>
+                    <p data-page-node-id="4Lo2jiJgchXqE0ibneQs0f">
+                        Header 与 OIDC 两种外部认证的 <code data-page-node-id="S1EouVIMBBXf6BKtTeFbjp">groups → admin</code> 角色都在<strong data-page-node-id="OzKv0p0Pv9EqnkKGnGTPQF">首次建档时写死</strong>，
+                        后续组变化不会自动升/降权，需管理员显式调整。OIDC 从 ID token 的 <code data-page-node-id="0lB8ZUvUOqqiWPQgG2s7aC">groups</code> claim（可配置）取组；
+                        若 IdP 不把组放进 ID token（仅在 userinfo），该 claim 缺失，首登统一落 <code data-page-node-id="YKQumR50T9GAdWhNwmYbXs">default_role</code>。
+                        组到角色的精细实时同步留待后续按需扩展。
+                    </p>
                 </div>
 
-                <h2 id="next">下一步</h2>
-                <ul>
-                    <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。</li>
-                    <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
-                    <li><a href="api.html">API 接口</a> —— 76 个 REST 端点的完整契约，适合做外部集成。</li>
+                <h2 id="import-har" data-page-node-id="7FGVs6H85ZF2PEtvHtUcLr">导入 QD HAR 模板</h2>
+                <ul data-page-node-id="yZwGmIWHyNU4WSwptJbMmA">
+                    <li data-page-node-id="ZxBHtG7HRaRV1C9MSOpKOi">在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code data-page-node-id="dJk6SCBG9tw9Ae5LB81Gi9">*.har.json</code>。</li>
+                    <li data-page-node-id="O0ceLFQpakdqv0adZC5ZAe">导入时会校验并<strong data-page-node-id="9j5mcS1zAGXJYFTZgUuTVv">保留原始 HAR JSON</strong>，兼容样本见仓库的 <code data-page-node-id="76AMro4naaLjBsdfCzIDnZ">tests/fixtures</code>。</li>
+                    <li data-page-node-id="cREiCJ2pqmYehIikBB2sHv">也可以用命令行先校验再导入：</li>
+                </ul>
+                <pre data-page-node-id="PDeFOGdvHwwdHcO0N5037r"><code data-page-node-id="8pl8U0U4gqIDKvdl8fH3CL">cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
+                <p data-page-node-id="C8n0lXhKbWq0wbyOApp61G">模板的字段含义与两种形态见<a href="templates.html#qd-har" data-page-node-id="y5WiCqihVJdkajwqLWlBLF">模板与表达式 · 旧 QD HAR</a>。</p>
+
+                <h2 id="tasks" data-page-node-id="qU6ev55gphkCJtcEBrtEQu">创建与运行任务</h2>
+                <ol data-page-node-id="eAzXxw1t0cJhYblf6cdlTO">
+                    <li data-page-node-id="F0Ae7SPi9LdHtjvRCEoll6">新建模板或导入 HAR 后，<strong data-page-node-id="1QudaTLTAeSZvTNHdPmzAd">基于模板创建任务</strong>并填写变量。</li>
+                    <li data-page-node-id="ud5h38SEjlQckbeB8RO0Ad">配置 cron / 间隔调度，或手动「立即运行」。</li>
+                    <li data-page-node-id="a7soi5mY6PmOzcgCFuqI6n">在运行记录中查看每一步的<strong data-page-node-id="jyzTzQPRAXaxKXchsoVm8M">请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
+                    <li data-page-node-id="Ws10VmNJfrPWHbVprrFG0r">订阅仓库的任务会<strong data-page-node-id="rS0uadUY4TDUNdROlWF2yJ">按仓库自动导入并同步</strong>；公共模板经 PushRequest 审批后发布。</li>
+                </ol>
+                <p class="text-sm text-gray-500" data-page-node-id="ZBAzkxWazo2BLJ0zRPmE2l">变量、断言与表达式写法见<a href="templates.html#variables" data-page-node-id="FgGFCicQtMeE17jcA8CO8N">模板与表达式</a>。</p>
+
+                <h2 id="har-editor" data-page-node-id="smQNnoM1Uo9CFRNblxSKGw">可视化 HAR 编辑器</h2>
+                <p data-page-node-id="ahyo1LvY45E2PHAyb2lHNF">
+                    WebUI 提供可视化编辑器，可直接增删改请求、设置<strong data-page-node-id="jlGi8cs3c798Q71aOZeHzq">请求头 / 表单 / 鉴权</strong>、编写
+                    <code data-page-node-id="FBYsCPcdJnlqNo9ulYAixs">success_asserts</code> 与 <code data-page-node-id="XKytBkTFRJphw3IG0wnqqR">extract_variables</code>，无需手改 JSON。
+                </p>
+
+                <h2 id="scheduling" data-page-node-id="nen20nNAdoRngtPByKJG8z">调度与随机延迟</h2>
+                <ul data-page-node-id="tRaEe2dYXO3n4bthRHz1XI">
+                    <li data-page-node-id="sW1PyF2UTEBXBnxwe5p8eI"><strong data-page-node-id="2zxHYgr5VwfuGw38LRZmvZ">两种调度</strong>：固定间隔与 cron，都在可视化调度器中配置。</li>
+                    <li data-page-node-id="FdkL0QG5Ux8pIyC8vcF4j9"><strong data-page-node-id="LqFbIuDNMrXTmgOV61b7S1">随机延迟</strong>：让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。</li>
+                    <li data-page-node-id="q9hijjDC6ftTemUyGn3IvE"><strong data-page-node-id="ZsXsOotukrjuJVH0ts2dt6">变量预填</strong>：模板变量支持在创建任务时预填默认值。</li>
                 </ul>
 
-                <div class="wiki-meta">
-                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-05</span>
+                <h3 id="timezone" data-page-node-id="Z8Hh2u4qwWItJKcKeMWjop">时区与夏令时</h3>
+                <p data-page-node-id="8AgsbjG5EnRkyBFStS1XsJ">cron 按<strong data-page-node-id="sJeuXVIaT3ZTX3Yy5JXRp9">每个任务各自的 IANA 时区</strong>（<code data-page-node-id="nQ3GkYq1x0C6CGChT67Pqp">timezone</code> 字段）求值，<strong data-page-node-id="07qOfmBGfs2a1Kw8IwDuvv">DST 感知</strong>：</p>
+                <ul data-page-node-id="h4H9ALGG0QNIiAVRwy06pv">
+                    <li data-page-node-id="VesS47KedCpMLklXz46aX3">设 <code data-page-node-id="8W2eeboHpU52XquC3SkoCC">America/New_York</code> 的任务，<code data-page-node-id="k9VgfqRC4pcIGThgfhbbGX">0 9 * * *</code> 会全年在当地 09:00 触发，<strong data-page-node-id="hWJGBWyN9GwOSRBvpXicI7">无需</strong>为冬令 / 夏令手动改 cron。</li>
+                    <li data-page-node-id="dbSkDgsFSyeItMCibrqpMW">任务未设 <code data-page-node-id="PQ1plweu6Xg6oYl8IUVNvo">timezone</code> 时，使用服务端 <code data-page-node-id="BZZJ1EwbNsy2Q8mHs7R1vA">QDRUST_DEFAULT_TIMEZONE</code>（默认 <code data-page-node-id="DDanxDRSb1QuoToE8lmtb7">Asia/Shanghai</code>）。</li>
+                    <li data-page-node-id="gVDnXjIsEYTbsj0ta8jfZi">WebUI 中任务列表与运行历史的「上次运行 / 开始时间」也按该任务时区展示；未设时区则用查看者浏览器本地时区。</li>
+                </ul>
+                <p class="text-sm text-gray-500" data-page-node-id="9aOn6oilEFbi2Ek0GAqydt">服务端默认时区的设置方式见<a href="deploy.html#env" data-page-node-id="8S7pOSJHocpPEwHDCdyjRw">部署与运维 · 环境变量</a>。</p>
+
+                <h2 id="logs" data-page-node-id="kXElVCL5aefjq9BX0MvBOF">运行日志与历史</h2>
+                <ul data-page-node-id="tGpZ3CEPlEIolJXujy15HD">
+                    <li data-page-node-id="A82DQ7RwohN2zmV3zNZy0L">每次运行会记录 <strong data-page-node-id="gUfWUR0UDqiWknbGZCeX8i">QD 风格的文本日志</strong>。</li>
+                    <li data-page-node-id="1ymwbuniJBfpWrdiMjxdsX">任务详情页可查看该任务的运行历史，并支持<strong data-page-node-id="O0ZpBoHpYPMDkM1zheySw2">清空</strong>历史记录。</li>
+                    <li data-page-node-id="rULmjCgdTtaZcZuP7rF0KW">活跃运行的步骤通过 <strong data-page-node-id="jpG153D8bABNEVGtcrGnZF">WebSocket</strong> 实时推送。</li>
+                    <li data-page-node-id="gOgHh2YCOCb2GNIL52hInZ">已完成记录的保留天数由 <code data-page-node-id="TJDVFJ4Z22BfDUve9KqUMT">LOG_RETENTION_DAYS</code> 控制，<code data-page-node-id="zHHC6xSGaTPMCaq4hzee4L">0</code> 表示永久保留。</li>
+                </ul>
+                <p class="text-sm text-gray-500" data-page-node-id="I3Z6nBo6w4Nq1NEBVVA9IR">WebSocket 的端点与消息格式见<a href="api.html#websocket" data-page-node-id="cdZvJ0UF1AVCjdJ0Ux6ojt">API 接口 · WebSocket 实时接口</a>。</p>
+
+                <h2 id="cli" data-page-node-id="nEI5gJGAVhIXtMlWgvwPod">命令行（CLI）</h2>
+                <p data-page-node-id="KlO5bajVzX2gr86Zrvag7o">校验旧 QD HAR：</p>
+                <pre data-page-node-id="xFGs1dXgRD0xfGGvY6HVgG"><code data-page-node-id="4zUblLWtJ0vrbptqi6Wssa">cargo run -p qdrust-cli -- validate .\template.har.json</code></pre>
+                <p data-page-node-id="7e1GFZtgAlGPbcbVrB8x4K">执行 HAR，并传入变量和整体超时：</p>
+                <pre data-page-node-id="Ver9BoYzDDNGVCMwMLRklM"><code data-page-node-id="LFhmoG5T9aelBN9TkKw5sk">cargo run -p qdrust-cli -- run .\template.har.json --var token=abc --timeout 60</code></pre>
+                <div class="callout" data-page-node-id="OTJvdhw9dtS5o96t2cQ9uK">
+                    <div class="callout-title" data-page-node-id="IorW5RJTCTizmISXhpLOrJ">CLI 的网络策略更严格</div>
+                    <p data-page-node-id="PWojWhpfqBvIXG2LyjZoTi">CLI 默认<strong data-page-node-id="18uQBTxF5vMBfLH7qbolvO">拒绝私网、localhost 和无效 TLS 证书</strong>，不继承旧 QD 的宽松网络策略。用它调试本地服务时会因此需要额外放行。</p>
+                </div>
+
+                <h2 id="next" data-page-node-id="fCioCFsuaJHJ88YZj0DtBk">下一步</h2>
+                <ul data-page-node-id="VLN8qm2gXdd8zmk2r3eemP">
+                    <li data-page-node-id="aeJE4eyIiQBuQrmRtRMPih"><a href="templates.html" data-page-node-id="OeXoQFzYao4dNDm97U9Fv7">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code data-page-node-id="uJtHDhn8WM5pwwcTXNxCCf">api://util/*</code> 内置工具。</li>
+                    <li data-page-node-id="oKaiMgcBPvMs1Y0Nti238i"><a href="browser.html" data-page-node-id="KHfghnDEQOmOw7SIwncuXb">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
+                    <li data-page-node-id="9EShPTSrksTEcUMwgYI8Ik"><a href="api.html" data-page-node-id="HUXqlXhkFBE3kCNaj8cLas">API 接口</a> —— 76 个 REST 端点的完整契约，适合做外部集成。</li>
+                </ul>
+
+                <div class="wiki-meta" data-page-node-id="7xL9srX6365PC35gX49xz5">
+                    <span data-page-node-id="P6A4cRjWxQerEt9AiWjenz">MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span data-page-node-id="kXkE4zRufZAzKNx6OM4NE8">最后更新：2026-09-07</span>
                 </div>
             </main>
 
             <!-- On-page TOC -->
-            <aside class="wiki-toc">
-                <div class="wiki-toc-title">本页目录</div>
-                <nav id="toc"></nav>
+            <aside class="wiki-toc" data-page-node-id="HxCq5EwpNXXbPoA5lVKk6S">
+                <div class="wiki-toc-title" data-page-node-id="I1Ah8eH11E8bePhqnhF3il">本页目录</div>
+                <nav id="toc" data-page-node-id="cxNo7T3DJAWtKKSgsljHhQ"></nav>
             </aside>
         </div>
     </div>
 
-    <footer class="py-10 bg-gray-50 border-t border-gray-200">
-        <div class="wiki-shell px-6 text-center text-gray-600 text-sm">
-            <p class="mb-1">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
-            <p>
-                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900">@CallmeLins</a>
+    <footer class="py-10 bg-gray-50 border-t border-gray-200" data-page-node-id="Q0VsWtwYe55dh5Cowfn1S2">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm" data-page-node-id="VFLp5WX9MTCrPvoTPhiqEx">
+            <p class="mb-1" data-page-node-id="0O9OB2A0XVbdX8SMH5ZKVJ">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p data-page-node-id="1vjzy67I1atBjXoqks5Dr8">
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900" data-page-node-id="HmCyYvDvkpdYOePLsodmU7">@CallmeLins</a>
             </p>
         </div>
     </footer>

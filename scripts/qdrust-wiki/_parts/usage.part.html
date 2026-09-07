@@ -1,6 +1,6 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    从初始化管理员到跑起第一个任务：导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
+                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
                 </p>
 
                 <h2 id="first-run">首次启动与管理员</h2>
@@ -10,6 +10,83 @@
                     <li>管理员可在「设置 / 管理员」中管理用户、站点设置、日志清理、备份与恢复。</li>
                 </ol>
                 <p class="text-sm text-gray-500">还没部署？先看<a href="deploy.html">部署与运维</a>。</p>
+
+                <h2 id="external-login">第三方登录（OIDC / 反向代理 Header）</h2>
+                <p>自托管部署可选择通过外部身份提供方（IdP）登录，<strong>本地账号密码能力始终保留</strong>。</p>
+
+                <h3 id="auth-mode">认证模式与开关</h3>
+                <p>默认 <code>local</code>，严格后向兼容：</p>
+                <ul>
+                    <li>
+                        <code>QDRUST_AUTH_MODE</code>：<code>local</code> | <code>hybrid</code> | <code>oidc</code>。
+                        <code>oidc</code> 模式下本地登录入口默认关闭；若想保留一个本地管理员应急入口，同时设
+                        <code>QDRUST_LOCAL_LOGIN_ENABLED=true</code>。
+                    </li>
+                    <li>外部提供方通过<strong>独立开关</strong>叠加：<code>QDRUST_OIDC_ENABLED</code> / <code>QDRUST_HEADER_AUTH_ENABLED</code>。</li>
+                </ul>
+                <p class="text-sm text-gray-500">WebUI 登录页按 <code>GET /api/v1/auth/config</code> 返回的策略渲染入口，详见<a href="api.html#ep-auth">API 接口 · 认证与会话</a>。</p>
+
+                <h3 id="oidc">OIDC（Authorization Code + PKCE）</h3>
+                <p>对接 authentik / authelia / keycloak / pocket-id：</p>
+                <pre><code>QDRUST_AUTH_MODE=hybrid          # 或 oidc（纯 IdP，关本地入口）
+QDRUST_OIDC_ENABLED=true
+QDRUST_OIDC_PROVIDER_NAME=Authentik   # SSO 按钮上显示的名称
+QDRUST_OIDC_ISSUER=https://auth.example.com/application/o/qdrust/
+QDRUST_OIDC_CLIENT_ID=qdrust
+QDRUST_OIDC_CLIENT_SECRET=...
+# QDRUST_OIDC_REDIRECT_URI 留空则由服务端在请求时按反代前缀推导
+QDRUST_OIDC_SCOPES="openid profile email"
+QDRUST_OIDC_AUTO_CREATE_USERS=true    # 首登自动建档（哨兵口令，本地无法登录该外部账号）
+QDRUST_OIDC_DEFAULT_ROLE=user         # 未命中 admin 组的建档角色
+QDRUST_OIDC_ADMIN_GROUPS=qdrust-admins # 命中则首次建档为 admin
+QDRUST_OIDC_GROUPS_CLAIM=groups       # ID token 中携带组成员身份的 claim 名（默认 groups）</code></pre>
+                <p>在 IdP 侧把回调地址登记为 <code>https://你的域名[/&lt;base_path&gt;]/api/v1/auth/oidc/callback</code>。</p>
+                <p>
+                    OIDC 首登按 <strong>ID token 里的 <code>groups</code> claim</strong>（可通过 <code>QDRUST_OIDC_GROUPS_CLAIM</code>
+                    换成 IdP 实际使用的 claim 名，如某些 Keycloak 映射后的 <code>roles</code>）解析角色：claim 命中
+                    <code>QDRUST_OIDC_ADMIN_GROUPS</code> 中任一成员则建档为 <code>admin</code>，否则落
+                    <code>QDRUST_OIDC_DEFAULT_ROLE</code>。若 IdP 不在 ID token 内下发组（部分 IdP 只在 userinfo 返回），
+                    则保持 claim 缺失、统一落 <code>default_role</code>，再让管理员手动调整。
+                </p>
+
+                <h3 id="header-auth">反向代理 Header 认证（forward-auth）</h3>
+                <p>
+                    对接 nginx <code>auth_request</code> / authelia forward-auth / authentik proxy：反代在<strong>每个请求</strong>注入身份头，
+                    服务端<strong>仅在源 IP 属于可信代理时才信任</strong>：
+                </p>
+                <pre><code>QDRUST_HEADER_AUTH_ENABLED=true
+QDRUST_HEADER_TRUSTED_PROXIES=127.0.0.1,10.0.0.1   # 必须显式配置
+QDRUST_HEADER_TRUSTED_PROXY_REQUIRED=true           # 默认 true：无可信代理则拒绝启动
+QDRUST_HEADER_USER_HEADER=Remote-User
+QDRUST_HEADER_EMAIL_HEADER=Remote-Email
+QDRUST_HEADER_GROUPS_HEADER=Remote-Groups
+QDRUST_HEADER_GROUPS_SEPARATOR=,
+QDRUST_HEADER_AUTO_CREATE_USERS=false               # 默认 false：仅已建档用户可登录
+QDRUST_HEADER_DEFAULT_ROLE=user
+QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
+                <p>
+                    Header 认证<strong>不每次建会话</strong>：仅当无有效会话、或头身份与会话用户不一致时才会建/刷新
+                    （身份漂移会撤销旧会话）。登出只清除 qdrust 自身会话。被隔离到 <code>/api/v1/auth/*</code> 之外的
+                    普通 API 与 SPA 均由该中间件兜底。
+                </p>
+                <p>反代需放行真实源 IP（Header 认证要读 <code>ConnectInfo</code> 源地址）。示例 nginx——在 <code>location /</code> 里把已认证的用户身份注入并转发给 8923：</p>
+                <pre><code>location / {
+    proxy_pass http://127.0.0.1:8923;
+    proxy_set_header Host $host;
+    # authelia/authentik 校验通过后注入；务必去掉客户端可能伪造的同名头
+    proxy_set_header Remote-User   $remote_user;     # 或取自 auth_request 变量
+    proxy_set_header Remote-Email  $upstream_http_remote_email;
+    proxy_set_header Remote-Groups $upstream_http_remote_groups;
+}</code></pre>
+                <div class="callout">
+                    <div class="callout-title">角色在首次建档时写死</div>
+                    <p>
+                        Header 与 OIDC 两种外部认证的 <code>groups → admin</code> 角色都在<strong>首次建档时写死</strong>，
+                        后续组变化不会自动升/降权，需管理员显式调整。OIDC 从 ID token 的 <code>groups</code> claim（可配置）取组；
+                        若 IdP 不把组放进 ID token（仅在 userinfo），该 claim 缺失，首登统一落 <code>default_role</code>。
+                        组到角色的精细实时同步留待后续按需扩展。
+                    </p>
+                </div>
 
                 <h2 id="import-har">导入 QD HAR 模板</h2>
                 <ul>
@@ -79,5 +156,5 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-05</span>
+                    <span>最后更新：2026-09-07</span>
                 </div>
