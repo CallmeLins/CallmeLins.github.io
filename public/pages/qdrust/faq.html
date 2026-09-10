@@ -188,7 +188,7 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">常见问题</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    部署、迁移、调度、插件相关的高频疑问。若这里没有答案，欢迎到 GitHub Issues 提问。
+                    部署、认证、迁移、调度、插件相关的高频疑问。若这里没有答案，欢迎到 GitHub Issues 提问。
                 </p>
 
                 <h2 id="session">部署与会话</h2>
@@ -209,6 +209,30 @@
                     单实例基于 SQLite 事务 + 租约保证不重复执行；多实例共享数据库时同样由租约机制保证。推荐 <code>docker compose up --scale qdrust=N</code> 加反向代理。Redis 仅用于会话缓存加速，非必需。
                 </p>
                 <p>需要注意的是，无头浏览器会话是<strong>进程内状态</strong>，不跨实例共享。</p>
+
+                <h2 id="auth">认证与第三方登录</h2>
+
+                <h3 id="oidc-no-redirect"><code>QDRUST_AUTH_MODE=oidc</code> 但页面没有直接跳转 IdP / 只看到登录面板？</h3>
+                <p>
+                    纯 OIDC 模式下未登录访问应<strong>自动跳转</strong>到 IdP 发起 SSO。只有两种情况会停留并显示 SSO 兜底面板：
+                </p>
+                <ul>
+                    <li>当前已带 <code>?login_error=</code>（上次回调失败，给你一个可重试的入口，避免跳转死循环）；</li>
+                    <li>页面已登录。</li>
+                </ul>
+                <p>若你始终停留在面板，多半是回调带上了遗留的 <code>login_error</code> 参数——清掉 URL 参数刷新即可。</p>
+                <p class="text-sm text-gray-500">另见<a href="usage.html#oidc-pure">使用指南 · 纯 OIDC 模式的登录体验</a>。</p>
+
+                <h3 id="oidc-logout">OIDC 登录了，但点登出又回到登录页，IdP 侧会话还在？</h3>
+                <p>
+                    默认只清除 qdrust 本地会话。要让提供方会话一起结束，配置 <code>QDRUST_OIDC_LOGOUT_URL</code>
+                    指向 IdP 的 end-session 端点（authentik：<code>.../protocol/openid-connect/logout</code>；
+                    Keycloak：<code>.../realms/&lt;realm&gt;/protocol/openid-connect/logout</code>）。
+                </p>
+                <p>
+                    可选配 <code>QDRUST_OIDC_POST_LOGOUT_REDIRECT_URI</code> 让 IdP 登出后跳回应用——<strong>仅当该地址已在 IdP 的
+                    OIDC 客户端登记过</strong>才配，否则多数 IdP 会拒绝未登记的回跳参数。
+                </p>
 
                 <h2 id="migration">迁移与升级</h2>
 
@@ -300,7 +324,7 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-03</span>
+                    <span>最后更新：2026-09-10</span>
                 </div>
             </main>
 

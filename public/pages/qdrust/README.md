@@ -10,7 +10,7 @@ qdrust 的项目介绍站，采用 **Wiki 风格**（侧边目录 + 正文 + 本
 public/pages/qdrust/
 ├── index.html          # 总览：定位、核心特性、与 QD 的关系、快速上手
 ├── deploy.html         # 部署与运维：Docker / Compose、反代到二级目录、环境变量、数据库、通知、备份回滚
-├── usage.html          # 使用指南：初始化管理员、导入 HAR、创建与运行任务、调度与时区、日志、CLI
+├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、任务、调度与时区、日志、CLI
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全、API
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、util 工具
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
@@ -75,7 +75,7 @@ python scripts/qdrust-wiki/build_pages.py
 |---|---|
 | 总览 | `README.md` 的介绍 / 核心特性 / 与 QD 的差异 / 组成 |
 | 部署与运维 | `README.md` 部署 / 更新章节 + `.env.example` + `compose.yaml` |
-| 使用指南 | `README.md` 的「使用」章节（初始化、导入 HAR、任务、调度、日志、CLI） |
+| 使用指南 | `README.md` 的「使用」章节（初始化、第三方登录、导入 HAR、任务、调度、日志、CLI） |
 | 架构设计 | `README.md` 架构决策说明 + `crates/*` 源码 + `migrations/` |
 | 模板与表达式 | `README.md` + `docs/template-schema-v1.md` + `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
 | 浏览器插件 | `README.md` 浏览器插件章节 + `crates/qdrust-plugin-browser/src/` |

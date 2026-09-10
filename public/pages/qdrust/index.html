@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="wZM6IrgmChPlpF2C9vkdGI">
-<head data-page-node-id="zEJApezGMDBECgyh6AG0qj">
-    <meta charset="UTF-8" data-page-node-id="ZOf7Wf4fozsKrrGI3fup4w">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="bnSmJRZCOxiwVz35XwsERU">
-    <meta name="description" content="qdrust —— 用 Rust + Vue 3 重写的 QD 兼容 HTTP 定时任务自动执行框架。本页为项目 Wiki 总览：定位、核心特性、与 QD 的关系、项目组成与快速上手。" data-page-node-id="UnECcmiqyh6ENkvkJhGYLE">
+<html lang="zh-CN" data-page-node-id="3D9yGr3cY2RxajnyspxeWA">
+<head data-page-node-id="grvmbLsAA7BDWTd4WHCuCD">
+    <meta charset="UTF-8" data-page-node-id="9Hraj7FWx7OUbI1FjZGs2C">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="8E5XLVaMMLhIT0GMkt45X0">
+    <meta name="description" content="qdrust —— 用 Rust + Vue 3 重写的 QD 兼容 HTTP 定时任务自动执行框架。本页为项目 Wiki 总览：定位、核心特性、与 QD 的关系、项目组成与快速上手。" data-page-node-id="GIUfF9fOwC2BSaOxldr3ii">
     <title>总览 | qdrust Wiki</title>
-    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/" data-page-node-id="WcAA78vI6GvFvEC7rj85Qy">
-    <link rel="icon" href="https://callmelins.github.io/favicon.svg" data-page-node-id="uqHS76EcITNLe1B7EvuGHM">
+    <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/" data-page-node-id="YJh1fI6osp2zG60Dg9hGhP">
+    <link rel="icon" href="https://callmelins.github.io/favicon.svg" data-page-node-id="Pf6lQIHrEx5c4vaOeeLzM2">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="5eCKiJQOQCM5GwF7kVLeS0">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="CJ7Dl4CwPy26O338eD6wLw">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" data-page-node-id="JfF3PpoMvYCpX7UcaGtjcx">
+    <link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="1PuWHkntNaXOMPRTngKR6J">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="4X7jfzcWgbDmF7D9SEos4A">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" data-page-node-id="oE8rE8bsosVpEqMGUiuiHf">
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -136,203 +136,203 @@
         }
     </style>
 </head>
-<body class="bg-white text-gray-900" data-page-node-id="Bf8gMv5w3ICYEbDQ5ocDJ3">
+<body class="bg-white text-gray-900" data-page-node-id="HbEVmMdl3aIhAIETphlYU0">
     <!-- Top bar -->
-    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200" data-page-node-id="2AFUldhDkAysCwoSW5T5za">
-        <div class="wiki-shell px-6 py-3.5" data-page-node-id="oibAHrVCu9zw1oiZYqws1G">
-            <div class="flex items-center justify-between gap-4" data-page-node-id="ZXelQotU8nbMVikuOS8HeV">
-                <div class="flex items-center gap-3 min-w-0" data-page-node-id="DwoxlH3eTfFhFNvvOLeEkN">
-                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录" data-page-node-id="KU0YCi8proZK9k0DYXBvk2">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="aJvqtvnvDHRtmWPRJ74KF6"><path d="M3 6h18M3 12h18M3 18h18" data-page-node-id="AT7eu6UyTQk34HFdmmCBad"/></svg>
+    <header class="fixed top-0 w-full bg-white/85 backdrop-blur-md z-50 border-b border-gray-200" data-page-node-id="sxHbvbO2t6cZEpeIrQI5w1">
+        <div class="wiki-shell px-6 py-3.5" data-page-node-id="DNa4YBvfPRrCYdSrafwkDP">
+            <div class="flex items-center justify-between gap-4" data-page-node-id="y9yPPJF28F7I9MpLAoDkP5">
+                <div class="flex items-center gap-3 min-w-0" data-page-node-id="cLPpw3fyT9E0oF7vv6MFmc">
+                    <button id="sidebarToggle" class="md:hidden p-1.5 -ml-1.5 rounded-md hover:bg-gray-100" aria-label="切换目录" data-page-node-id="WHl5EKl6JMvuNOb7Bc7Y8E">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="kOO6Ce98WCIXmrHafQlbcr"><path d="M3 6h18M3 12h18M3 18h18" data-page-node-id="ZOlgoVyU9rxMv2tp7fW6NM"/></svg>
                     </button>
-                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0" data-page-node-id="mJ8mWnVCGXOgOGh3lb26ZQ">
-                        <span class="text-lg font-semibold tracking-tight" data-page-node-id="DzEg2UnZpyic1CZBOaomS4">qdrust</span>
-                        <span class="text-xs text-gray-400 hidden sm:inline" data-page-node-id="2CXAVWMxkffVDQvM9QdoF1">Wiki</span>
+                    <a href="index.html" class="flex items-baseline gap-2 flex-shrink-0" data-page-node-id="OH57LY6xCWYWlfLAiy5aOY">
+                        <span class="text-lg font-semibold tracking-tight" data-page-node-id="PwlfVNAn2lA29zy7ImLNah">qdrust</span>
+                        <span class="text-xs text-gray-400 hidden sm:inline" data-page-node-id="TmTQ11v5hmcoVtRLPP3q1D">Wiki</span>
                     </a>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0" data-page-node-id="jB807bxUFnD0s2O3KOnq2C">
-                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200" data-page-node-id="cMRpsBmOGCG8mHVENEWqZJ">GitHub</a>
+                <div class="flex items-center gap-2 flex-shrink-0" data-page-node-id="7pOUIVsJWiHsuS5cBaUttE">
+                    <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg smooth-transition hover:bg-gray-200" data-page-node-id="kwYikA0cr5UxvlWnlkd6gz">GitHub</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="wiki-shell px-6 pt-28 pb-20" data-page-node-id="2NNyqGTo9SlT3ldU45EL8I">
-        <div class="wiki-grid" data-page-node-id="y9Tm8ivlovljrr2O68KUIa">
+    <div class="wiki-shell px-6 pt-28 pb-20" data-page-node-id="6Rpd8X6aOial31OHAczuVZ">
+        <div class="wiki-grid" data-page-node-id="miWufqJIlaVMxJbZE3Sa1W">
             <!-- Sidebar -->
-            <aside class="wiki-sidebar" id="sidebar" data-page-node-id="7GHHwN8zHW6rQASwIKhSY1">
-                <div class="wiki-nav-title" data-page-node-id="XafZ4VVqHDWqrXZQ8EKnZg">入门</div>
-                <a href="index.html" class="wiki-nav-link is-active" data-page-node-id="nt9270U8Giy6kEaopEin1m">总览</a>
-                <a href="deploy.html" class="wiki-nav-link" data-page-node-id="Jr4OOcYSJ2XssBnVmvM4ZR">部署与运维</a>
-                <a href="usage.html" class="wiki-nav-link" data-page-node-id="VyMb8aEXuW41lDukBLG9HX">使用指南</a>
+            <aside class="wiki-sidebar" id="sidebar" data-page-node-id="huvjNnFWO3uxhfSD6o6xfB">
+                <div class="wiki-nav-title" data-page-node-id="DoCTTFH2AKpZNaVCtpnoMW">入门</div>
+                <a href="index.html" class="wiki-nav-link is-active" data-page-node-id="PmcPkVlXzo1fqkuFq1USDF">总览</a>
+                <a href="deploy.html" class="wiki-nav-link" data-page-node-id="JuF4DO1qujlCv711FbKBfM">部署与运维</a>
+                <a href="usage.html" class="wiki-nav-link" data-page-node-id="7vyzv4UyyjYEilUicf2kjD">使用指南</a>
 
-                <div class="wiki-nav-title" data-page-node-id="IHwPHSRxBdXE8n3IU80EWJ">核心概念</div>
-                <a href="architecture.html" class="wiki-nav-link" data-page-node-id="xAalQ4C7trURfRzP4affwJ">架构设计</a>
-                <a href="templates.html" class="wiki-nav-link" data-page-node-id="226WDRRBRp0eB8XDv5l6s1">模板与表达式</a>
+                <div class="wiki-nav-title" data-page-node-id="54LaBECbtXMBtwZbhbd1Mq">核心概念</div>
+                <a href="architecture.html" class="wiki-nav-link" data-page-node-id="wEYCcxANv34InkoOj6Sx8T">架构设计</a>
+                <a href="templates.html" class="wiki-nav-link" data-page-node-id="sfaAxfGswN4cD7RMNhGE6e">模板与表达式</a>
 
-                <div class="wiki-nav-title" data-page-node-id="Al4G8i5CEqdztquVL2GXl0">进阶</div>
-                <a href="browser.html" class="wiki-nav-link" data-page-node-id="EZN3gEnY0fkDAqzn3CW7cb">浏览器插件</a>
+                <div class="wiki-nav-title" data-page-node-id="5PMS2KkJXLmvnRdhjqqOMO">进阶</div>
+                <a href="browser.html" class="wiki-nav-link" data-page-node-id="QUwvxUED0VCCiGegKaEUdc">浏览器插件</a>
 
-                <div class="wiki-nav-title" data-page-node-id="3GrTPNQLp4l5onGrsAYuUU">参考</div>
-                <a href="api.html" class="wiki-nav-link" data-page-node-id="UylofozrA0bFdMgYaBrsao">API 接口</a>
+                <div class="wiki-nav-title" data-page-node-id="alw0T9xZpxj01FDWy0MHpL">参考</div>
+                <a href="api.html" class="wiki-nav-link" data-page-node-id="Kb2GW6n7BCarrIKtCLM5hM">API 接口</a>
 
-                <div class="wiki-nav-title" data-page-node-id="EsKhMershfPy0QXaspRXgG">帮助</div>
-                <a href="faq.html" class="wiki-nav-link" data-page-node-id="FBGUAG45L77cwI4ppDSYzP">常见问题</a>
+                <div class="wiki-nav-title" data-page-node-id="CidZmKyoHf6DrYvdgxVTvB">帮助</div>
+                <a href="faq.html" class="wiki-nav-link" data-page-node-id="OYZo1Jc6qkmMn08qELmrgB">常见问题</a>
 
-                <div class="wiki-nav-title" data-page-node-id="v8EUiKllgL88lWNQZiVuYg">外部链接</div>
-                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link" data-page-node-id="EJsUM8863P23zDvzd0OPe6">源码仓库 ↗</a>
-                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link" data-page-node-id="J1duAXzJrXRSdBi28IvG8D">QD 原项目 ↗</a>
+                <div class="wiki-nav-title" data-page-node-id="eti49MjTs626c9VYmA3WUK">外部链接</div>
+                <a href="https://github.com/CallmeLins/qdrust" target="_blank" class="wiki-nav-link" data-page-node-id="0fozBlokClY9hCfIXso8mm">源码仓库 ↗</a>
+                <a href="https://github.com/qd-today/qd" target="_blank" class="wiki-nav-link" data-page-node-id="OC0pfkmMTqfFPNWfZzYUCI">QD 原项目 ↗</a>
             </aside>
 
             <!-- Article -->
-            <main class="wiki-article min-w-0" data-page-node-id="FiLBHzPdpGkocfbhUkvER6">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3" data-page-node-id="InNfHdg1ZPSkC0HUHmpuZb">qdrust</h1>
-                <p class="text-lg text-gray-600 mb-6" data-page-node-id="go5SZnYwkIVBwrFh1TXfUA">
-                    用 Rust + Vue 3 重写的 <strong data-page-node-id="viwHDYK3OGnPcnYnKiAdq2">QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
+            <main class="wiki-article min-w-0" data-page-node-id="LYW14pwbkxqnStUaU1L2V0">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3" data-page-node-id="7K6nr6myLfPTgDHmGxK2wk">qdrust</h1>
+                <p class="text-lg text-gray-600 mb-6" data-page-node-id="YlnWQU27OPAHK668YXqpRb">
+                    用 Rust + Vue 3 重写的 <strong data-page-node-id="d4MTibPGfFOlojrHLSGB3i">QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
                 </p>
-                <div class="mb-10" data-page-node-id="ADs53QAQXZV1tdP2P6QtlD">
-                    <span class="badge badge-dark" data-page-node-id="Jlb5hDcJL7kCUi3JN6Nz3G">v0.1.5</span>
-                    <span class="badge" data-page-node-id="734T5NDak0RdcTmxsHjeYu">Rust 2024 · 1.85+</span>
-                    <span class="badge" data-page-node-id="JeXwLZqnzvDnU524xf76Ze">MIT</span>
-                    <span class="badge" data-page-node-id="HSyE4EDSB8i9JLagCy0qXl">linux / amd64 / arm64</span>
+                <div class="mb-10" data-page-node-id="116UAxodVQuwcm1OpHFSiT">
+                    <span class="badge badge-dark" data-page-node-id="QetCMtTDHQeCJ1C7sGLfXc">v0.1.8</span>
+                    <span class="badge" data-page-node-id="Ox5iBwitFvGXeH65BSHFXK">Rust 2024 · 1.85+</span>
+                    <span class="badge" data-page-node-id="Y5I0S4DQdDVhXp16YVDphw">MIT</span>
+                    <span class="badge" data-page-node-id="ukjNxjRwuqpaGBCLioeWgz">linux / amd64 / arm64</span>
                 </div>
 
-                <h2 id="what" data-page-node-id="bjqAsrdXSifV4CwhPwcWju">它是什么</h2>
-                <p data-page-node-id="AdQ9NCWSAlNnjkE9vM7D5B">
-                    qdrust 按 <a href="https://github.com/qd-today/qd" target="_blank" data-page-node-id="105LUGQlppBldcBMVoVykp">QD</a>（HTTP 请求定时任务自动执行框架）的路线重新设计，是一份<strong data-page-node-id="0s6BmHqOd8v6DhLFWudJ9N">独立的 Rust 实现</strong>：解析并执行旧 QD 的 HAR 模板，提供命令行工具、REST API、定时调度与 WebUI。
+                <h2 id="what" data-page-node-id="xvxzFDoihCTSD4kWuWBJjw">它是什么</h2>
+                <p data-page-node-id="AJonS0XAivu3t95VV8C17F">
+                    qdrust 按 <a href="https://github.com/qd-today/qd" target="_blank" data-page-node-id="4DjtYcCzeG0QsjHh9glzFF">QD</a>（HTTP 请求定时任务自动执行框架）的路线重新设计，是一份<strong data-page-node-id="LBlQAEg9seUn1rKJ0wIFCN">独立的 Rust 实现</strong>：解析并执行旧 QD 的 HAR 模板，提供命令行工具、REST API、定时调度与 WebUI。
                 </p>
-                <p data-page-node-id="4ln8HTBi048TbIgDPOd9n5">
-                    一句话概括它的工作：<strong data-page-node-id="FmoQl4S7MuC0s3zCmnAiho">把浏览器里抓到的 HTTP 请求（HAR）存成模板，按 cron 或固定间隔自动重放执行。</strong>典型用途是签到、监控、API 轮询这类需要周期性触发的 HTTP 任务；执行结果可通过 10 种渠道推送通知。
-                </p>
-
-                <h2 id="why" data-page-node-id="faEEKe9Phg38B2MAIhLIvV">解决什么问题</h2>
-                <p data-page-node-id="9NIYVqGyj9fWBjDykSSBYl">如果你曾经为了「每天自动签到」而写过脚本，大概率遇到过这些事：</p>
-                <ul data-page-node-id="r7ik1BKC2mAvjhyfJpR45V">
-                    <li data-page-node-id="yKhYZrvI71V0vloROzyZMn">抓包、抠 Cookie、处理签名参数，一次性的活儿却要写成长期维护的脚本；</li>
-                    <li data-page-node-id="Kk2m1jNAVktoSiNi67yU0t">脚本散落在各处，没有统一的调度、日志和失败告警；</li>
-                    <li data-page-node-id="YK9xSA8LZDh4AXSQqO3r0S">站点改版后签名逻辑变了，纯 HTTP 请求跑不通，又不想为一个步骤引入整套爬虫框架。</li>
-                </ul>
-                <p data-page-node-id="n4WwVYHEJNF0XgQlY0JGIF">
-                    qdrust 的做法是把「请求」本身当成资产来管理：HAR 是标准格式，浏览器抓完直接导入；模板可变、可分组、可复用；调度、运行日志、步骤级回放和通知由服务端统一负责。而那些纯 HTTP 做不了的一步（JS 生成签名、验证码、多步表单），交给可选的 <code data-page-node-id="VIWHWZBlaOIBR4lf924BIU">api://browser/*</code> 无头浏览器插件补齐，其余步骤仍走普通 HTTP——这是刻意保持的最小设计。
+                <p data-page-node-id="f2WBI2vzS653u4e7d3QBqb">
+                    一句话概括它的工作：<strong data-page-node-id="GMVZJEi2o9vDbEk7MxiNjZ">把浏览器里抓到的 HTTP 请求（HAR）存成模板，按 cron 或固定间隔自动重放执行。</strong>典型用途是签到、监控、API 轮询这类需要周期性触发的 HTTP 任务；执行结果可通过 10 种渠道推送通知。
                 </p>
 
-                <h2 id="features" data-page-node-id="dgPD6BoW49zHmBUNcrbDAx">核心特性</h2>
-                <ul data-page-node-id="r0Gh9LupTeCuYZ9P9DlOiY">
-                    <li data-page-node-id="lg5nfZ1kWeK3AAS5BvqLPe"><strong data-page-node-id="wmI4CC0zoAlxehuNilquBN">旧 QD HAR 兼容</strong>：导入、校验、保留原始 HAR JSON，并重放执行。兼容样本位于 <code data-page-node-id="Xi8sALbDOIIX7ULZGDxx1I">tests/fixtures</code>。</li>
-                    <li data-page-node-id="lHDYEG0VqXLNSgNhlVyno9"><strong data-page-node-id="HoIv4DPrzSOdqfKbNLSSfF">可视化 HAR 编辑器</strong>：在 WebUI 里直接编辑请求、变量与断言，无需手写 JSON。</li>
-                    <li data-page-node-id="ACwXxp5fydMBuuvEMWacId"><strong data-page-node-id="JI2ksr2i3rj9UduCq780gD">双后端数据库</strong>：SQLite（开箱即用）与 MySQL（按 <code data-page-node-id="tIZZyltBXBUk3Rdvn8xX4T">DATABASE_URL</code> 自动选择）。</li>
-                    <li data-page-node-id="3OPJyJHCQyREAaVGo3KSIZ"><strong data-page-node-id="aL98KpftGk84WGuxMx3rN9">完整通知体系</strong>：Webhook + Email + 8 种推送渠道，共 <strong data-page-node-id="nXSZ5xU8YIeDlt58hDEC1a">10 种</strong>。</li>
-                    <li data-page-node-id="RrMAlLabGxANIYR9k9Nayp"><strong data-page-node-id="G7BT1SesbqN8lznD9UVCNh">模板表达式</strong>：minijinja 驱动的 Jinja2 语法，37 个全局函数与 51 个过滤器，外加 <code data-page-node-id="KdpTFjwk7Ut0SGHX9DDszy">api://util/*</code> 内置工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / OCR）。</li>
-                    <li data-page-node-id="n5gaBbrQNfDHih49RcbTN0"><strong data-page-node-id="JH9mIKvvyeurbM6CmCxD8V">无头浏览器插件</strong>（可选）：<code data-page-node-id="Oo4bHpkkvfkKmBoPf99ct1">api://browser/*</code> 通过 CDP 驱动远程无头浏览器，支持跨步骤存活的会话复用与 <code data-page-node-id="uk2L2MmtZ7PmTGSGNMF9uo">type</code> / <code data-page-node-id="MFTdYagPejYGwvZvinVUmY">click</code> DOM 操作。</li>
-                    <li data-page-node-id="i4gMBeYukGkmzKWkpgzVAO"><strong data-page-node-id="FFKO6tX2kyi5yciYNgr20q">任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。</li>
-                    <li data-page-node-id="vcf3jEy6AZLHR1vTuG9DOv"><strong data-page-node-id="IID0EsWCkef7DF5CJW7rmX">运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流。</li>
-                    <li data-page-node-id="UQNuLtXAkJ4UaFzETwQOlH"><strong data-page-node-id="SBqi3cZz9RJqR0MgdzFgGv">安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验。</li>
-                    <li data-page-node-id="Jco5MrgG5UpvFJhzeDeFX9"><strong data-page-node-id="dGarJUy2UR7tchpVlIJSen">外部身份登录</strong>（可选）：OIDC 授权码 + PKCE 对接 authentik / authelia / keycloak / pocket-id，或反向代理 Header 认证（forward-auth）。<strong data-page-node-id="zhpbjHjqfOxahxNnDcad1r">本地账号密码始终保留</strong>，详见<a href="usage.html#external-login" data-page-node-id="JLh0HfUPb4exST5ZNR8qXh">使用指南</a>。</li>
-                    <li data-page-node-id="mrx2J3vWtrzGvTM8WZgjhQ"><strong data-page-node-id="XAzllNo9WBTYmRvnKl61e4">运维友好</strong>：Docker 镜像（amd64 / arm64）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。</li>
+                <h2 id="why" data-page-node-id="gACFeysUUAh8hrtn9s1QBM">解决什么问题</h2>
+                <p data-page-node-id="b7utpmCFynPgNy8t0fVEji">如果你曾经为了「每天自动签到」而写过脚本，大概率遇到过这些事：</p>
+                <ul data-page-node-id="oKOsrpDIzvgPDy9F9ZcezT">
+                    <li data-page-node-id="e5fmXZTMSJF4T4R3wAiVBs">抓包、抠 Cookie、处理签名参数，一次性的活儿却要写成长期维护的脚本；</li>
+                    <li data-page-node-id="EXuVzAx26ysiMJhFbk9GWs">脚本散落在各处，没有统一的调度、日志和失败告警；</li>
+                    <li data-page-node-id="xvXLENUhBQVn36DbWcLqqs">站点改版后签名逻辑变了，纯 HTTP 请求跑不通，又不想为一个步骤引入整套爬虫框架。</li>
                 </ul>
-
-                <h2 id="vs-qd" data-page-node-id="FchhlAYpwYQum6aUubpHAM">与 QD 的关系</h2>
-                <p data-page-node-id="FR5NQJb0hrhzROuXiJ4bNN">
-                    qdrust 是<strong data-page-node-id="ZOZ3BmcKWRNwdIFqof3Rre">独立、干净重写的 Rust 实现</strong>：不继承 QD 的代码、不导入其数据库、不复用其 Cookie，仅对齐核心 HAR 兼容契约与 <code data-page-node-id="21I7mHnafz3hmGIs5qnYKR">api://util</code> 工具语义。
+                <p data-page-node-id="aOWJb1IbYPnkhMzhFBwlqS">
+                    qdrust 的做法是把「请求」本身当成资产来管理：HAR 是标准格式，浏览器抓完直接导入；模板可变、可分组、可复用；调度、运行日志、步骤级回放和通知由服务端统一负责。而那些纯 HTTP 做不了的一步（JS 生成签名、验证码、多步表单），交给可选的 <code data-page-node-id="ftN0bmqua1zmwE22vXOQaB">api://browser/*</code> 无头浏览器插件补齐，其余步骤仍走普通 HTTP——这是刻意保持的最小设计。
                 </p>
 
-                <h3 id="compat" data-page-node-id="DW9nHnE2kNqzai2WGXI6aM">兼容范围</h3>
-                <ul data-page-node-id="EGX3buvJfxGi7uQqvO1MjT">
-                    <li data-page-node-id="e0uHEOwIPCXgPxVuqIc0kH"><strong data-page-node-id="Y4spQmb8H6FMitfEzesTr3">兼容</strong>：旧 QD 的 HAR 模板（这是核心兼容契约）、<code data-page-node-id="eIc3o7SiCXqVnZRPWBpHNZ">api://util/*</code> 工具语义、Jinja2 表达式写法。</li>
-                    <li data-page-node-id="uh8FnA1apA6i2SouAnBThw"><strong data-page-node-id="1hHptUQHQOCyPHWslzJ8Ex">不兼容</strong>：旧 QD 数据库、旧登录 Cookie、旧 URL / 旧 API、任意 Python 动态表达式。</li>
+                <h2 id="features" data-page-node-id="IFJLFAwRDqgmEsIapYt4GZ">核心特性</h2>
+                <ul data-page-node-id="qycPOvih5bfRng1ArRzJIu">
+                    <li data-page-node-id="SQPoUh7HhiO7KoPmmBnRuM"><strong data-page-node-id="9ru9SLR6DHaKcIYFAssbe3">旧 QD HAR 兼容</strong>：导入、校验、保留原始 HAR JSON，并重放执行。兼容样本位于 <code data-page-node-id="GiRpTCx8g1JZO5J5tnHOdc">tests/fixtures</code>。</li>
+                    <li data-page-node-id="Rcr5FbczkuO7upEdUVAucZ"><strong data-page-node-id="wMuZUGw3ba2foxz2qiKpj4">可视化 HAR 编辑器</strong>：在 WebUI 里直接编辑请求、变量与断言，无需手写 JSON。</li>
+                    <li data-page-node-id="h8BIXWOqeWKvlEjhAHynzD"><strong data-page-node-id="A0ARj5x19FBCMb6haDf6SK">双后端数据库</strong>：SQLite（开箱即用）与 MySQL（按 <code data-page-node-id="DhfT3px5HDdJzocsIb3yWF">DATABASE_URL</code> 自动选择）。</li>
+                    <li data-page-node-id="XkalFUITunjq3KGJQcBUzU"><strong data-page-node-id="hIxumNks9shIdV0Gk5ShbQ">完整通知体系</strong>：Webhook + Email + 8 种推送渠道，共 <strong data-page-node-id="xqRsefLQojcC5iXgxafbIx">10 种</strong>。</li>
+                    <li data-page-node-id="polKBPG1Lsayc6DBpTllw8"><strong data-page-node-id="yJTtb4qU4SCJxbBOSXFhJi">模板表达式</strong>：minijinja 驱动的 Jinja2 语法，37 个全局函数与 51 个过滤器，外加 <code data-page-node-id="uyJPH4V5eTmi9WQo6cFJI7">api://util/*</code> 内置工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / OCR）。</li>
+                    <li data-page-node-id="vUR32mnHBo7ri69sVyErTo"><strong data-page-node-id="22jOFDDipCRNxZ543uhXrk">无头浏览器插件</strong>（可选）：<code data-page-node-id="zSaKtPs9DNUnAhg1rPy5Sb">api://browser/*</code> 通过 CDP 驱动远程无头浏览器，支持跨步骤存活的会话复用与 <code data-page-node-id="BwtwaSDogpOlJJtQGSIlvn">type</code> / <code data-page-node-id="IkWgJ6Om76Dl7xJXiQLsTi">click</code> DOM 操作。</li>
+                    <li data-page-node-id="BBJD5xeGCoq9cIBrYsDE1x"><strong data-page-node-id="m0Dj0dN5saBkRmCK3fd30J">任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。</li>
+                    <li data-page-node-id="jHqhfQ3dTlDBo7zDaiBenw"><strong data-page-node-id="9pD01yBpFhxKUkZQWo3djc">运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流。</li>
+                    <li data-page-node-id="XElLxll9EIJPpCY9X88Rdr"><strong data-page-node-id="3Vsu0E2D4HDeAdWLIqdb8c">安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验。</li>
+                    <li data-page-node-id="l9yZj4cpTiZ8ZaZ6rZ4not"><strong data-page-node-id="bd6KYkCp0ExH1S2tamctek">外部身份登录</strong>（可选）：OIDC 授权码 + PKCE 对接 authentik / authelia / keycloak / pocket-id，或反向代理 Header 认证（forward-auth）。<strong data-page-node-id="0UQ1IiYvibxwlXCjG6rJv5">本地账号密码始终保留</strong>，详见<a href="usage.html#external-login" data-page-node-id="d1kww8FC5QxAmYDYEncnrA">使用指南</a>。</li>
+                    <li data-page-node-id="WqJDmlhmOj8RFWcwLiDOLJ"><strong data-page-node-id="YYCiIpbsgsMSCvcYeuV75A">运维友好</strong>：Docker 镜像（amd64 / arm64）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。</li>
                 </ul>
 
-                <h3 id="diffs" data-page-node-id="EsoghOfVW5BSgcVkH2TTWA">两处刻意差异</h3>
-                <ul data-page-node-id="BKw2RXnqfksVeXaeEt7wFB">
-                    <li data-page-node-id="6fYxsGQJrFr2DyXBP3bzz3"><strong data-page-node-id="fRRfaqzkNQWLhwqHCHn3EE">单进程异步模型</strong>：采用 <code data-page-node-id="j91If7FZOoZ2uMcjwyVEl2">axum::serve</code> + Tokio，而非 Tornado 多进程；横向扩展靠 Docker 副本 + 反向代理。</li>
-                    <li data-page-node-id="EgE6EGUTcxAXI0MhyHQLyj"><strong data-page-node-id="KQI6EUNaJR36d04Wj0TU6D">非持久化本地队列</strong>：基于 SQLite 事务（<code data-page-node-id="XdnssFZmVUtA8HkWxRyuP2">claim_run</code> + 租约恢复），保证单实例正确性与多实例不重复执行。</li>
+                <h2 id="vs-qd" data-page-node-id="TzNXeRmeK0wR13Gu7odT8z">与 QD 的关系</h2>
+                <p data-page-node-id="dZXchSKJMguFpOUOpVQMAn">
+                    qdrust 是<strong data-page-node-id="wQZ9cybLgZIRNLFdEPi2X1">独立、干净重写的 Rust 实现</strong>：不继承 QD 的代码、不导入其数据库、不复用其 Cookie，仅对齐核心 HAR 兼容契约与 <code data-page-node-id="Ft2L34F4DCxxdQqBRWmeRO">api://util</code> 工具语义。
+                </p>
+
+                <h3 id="compat" data-page-node-id="haCOj5X6X6JzcFTMY4yhAg">兼容范围</h3>
+                <ul data-page-node-id="F0oftRIvjBxalCq0OgaH9D">
+                    <li data-page-node-id="JUOzZyStwiId01tLyGbC7L"><strong data-page-node-id="GKv0lnjnjRltEpKo2atVBP">兼容</strong>：旧 QD 的 HAR 模板（这是核心兼容契约）、<code data-page-node-id="NiKe1rHUoXWzY2JL6Btzh1">api://util/*</code> 工具语义、Jinja2 表达式写法。</li>
+                    <li data-page-node-id="OYd26ou0FXbumCpMNh6BlS"><strong data-page-node-id="HvYxgcIvhqePyD5Pq2PaXo">不兼容</strong>：旧 QD 数据库、旧登录 Cookie、旧 URL / 旧 API、任意 Python 动态表达式。</li>
                 </ul>
 
-                <h2 id="components" data-page-node-id="yfKxABT10oIP7VInl5n7qm">项目组成</h2>
-                <p data-page-node-id="M0DXUfy8Xda2ScpRDMoY10">仓库是一个 Cargo workspace，加上一个独立的前端工程：</p>
+                <h3 id="diffs" data-page-node-id="jCjaC4kIDOV4z28BoOvhaj">两处刻意差异</h3>
+                <ul data-page-node-id="tVhfjZxGztPhEcsn5n4syK">
+                    <li data-page-node-id="wXNuCsJ4fLPzNVctbIZ0kr"><strong data-page-node-id="s0rqcI2gzcDnXLbeVjX2Il">单进程异步模型</strong>：采用 <code data-page-node-id="YwwhkAb9mU2EavTbbbN6jn">axum::serve</code> + Tokio，而非 Tornado 多进程；横向扩展靠 Docker 副本 + 反向代理。</li>
+                    <li data-page-node-id="yll9fmIw1k15fp7o4CYb1p"><strong data-page-node-id="TKf01gYHr4GqjvfNlhtL9K">非持久化本地队列</strong>：基于 SQLite 事务（<code data-page-node-id="YlkIkE5b4C1N8j6J5EOVvD">claim_run</code> + 租约恢复），保证单实例正确性与多实例不重复执行。</li>
+                </ul>
 
-                <div class="overflow-x-auto mb-6" data-page-node-id="ONUru3Lu5z8xqfYQzq1vEh">
-                    <table data-page-node-id="IUXI6BighWmRTk5lF94bFS">
-                        <thead data-page-node-id="DJ01Tq3eu1XS5uKQLRfca7"><tr data-page-node-id="lYUWLc8g1KDlaAwBU3nvRK"><th data-page-node-id="9RZDeMBemPWk4SjBqhauCz">组件</th><th data-page-node-id="YuRfXCjxIgwRBDhDD5ASEH">说明</th></tr></thead>
-                        <tbody data-page-node-id="6Znvis17bz4GGZFdTr949J">
-                            <tr data-page-node-id="p4ia4jzMK1q5IgzQ1TZ6f7"><td data-page-node-id="fOSUnuZeZVxrRAXAYpWyDy"><code data-page-node-id="RyMVwnWU41U3KnKJ7Kgs4Q">crates/qdrust-core</code></td><td data-page-node-id="utGlfgl9AxnSL8xdsIrFFH">旧 QD HAR 解析、编译、变量求值与 HTTP 执行核心。</td></tr>
-                            <tr data-page-node-id="Kyex4uA2GoLXqVfNy8SEId"><td data-page-node-id="jSAVmtSd1ZOZz75CmuuUqI"><code data-page-node-id="OuGzAOVQRUc0sPyomOmFUj">crates/qdrust-cli</code></td><td data-page-node-id="kn6hnPPhNErO9gtHXGfXuZ">无需启动服务即可校验和执行 HAR。</td></tr>
-                            <tr data-page-node-id="U3AobxbwFBP70J2LaUelET"><td data-page-node-id="bCB9DVTvzNXA97TiWZWjJk"><code data-page-node-id="3AS7zsaYudVdDnB5KhV0ix">crates/qdrust-server</code></td><td data-page-node-id="sSkZYzbGFcHjDL9j7GKlVM">基于 Axum、SQLx 与 SQLite/MySQL 的 API、认证、调度与运行管理。</td></tr>
-                            <tr data-page-node-id="PFmnzwHXvqARlE1kwCOw8Z"><td data-page-node-id="oAT2R6C0jYby9rBvmJBwoX"><code data-page-node-id="HB9FUGWABXtHJiRCezwneg">crates/qdrust-plugin-browser</code></td><td data-page-node-id="Nuy8p2JIT0RnvRWXbyCPbJ">基于 chromiumoxide 的无头浏览器插件实现。</td></tr>
-                            <tr data-page-node-id="IovR1qkXaslj9Mr9wauIph"><td data-page-node-id="NOcPgVlWfBquWRAcFZk8PG"><code data-page-node-id="ywBu0iZ0pH4JHXo93zsHCk">webui</code></td><td data-page-node-id="IKTlAO8XLqJbwZN7VPrgXj">基于 Vue 3、TypeScript 与 Vite 的 Web 界面。</td></tr>
+                <h2 id="components" data-page-node-id="PgfazHCLrdNK0JGNCWWoFG">项目组成</h2>
+                <p data-page-node-id="WgwtJteM8AfQaj0DrdOIBc">仓库是一个 Cargo workspace，加上一个独立的前端工程：</p>
+
+                <div class="overflow-x-auto mb-6" data-page-node-id="UpVWmDEXypbBgSN9IOQF4m">
+                    <table data-page-node-id="RtiIFKlRaHUsXqogizupXY">
+                        <thead data-page-node-id="yXyGjmyTHN1HnGyKgcS5AY"><tr data-page-node-id="bU9eKns4Nb8nj1N89V7Wev"><th data-page-node-id="Wxz6E31HilIIMqvpqh4D8u">组件</th><th data-page-node-id="H3ZPuHwguULFYHT1LfsEzu">说明</th></tr></thead>
+                        <tbody data-page-node-id="WbQVmNmXSQ51CKJRYFtdIX">
+                            <tr data-page-node-id="3Hjx0kCfOfWvo2UoSEJkgL"><td data-page-node-id="prGeTtYeJK8WLZi62hjOjJ"><code data-page-node-id="sxj6XxBMbQjqLuuXOhxQRY">crates/qdrust-core</code></td><td data-page-node-id="VbZiArgjGW5EX7S39sdgCG">旧 QD HAR 解析、编译、变量求值与 HTTP 执行核心。</td></tr>
+                            <tr data-page-node-id="4IVe2c2P1GFSJJkTSMiHI3"><td data-page-node-id="omqGCpubqU16AY0Di9MFaD"><code data-page-node-id="lzFBePLMUsG0GFtMmqIsLQ">crates/qdrust-cli</code></td><td data-page-node-id="xbn3uyIAhuK7YKTEBFLq7Q">无需启动服务即可校验和执行 HAR。</td></tr>
+                            <tr data-page-node-id="cmTVnoJxhC8NVXWQFNRvvc"><td data-page-node-id="VHtbeDDGwXLjYPKTNAOyHD"><code data-page-node-id="AvLCLLMK80GcctcvIdatft">crates/qdrust-server</code></td><td data-page-node-id="9HB02bTUJnufOnP86rhYMl">基于 Axum、SQLx 与 SQLite/MySQL 的 API、认证、调度与运行管理。</td></tr>
+                            <tr data-page-node-id="EDC4il3tBFBGpTUzFGHwtf"><td data-page-node-id="nCiZcZAFTsgZcjX24Chlc2"><code data-page-node-id="CCaOKWzzlEKIAPaXB3cVxJ">crates/qdrust-plugin-browser</code></td><td data-page-node-id="zd6sybCIVYhaOL745Nfsze">基于 chromiumoxide 的无头浏览器插件实现。</td></tr>
+                            <tr data-page-node-id="oiJNMoYK7jKBo5wZZmPEyK"><td data-page-node-id="Bb36cGW2VmaiRqcsDkTtCM"><code data-page-node-id="BE9uPzDXPatYATSi7PDkOG">webui</code></td><td data-page-node-id="GHGXYXG1OH6B7gNDCIUz7H">基于 Vue 3、TypeScript 与 Vite 的 Web 界面。</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <p data-page-node-id="te3qeon1jsKuxaC4tURVbB">
+                <p data-page-node-id="5ibvKokRzynrDBya80eztv">
                     服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、模板（搜索/分组/分页、可视化 HAR 编辑器、公共发布审批 PushRequest、订阅仓库自动导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填）、运行记录与步骤、WebSocket 实时步骤流、租约恢复、插件系统、10 种通知渠道、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI。
                 </p>
 
-                <h2 id="quickstart" data-page-node-id="SC441J6YaZD9oGrdhGiX2E">30 秒跑起来</h2>
-                <p data-page-node-id="qowQaob02MXoeVyO1IsR3T">镜像已发布到 GitHub 容器注册表，直接拉取运行即可，无需本地构建：</p>
-                <pre data-page-node-id="CDN5CBnL114hQUISrh4LOy"><code data-page-node-id="WzGiZy0eeryD93eOrE5MAR"># 最简启动：数据保存在命名卷 qdrust-data，监听 8923 端口
+                <h2 id="quickstart" data-page-node-id="vZfCT6aPjQKIzWGiLEkF1d">30 秒跑起来</h2>
+                <p data-page-node-id="UV3ZbC97w5Hlgw9cOdOZT7">镜像已发布到 GitHub 容器注册表，直接拉取运行即可，无需本地构建：</p>
+                <pre data-page-node-id="fbjbjcMhjHmi1EQs1LyUqn"><code data-page-node-id="GEKwQzeY576lnA6et3TE42"># 最简启动：数据保存在命名卷 qdrust-data，监听 8923 端口
 docker run -d --name qdrust -p 8923:8923 \
   -v qdrust-data:/data \
   ghcr.io/callmelins/qdrust:latest</code></pre>
-                <p data-page-node-id="JqCsgH0B4EPsV3XwE05Aay">然后访问 <code data-page-node-id="RRCAFYSHXkUtWgaEeVlF2E">http://localhost:8923/</code>，首次打开会引导创建<strong data-page-node-id="TRkAvavyLUtVvFF7ISG3wT">初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code data-page-node-id="cCopNai2fd05xhCkmhbozp">data/qd.db</code>。</p>
+                <p data-page-node-id="3AZgKXHta98aULcWmz6JDc">然后访问 <code data-page-node-id="VtxNQG4EXQewDYKNidD2gt">http://localhost:8923/</code>，首次打开会引导创建<strong data-page-node-id="REsMrgnrmrJn6SCHy2FjCI">初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code data-page-node-id="qwaU3FNyGCpQP426RUwJd0">data/qd.db</code>。</p>
 
-                <div class="callout" data-page-node-id="vg4EkNWBKwTtnK6Ky1OeDf">
-                    <div class="callout-title" data-page-node-id="TW5FcXfLX6ZoqhsDzCHK1W">HTTPS 部署请注意</div>
-                    <p data-page-node-id="IWl5Bzm7T206c0HDDOjDAF">走 HTTPS 反向代理后，必须把 <code data-page-node-id="jtq1tDXAcQq2cH5rbvkbo8">COOKIE_SECURE</code> 设为 <code data-page-node-id="D046EynVDHHzD3hGKzZDUL">true</code>，否则安全 Cookie 不会被浏览器接受，表现为登录会话不生效 / 反复被登出。</p>
+                <div class="callout" data-page-node-id="WEFChBLOWEEVafMt9nNYv7">
+                    <div class="callout-title" data-page-node-id="cR4GzfFjsx9TIenj20sqoS">HTTPS 部署请注意</div>
+                    <p data-page-node-id="pD2m6psU1unG4H3FfnzQFK">走 HTTPS 反向代理后，必须把 <code data-page-node-id="7HtahrBYbLj8UNWAL18xLA">COOKIE_SECURE</code> 设为 <code data-page-node-id="4eBajwdwsyi6JZqB9BePzS">true</code>，否则安全 Cookie 不会被浏览器接受，表现为登录会话不生效 / 反复被登出。</p>
                 </div>
 
-                <h2 id="next" data-page-node-id="u5Zo8crdmIEaIhV2PyU9Az">下一步</h2>
-                <div class="card-grid" data-page-node-id="m4HbXfwR1STbOqo0BlldI6">
-                    <a href="deploy.html" class="wiki-card" data-page-node-id="r2tH7MPPqZ9si5KxRMiCc0">
-                        <h4 data-page-node-id="JwNZexJPkPeDRzN5lDxESk">部署与运维 →</h4>
-                        <p data-page-node-id="GJGqu5GrPJaG0olrmUAWvn">Compose 生产配置、反代到二级目录、环境变量全表、数据库选型、备份与升级回滚。</p>
+                <h2 id="next" data-page-node-id="cKJs8xQhZtmIFbLil1YR33">下一步</h2>
+                <div class="card-grid" data-page-node-id="bLCDI7kRBGUh2xRnaQTnWT">
+                    <a href="deploy.html" class="wiki-card" data-page-node-id="6NgOwqGuDSDnFCShqCBWBI">
+                        <h4 data-page-node-id="QFrC8ZnXodBj5m6ZMw3rwZ">部署与运维 →</h4>
+                        <p data-page-node-id="AMJmTx1u4S0pPW1gDCvt3C">Compose 生产配置、反代到二级目录、环境变量全表、数据库选型、备份与升级回滚。</p>
                     </a>
-                    <a href="usage.html" class="wiki-card" data-page-node-id="6eUFQrjs28AyLR2PkEAWWh">
-                        <h4 data-page-node-id="i3gIGOd7IpMGgb2B7Nw0Q1">使用指南 →</h4>
-                        <p data-page-node-id="VZrsED4kgqaxROPNSJFk88">初始化管理员、导入旧 QD 模板、创建与运行任务、调度与随机延迟、cron 时区与夏令时、CLI。</p>
+                    <a href="usage.html" class="wiki-card" data-page-node-id="8r47eTBFle92xDltFfs7HH">
+                        <h4 data-page-node-id="5MaEKyDeNOCPqXj44bDWbU">使用指南 →</h4>
+                        <p data-page-node-id="JTcEFpqhTTuzJX6MdDJtMj">初始化管理员、导入旧 QD 模板、创建与运行任务、调度与随机延迟、cron 时区与夏令时、CLI。</p>
                     </a>
-                    <a href="architecture.html" class="wiki-card" data-page-node-id="RRQB5VhUjGqd4cy9Wsmhwo">
-                        <h4 data-page-node-id="MbiQB6O0wqTOcMXgwVkIOz">架构设计 →</h4>
-                        <p data-page-node-id="sqOSPzkIBVY7eHhHkMDXQm">运行时模型、执行链路、调度与租约队列、数据模型、安全策略与 API 一览。</p>
+                    <a href="architecture.html" class="wiki-card" data-page-node-id="uy7yJkFeENq0jwacEpcXRW">
+                        <h4 data-page-node-id="xRrVmFSdC3eMquxvIKCEAt">架构设计 →</h4>
+                        <p data-page-node-id="GBfZBuHqD713qAhFJpM6I1">运行时模型、执行链路、调度与租约队列、数据模型、安全策略与 API 一览。</p>
                     </a>
-                    <a href="templates.html" class="wiki-card" data-page-node-id="UForRyHFHTpn0p8lFkoLoY">
-                        <h4 data-page-node-id="PJzijiRW4fFQcTovVkxfUO">模板与表达式 →</h4>
-                        <p data-page-node-id="VG8A9ux09zmbulvYfDazkP">HAR 兼容契约、Template Schema v1、变量与断言、函数/过滤器、<code data-page-node-id="2ZFHuqyiD0aZBCjXOJemDr">api://util/*</code> 工具。</p>
+                    <a href="templates.html" class="wiki-card" data-page-node-id="h3nx2h2BWYmx9eH0BV0yXC">
+                        <h4 data-page-node-id="4SHzdkt2RCphFbfeVcA2bi">模板与表达式 →</h4>
+                        <p data-page-node-id="PXo1b8CzETvTRixrrQUUq6">HAR 兼容契约、Template Schema v1、变量与断言、函数/过滤器、<code data-page-node-id="uHXfBY5Fn31c5KZ7tfDA46">api://util/*</code> 工具。</p>
                     </a>
-                    <a href="browser.html" class="wiki-card" data-page-node-id="d3iGqfnoEiOspR4bCmHRq9">
-                        <h4 data-page-node-id="LCQ8BrBSq8zucxGZnKgsfl">浏览器插件 →</h4>
-                        <p data-page-node-id="tUY2pb0212GB389YDlz6u5">纯 HTTP 跑不通时，如何用无头浏览器补齐签名、验证码与多步表单交互。</p>
+                    <a href="browser.html" class="wiki-card" data-page-node-id="104N0PPwm1suadaTQlsLRb">
+                        <h4 data-page-node-id="qUjPbbHDhqmvgkHdJUGvms">浏览器插件 →</h4>
+                        <p data-page-node-id="1AuWnanXuZxoJb8aLVdpbU">纯 HTTP 跑不通时，如何用无头浏览器补齐签名、验证码与多步表单交互。</p>
                     </a>
-                    <a href="api.html" class="wiki-card" data-page-node-id="PrNdvt5eGNtjz6hcpjLFGx">
-                        <h4 data-page-node-id="bv9Ycq71AhAqbzuWD0avU7">API 接口 →</h4>
-                        <p data-page-node-id="raeB7XhJBZhA5rznbJSYcA">76 个 REST 端点的完整契约：认证、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
+                    <a href="api.html" class="wiki-card" data-page-node-id="W4VZA7BBnH0Q2bb7q7jtqQ">
+                        <h4 data-page-node-id="AK5HrkI9TwuNjvQC7WxFsL">API 接口 →</h4>
+                        <p data-page-node-id="s64tNk0GFfJtj9fsrupVtr">76 个 REST 端点的完整契约：认证、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
                     </a>
                 </div>
 
-                <h2 id="status" data-page-node-id="yIRAt7oxGPH97CjPg0VFXN">项目状态</h2>
-                <p data-page-node-id="0ydATED1TryhFp9TVR7ged">
-                    Phase 0–8 代码与容器已实现完成（Phase 8 状态为 <em data-page-node-id="Rypmq1uPGussJHuytstF7g">Implementation Complete</em>）：Docker 构建与非 root 运行、health/ready 探针、Compose 健康检查、SQLite 备份恢复脚本、amd64/arm64 多架构与 SBOM 流水线均已落地。发布前仍待完成的是浏览器主要工作流的人工验收与首个镜像的发布检查——这两项需要真实运行环境，项目选择不在未运行时标记为通过。
+                <h2 id="status" data-page-node-id="rpdYoAYz4sl5y7saNAE8Lv">项目状态</h2>
+                <p data-page-node-id="6YBBbonyoC6tyiF33UfouS">
+                    Phase 0–8 代码与容器已实现完成（Phase 8 状态为 <em data-page-node-id="nJHFmioXfR7AYfqaGqviZ5">Implementation Complete</em>）：Docker 构建与非 root 运行、health/ready 探针、Compose 健康检查、SQLite 备份恢复脚本、amd64/arm64 多架构与 SBOM 流水线均已落地。发布前仍待完成的是浏览器主要工作流的人工验收与首个镜像的发布检查——这两项需要真实运行环境，项目选择不在未运行时标记为通过。
                 </p>
 
-                <div class="wiki-meta" data-page-node-id="t77V0oB8bKauWVlCy4YNUP">
-                    <span data-page-node-id="HFx7Y0Iv8hkTvgDG9DC4g5">MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span data-page-node-id="n9zwCc19vF0TbPF6kepqAq">最后更新：2026-09-07</span>
+                <div class="wiki-meta" data-page-node-id="F2dlMA5SwUKCqUBgHnFLX9">
+                    <span data-page-node-id="aDDvOm2dHOU2kPa21R4j5G">MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span data-page-node-id="7c2WgImRmhjmsmbfa9MJvb">最后更新：2026-09-10</span>
                 </div>
             </main>
 
             <!-- On-page TOC -->
-            <aside class="wiki-toc" data-page-node-id="Qs93jmqMuL8wTGBz1MxJVz">
-                <div class="wiki-toc-title" data-page-node-id="942n2aZRbejLbC01qSxXnt">本页目录</div>
-                <nav id="toc" data-page-node-id="7ND1yP1fPXS0FVFgWARzbK"></nav>
+            <aside class="wiki-toc" data-page-node-id="ksU8RAk2gK02rz3rwau2th">
+                <div class="wiki-toc-title" data-page-node-id="LCYhTV39Uw02ECsm8hjGHv">本页目录</div>
+                <nav id="toc" data-page-node-id="W82MokWYBCj6K9eUZwN3E8"></nav>
             </aside>
         </div>
     </div>
 
-    <footer class="py-10 bg-gray-50 border-t border-gray-200" data-page-node-id="Vus6OmYcDMvla2cmvXu9xy">
-        <div class="wiki-shell px-6 text-center text-gray-600 text-sm" data-page-node-id="T8UMx7vx8SDo7CfnkCDVwo">
-            <p class="mb-1" data-page-node-id="jORaLYLHdcPN2DnGsXQgDX">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
-            <p data-page-node-id="w3Ig1ga4dcTUKxKUjeMk87">
-                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900" data-page-node-id="PjMk46VAHjFwyuIUWWIuAF">@CallmeLins</a>
+    <footer class="py-10 bg-gray-50 border-t border-gray-200" data-page-node-id="XmIbrPPipLlGGJk6e5EJBl">
+        <div class="wiki-shell px-6 text-center text-gray-600 text-sm" data-page-node-id="pa14Vqb2HqeqcF3I6Ye006">
+            <p class="mb-1" data-page-node-id="5MNNU2KXpENDfV115cXsu9">qdrust · 用 Rust 重写的 QD 兼容定时任务框架</p>
+            <p data-page-node-id="gR8mXzxKwHes0rdPKzmYqw">
+                <a href="https://github.com/CallmeLins" target="_blank" class="hover:text-gray-900" data-page-node-id="1vXxtKo7fT24a926irk8Im">@CallmeLins</a>
             </p>
         </div>
     </footer>

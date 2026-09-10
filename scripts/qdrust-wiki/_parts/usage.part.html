@@ -30,7 +30,7 @@
                 <p>对接 authentik / authelia / keycloak / pocket-id：</p>
                 <pre><code>QDRUST_AUTH_MODE=hybrid          # 或 oidc（纯 IdP，关本地入口）
 QDRUST_OIDC_ENABLED=true
-QDRUST_OIDC_PROVIDER_NAME=Authentik   # SSO 按钮上显示的名称
+QDRUST_OIDC_PROVIDER_NAME=Authentik   # SSO 按钮上显示的名称（来自显式配置）
 QDRUST_OIDC_ISSUER=https://auth.example.com/application/o/qdrust/
 QDRUST_OIDC_CLIENT_ID=qdrust
 QDRUST_OIDC_CLIENT_SECRET=...
@@ -39,14 +39,66 @@ QDRUST_OIDC_SCOPES="openid profile email"
 QDRUST_OIDC_AUTO_CREATE_USERS=true    # 首登自动建档（哨兵口令，本地无法登录该外部账号）
 QDRUST_OIDC_DEFAULT_ROLE=user         # 未命中 admin 组的建档角色
 QDRUST_OIDC_ADMIN_GROUPS=qdrust-admins # 命中则首次建档为 admin
-QDRUST_OIDC_GROUPS_CLAIM=groups       # ID token 中携带组成员身份的 claim 名（默认 groups）</code></pre>
+QDRUST_OIDC_GROUPS_CLAIM=groups       # ID token 中携带组成员身份的 claim 名（默认 groups）
+# --- 可选：OIDC 单点登出（end-session） ---
+# QDRUST_OIDC_LOGOUT_URL=https://auth.example.com/protocol/openid-connect/logout
+#   # 用户点击登出时，清本地会话后顶层跳转到该 IdP 端点，把提供方会话也一并结束。
+# QDRUST_OIDC_POST_LOGOUT_REDIRECT_URI=https://your.domain/qd/
+#   # 可选：IdP 登出后跳回的应用地址。仅在 IdP 侧已登记该地址时才应配置，
+#   # 否则多数 IdP 会拒绝未登记的回跳参数，用户将停留在 IdP 自带的登出完成页。</code></pre>
                 <p>在 IdP 侧把回调地址登记为 <code>https://你的域名[/&lt;base_path&gt;]/api/v1/auth/oidc/callback</code>。</p>
+
+                <h3 id="oidc-pure">纯 OIDC 模式的登录体验</h3>
+                <p>
+                    <code>QDRUST_AUTH_MODE=oidc</code> 时，未登录用户访问页面会<strong>自动跳转</strong>到 IdP 发起 SSO，
+                    不再先停留在一个多余的登录面板；仅在回调失败（带 <code>login_error</code>）或已登录时保留 SSO 兜底面板，
+                    避免重定向循环。
+                </p>
+
+                <h3 id="oidc-role">角色映射（groups claim）</h3>
                 <p>
                     OIDC 首登按 <strong>ID token 里的 <code>groups</code> claim</strong>（可通过 <code>QDRUST_OIDC_GROUPS_CLAIM</code>
                     换成 IdP 实际使用的 claim 名，如某些 Keycloak 映射后的 <code>roles</code>）解析角色：claim 命中
                     <code>QDRUST_OIDC_ADMIN_GROUPS</code> 中任一成员则建档为 <code>admin</code>，否则落
                     <code>QDRUST_OIDC_DEFAULT_ROLE</code>。若 IdP 不在 ID token 内下发组（部分 IdP 只在 userinfo 返回），
                     则保持 claim 缺失、统一落 <code>default_role</code>，再让管理员手动调整。
+                </p>
+
+                <h3 id="oidc-username">首登用户名的取值链</h3>
+                <p>
+                    按 <code>preferred_username</code> → <code>nickname</code> → <code>name</code> → <code>email</code>
+                    本地部分依次取<strong>第一个可读值</strong>。这里会<strong>跳过明显是不透明标识</strong>的候选
+                    （如全十六进制 / UUID / 纯数字的 <code>preferred_username</code>——部分 IdP 把内部 id 直接塞进该 claim），
+                    避免把一串 hex 存成登录名，此时只要 <code>name</code>/<code>email</code> 可读就会取到它们。
+                </p>
+
+                <h3 id="oidc-userinfo">ID token 只给 <code>sub</code> 时的 UserInfo 回退</h3>
+                <p>
+                    少数 IdP（部分 authentik / Keycloak 配置、企业 IdP）签发的 ID token <strong>只含 <code>sub</code></strong>，
+                    把 <code>preferred_username</code>/<code>name</code>/<code>email</code> 全部放在 <strong>UserInfo 端点</strong>。
+                    此时 qdrust 会用换来的 access_token 调 <code>userinfo_endpoint</code> 补取这些 claim，再走上面的取值链，
+                    从而拿到可读用户名而不是那串 <code>sub</code> id。
+                </p>
+                <p>该调用是<strong>尽力而为</strong>：provider 未公布 userinfo、或调用失败，都只记日志、不阻断已验签的登录。</p>
+
+                <h3 id="oidc-fallback">最终兜底（整条链全空时）</h3>
+                <p>
+                    若 ID token 与 UserInfo 都没给出任何可读字段（IdP 只发一个不透明 <code>sub</code>），qdrust 不再把原始
+                    <code>sub</code> 当用户名，而是从中派生一个短且稳定的可读句柄 <code>user-&lt;前 8 位&gt;</code>
+                    （如 <code>user-23cc07f8</code>；派生前会去掉 uuid 连字符等分隔符，同一 <code>sub</code> 恒定映射）。
+                    <code>sub</code> 本身仍单独存储，作为账号的稳定身份键。
+                </p>
+                <p>
+                    想彻底避免出现兜底名，可在 IdP 侧给 ID token 补上 <code>preferred_username</code>/<code>name</code> 的
+                    mapper（或确保 <code>profile</code>/<code>email</code> scope 生效）。只影响<strong>新建档</strong>，
+                    存量用户需手动改名或重新建档。
+                </p>
+
+                <h3 id="oidc-subpath">二级目录部署下的 SSO 登录</h3>
+                <p>
+                    登录判定<strong>不再依赖</strong> <code>/ready</code> 探针（后端把 <code>/ready</code>/<code>/health</code>
+                    保留在根路径供 Docker HEALTHCHECK；经原样转发的 nginx 时，二级目录页面发起的根路径探针本就不会命中）。
+                    会话有效性改为以 <code>/session</code> 成功为准，因此子路径部署时 SSO 登录不再被探针失败误判为「未登录」。
                 </p>
 
                 <h3 id="header-auth">反向代理 Header 认证（forward-auth）</h3>
@@ -156,5 +208,5 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-07</span>
+                    <span>最后更新：2026-09-10</span>
                 </div>
