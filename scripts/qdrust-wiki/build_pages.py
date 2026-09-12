@@ -59,8 +59,16 @@ PAGES = [
         "part": "deploy.part.html",
         "nav": "deploy.html",
         "title": "部署与运维 | qdrust Wiki",
-        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、10 种通知渠道、备份与升级回滚。",
+        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚。",
         "path": "deploy.html",
+    },
+    {
+        "file": "notify.html",
+        "part": "notify.part.html",
+        "nav": "notify.html",
+        "title": "推送与通知 | qdrust Wiki",
+        "description": "qdrust 推送与通知：11 种渠道的 kind 与配置项、通知动作的批量绑定 / 失败阈值 / 仅自动执行、标题与正文模板变量。",
+        "path": "notify.html",
     },
     # 注意：api.html 不在此生成——它由 scripts/gen-qdrust-api.py 负责
     # （数据来自 docs/openapi-v1.json + api.rs 路由表，来源不同）。

@@ -103,6 +103,7 @@ DESC = {
     ("DELETE", "/api/v1/notification-channels/{id}"): "删除渠道，同时解除任务绑定",
     ("GET", "/api/v1/tasks/{id}/notification-actions"): "列出任务已绑定的通知渠道与触发时机",
     ("POST", "/api/v1/tasks/{id}/notification-actions"): "把渠道绑定到任务，指定在成功 / 失败 / 总是时推送",
+    ("POST", "/api/v1/notification-actions/batch"): "批量把同一渠道绑定到多个任务",
     ("DELETE", "/api/v1/notification-actions/{id}"): "解除绑定",
 
     ("GET", "/api/v1/public-templates"): "列出公共模板市场已通过审批的模板",
@@ -166,7 +167,7 @@ MODEL_NOTES = {
     "Run": "一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。",
     "Template": "模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。",
     "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。",
-    "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 10 种渠道。",
+    "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 11 种渠道（webhook / custom_http / email + 8 种推送）。",
     "RunEvent": "WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。",
     "TemplatePage": "模板列表的分页结果。<code>next_cursor</code> 为 null 时表示已到末页。",
     "ApiError": "所有 4xx / 5xx 响应的统一信封。<code>code</code> 是稳定的错误键，前端据此做本地化；<code>message</code> 为英文兜底。",

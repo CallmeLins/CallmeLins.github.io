@@ -2,7 +2,7 @@
 
 qdrust 的项目介绍站，采用 **Wiki 风格**（侧边目录 + 正文 + 本页锚点目录），纯静态 HTML + Tailwind CSS 构建。
 
-与 `pages/bayin`（偏产品介绍）不同，这个站点侧重**把项目讲清楚**：是什么、为什么这么设计、怎么用，内容主要来源于 `qdrust` 仓库的 README 与源码。
+与 `pages/bayin`（偏产品介绍）不同，这个站点侧重**把项目讲清楚**：是什么、为什么这么设计、怎么用，内容主要来源于 `qdrust` 仓库的 README、`docs/` 目录与源码。
 
 ## 📁 文件结构
 
@@ -14,7 +14,8 @@ public/pages/qdrust/
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全、API
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、util 工具
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
-├── api.html            # API 接口：79 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
+├── notify.html         # 推送与通知：11 种渠道、通知动作、标题正文模板变量
+├── api.html            # API 接口：80 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
 ├── faq.html            # 常见问题
 └── README.md           # 本文档
 ```
@@ -47,7 +48,7 @@ npm run build
 
 ### 页面的更新方式
 
-成品页由**外壳 + 正文片段**拼装而成，**不要直接改** `architecture / templates / browser / deploy / usage / faq` 这 6 个 HTML——改了会被下次生成覆盖：
+成品页由**外壳 + 正文片段**拼装而成，**不要直接改** `architecture / templates / browser / notify / deploy / usage / faq` 这 7 个 HTML——改了会被下次生成覆盖：
 
 | 改什么 | 改哪里 |
 |---|---|
@@ -65,24 +66,25 @@ python scripts/qdrust-wiki/build_pages.py
 
 > `index.html` 本身是手写的（它既是总览页，也是外壳），不参与生成。
 
-### API 页面的更新方式
+### 内容来源
 
-`api.html` 由脚本生成，**不要手改 HTML**——下次 qdrust 升级时会重新生成，手改内容会被覆盖：
-
-内容来源与对应关系：
+qdrust 的 README 已精简为**指路页**，详细内容拆进了仓库的 `docs/` 目录。因此各页的对应关系是：
 
 | 页面 | 主要来源 |
 |---|---|
 | 总览 | `README.md` 的介绍 / 核心特性 / 与 QD 的差异 / 组成 |
-| 部署与运维 | `README.md` 部署 / 更新章节 + `.env.example` + `compose.yaml` |
-| 使用指南 | `README.md` 的「使用」章节（初始化、第三方登录、导入 HAR、任务、调度、日志、CLI） |
-| 架构设计 | `README.md` 架构决策说明 + `crates/*` 源码 + `migrations/` |
-| 模板与表达式 | `README.md` + `docs/template-schema-v1.md` + `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
-| 浏览器插件 | `README.md` 浏览器插件章节 + `crates/qdrust-plugin-browser/src/` |
+| 部署与运维 | `docs/deployment.md` + `.env.example` + `compose.yaml` + `docs/operations.md` |
+| 使用指南 | `docs/usage.md` + `docs/authentication.md`（初始化、第三方登录、导入 HAR、任务、调度、日志、CLI） |
+| 推送与通知 | `docs/notifications.md` + `crates/qdrust-server/src/push_channels.rs` 的 `ALL_CHANNEL_KINDS` |
+| 架构设计 | `docs/adr/` + `docs/threat-model.md` + `crates/*` 源码 + `migrations/` |
+| 模板与表达式 | `docs/expressions.md` + `docs/template-schema-v1.md` + `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
+| 浏览器插件 | `docs/browser-plugin.md` + `crates/qdrust-plugin-browser/src/` |
 | API 接口 | `docs/openapi-v1.json` + `crates/qdrust-server/src/api.rs` 路由注册 + `docs/api-error-codes.md` |
-| 常见问题 | `README.md` 的 FAQ 章节 |
+| 常见问题 | `docs/faq.md`（wiki 另有分组与补充） |
 
-> 表达式的函数 / 过滤器清单、`api://util/*` 工具清单、浏览器 action 清单均从源码核对得出，与 README 的概述性表述可能有出入时以源码为准。
+> 表达式的函数 / 过滤器清单、`api://util/*` 工具清单、浏览器 action 清单、通知渠道 <code>kind</code> 清单均从源码核对得出，与文档的概述性表述有出入时以源码为准。
+>
+> 两个已知的文档与源码不一致（wiki 以源码为准）：`docs/expressions.md` 写「26 个过滤器 + 38 个函数」，实际是 **37 个全局函数 / 51 个过滤器**（26 个通过 `qd_fn!` 同时注册为函数与过滤器）；`docs/notifications.md` 的渠道数与 `ALL_CHANNEL_KINDS` 一致，为 11 种。
 
 ### API 页面的更新方式
 
@@ -102,11 +104,11 @@ python scripts/gen-qdrust-api.py --qdrust D:/code/qdrust
    路由注册在源码里分两段，脚本都扫：inner（`Router::new()` 到 `let state = AppState {`，含 API 与 SPA）与 root（`let mut root = Router::new()` 到 `root.with_state`，只含 `/health`、`/ready` 探针——它们刻意留在根路径，不受 `QDRUST_BASE_PATH` 影响）。
 2. `docs/openapi-v1.json` —— 给出参数、请求体、响应与 `components.schemas`。
 
-脚本会自动补两份数据的缺口：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，源码里已注册却未进文档的端点也会一并补入（当前 4 处：`DELETE /admin/users/{id}` 与 3 个 OIDC 登录端点），并在页面末尾的「与 OpenAPI 文档的差异」列出——这部分是**动态生成**的，不用手改。
+脚本会自动补两份数据的缺口：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，源码里已注册却未进文档的端点也会一并补入，并在页面末尾的「与 OpenAPI 文档的差异」列出——**条数与清单都是动态生成的**，不用手改（当前 5 处：`DELETE /admin/users/{id}`、3 个 OIDC 登录端点、`POST /notification-actions/batch`）。
 
 新增端点时只需在脚本的 `DESC` 字典补一条中文说明，`GROUPS` 列表调整分组规则，其余全部随源码自动更新。
 
-> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数，与上次对比是否异常下降。
+> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数（当前 **80**：公开 13 / 需登录 56 / 管理员 11），与上次对比是否异常下降。
 
 ## 🔗 相关链接
 

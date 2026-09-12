@@ -132,25 +132,12 @@ QDRUST_BASE_PATH=/qd
                 </ul>
 
                 <h2 id="notify">通知渠道</h2>
-                <p>任务成功或失败时可推送提醒。系统共支持 <strong>10 种</strong>渠道，在「通知」页新建渠道并绑定到任务即可。</p>
-                <div class="overflow-x-auto mb-6">
-                    <table>
-                        <thead><tr><th>渠道</th><th>所需配置</th><th>说明</th></tr></thead>
-                        <tbody>
-                            <tr><td><strong>Webhook</strong></td><td><code>url</code></td><td>向该 URL <code>POST</code> JSON（含 <code>event</code> / <code>task_name</code> / <code>run_id</code> / <code>http_status</code> / <code>error</code>）</td></tr>
-                            <tr><td><strong>Email</strong></td><td><code>to</code></td><td>经 SMTP 发送，需先配置 <code>QDRUST_SMTP_*</code></td></tr>
-                            <tr><td><strong>Bark</strong></td><td><code>url</code></td><td>iOS 推送，形如 <code>https://api.day.app/你的Key</code></td></tr>
-                            <tr><td><strong>Server 酱</strong></td><td><code>sendkey</code></td><td>微信推送 SendKey</td></tr>
-                            <tr><td><strong>Telegram</strong></td><td><code>token</code>, <code>chat_id</code>, <code>host</code>(可选)</td><td>机器人；<code>host</code> 可指定自建 API 域名</td></tr>
-                            <tr><td><strong>钉钉机器人</strong></td><td><code>access_token</code></td><td>自定义机器人 access_token</td></tr>
-                            <tr><td><strong>WxPusher</strong></td><td><code>app_token</code>, <code>uid</code></td><td>应用 token 与目标 UID</td></tr>
-                            <tr><td><strong>WxPusher SPT</strong></td><td><code>spt</code></td><td>主题推送码（逗号分隔可多个）</td></tr>
-                            <tr><td><strong>企业微信应用</strong></td><td><code>corpid</code>, <code>secret</code>, <code>agentid</code>, <code>to_user</code>, <code>proxy</code>(可选)</td><td>自建应用消息；<code>to_user</code> 默认 <code>@all</code></td></tr>
-                            <tr><td><strong>企业微信群机器人</strong></td><td><code>key</code></td><td>群机器人 webhook key</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p>通知标题与正文由调度器统一渲染，在 Email 与推送渠道间共享；<strong>单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
+                <p>
+                    任务成功或失败时可推送提醒，系统共支持 <strong>11 种</strong>渠道，在「通知」页新建渠道并绑定到任务即可。
+                    渠道清单、各渠道的 <code>kind</code> 与配置项、批量绑定 / 失败阈值 / 仅自动执行、以及标题与正文模板变量，
+                    统一放在<a href="notify.html">推送与通知</a>页。
+                </p>
+                <p>部署侧只需留意两点：<strong>Email 渠道依赖 <code>QDRUST_SMTP_*</code></strong>；<strong>单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
 
                 <h2 id="backup">备份、升级与回滚</h2>
                 <p>qdrust 使用不可变语义版本镜像标签。升级步骤：</p>
@@ -194,5 +181,5 @@ npm --prefix webui run build</code></pre>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-07</span>
+                    <span>最后更新：2026-09-12</span>
                 </div>

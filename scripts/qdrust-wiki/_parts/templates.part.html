@@ -115,6 +115,19 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
                     变量的引用语法是 <code>{{name}}</code>，求值发生在<strong>请求发送之前</strong>，且可以嵌套表达式（见下节）。注意执行是顺序的——在某一步里引用后面才提取的变量只会拿到空值。
                 </p>
 
+                <h3 id="variables-derive">模板变量是怎么算出来的</h3>
+                <p>
+                    基于模板新建任务时，WebUI 需要知道「该让你填哪些变量」。这份清单由服务端按旧 QD <code>HARSave.get_variables</code>
+                    的语义推导，通过 <code>GET /api/v1/templates</code> 的 <code>variables</code> 字段返回：
+                </p>
+                <ul>
+                    <li>只看请求<strong>实际读取</strong>的名字：method、URL、请求体，以及每个请求头 / Cookie 的名字与值；</li>
+                    <li>用 Jinja 解析，所以<strong>过滤器和函数名不算变量</strong>：<code>{{jpop_username|urlencode}}</code> 只产出 <code>jpop_username</code>，<code>{{md5(password)}}</code> 只产出 <code>password</code>；</li>
+                    <li><strong>按条目顺序判定</strong>：只有被 <code>extract_variables</code> 提取<strong>之后</strong>的引用才不算输入。所以登录后的 <code>{{token}}</code> 不会被问，而先喂给 <code>api://util/gb2312</code> 再由该条目回写提取的 <code>{{username}}</code> 仍然是输入；</li>
+                    <li>无法解析的片段（如 <code>{% while ... %}</code> 控制条目）不产生变量。</li>
+                </ul>
+                <p><code>native_v1</code> 模板则直接用定义里声明的变量名。</p>
+
                 <h2 id="expressions">表达式</h2>
                 <p>
                     模板变量与步骤请求支持 Jinja2 语法，由 <a href="https://github.com/mitsuhiko/minijinja" target="_blank">minijinja</a> 驱动。qdrust 注册了 <strong>37 个全局函数</strong>与 <strong>51 个过滤器</strong>。
@@ -176,5 +189,5 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-03</span>
+                    <span>最后更新：2026-09-12</span>
                 </div>

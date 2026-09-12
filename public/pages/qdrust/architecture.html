@@ -172,6 +172,7 @@
 
                 <div class="wiki-nav-title">进阶</div>
                 <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
+                <a href="notify.html" class="wiki-nav-link">推送与通知</a>
 
                 <div class="wiki-nav-title">参考</div>
                 <a href="api.html" class="wiki-nav-link">API 接口</a>
@@ -237,7 +238,7 @@ extract_variables → 写入变量表 → 供后续步骤 {{var}} 引用
    ▼
 success_asserts / failed_asserts → 判定成败
    ▼
-通知渠道投递（10 种）· WebSocket 实时步骤流 · 运行日志</code></pre>
+通知渠道投递（11 种）· WebSocket 实时步骤流 · 运行日志</code></pre>
                 <p>
                     关键点在于 <code>api://</code> 伪协议：当步骤 URL 以 <code>api://</code> 开头时，executor 不会发起真实 HTTP 请求，而是在进程内计算结果（<code>util</code>）或驱动浏览器（<code>browser</code>）。因此「取个时间戳」「算个 MD5」这类步骤不需要任何外部服务，也不产生网络出站。
                 </p>
@@ -260,7 +261,7 @@ success_asserts / failed_asserts → 判定成败
                 </div>
 
                 <h2 id="data-model">数据模型</h2>
-                <p>迁移脚本按阶段递增（forward-only），核心实体如下：</p>
+                <p>迁移脚本按阶段递增（forward-only），共 <strong>19 张表</strong>：</p>
                 <div class="overflow-x-auto mb-6">
                     <table>
                         <thead><tr><th>分组</th><th>表</th><th>用途</th></tr></thead>
@@ -269,20 +270,21 @@ success_asserts / failed_asserts → 判定成败
                             <tr><td><code>push_requests</code></td><td>公共模板发布审批</td></tr>
                             <tr><td rowspan="2">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板仓库</td></tr>
                             <tr><td><code>subscription_syncs</code></td><td>同步记录</td></tr>
-                            <tr><td rowspan="2">任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填</td></tr>
-                            <tr><td><code>task_groups</code></td><td>任务分组</td></tr>
-                            <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录与状态</td></tr>
+                            <tr><td>任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填（分组是 <code>grp</code> 列，无独立分组表）</td></tr>
+                            <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录、状态与租约列（<code>lease_owner</code> / <code>lease_expires_at</code>，租约不单独建表）</td></tr>
                             <tr><td><code>run_steps</code></td><td>步骤级请求 / 响应 / 提取变量</td></tr>
-                            <tr><td>租约</td><td><code>run_leases</code></td><td>运行租约，用于崩溃恢复与防重复执行</td></tr>
-                            <tr><td rowspan="4">认证</td><td><code>users</code></td><td>用户</td></tr>
+                            <tr><td rowspan="6">认证</td><td><code>users</code></td><td>用户</td></tr>
                             <tr><td><code>sessions</code></td><td>会话</td></tr>
                             <tr><td><code>password_reset_tokens</code></td><td>重置密码令牌</td></tr>
                             <tr><td><code>email_verification_tokens</code></td><td>邮箱验证令牌</td></tr>
-                            <tr><td rowspan="2">通知</td><td><code>notification_channels</code></td><td>通知渠道配置</td></tr>
-                            <tr><td><code>notification_actions</code></td><td>渠道与任务的绑定关系</td></tr>
-                            <tr><td rowspan="3">系统</td><td><code>plugins</code></td><td>外部插件二进制与能力声明</td></tr>
+                            <tr><td><code>external_identities</code></td><td>外部身份（OIDC / Header）到本地账号的映射</td></tr>
+                            <tr><td><code>oidc_login_states</code></td><td>OIDC 授权码 + PKCE 的中间状态</td></tr>
+                            <tr><td rowspan="2">通知</td><td><code>notification_channels</code></td><td>通知渠道配置（<code>kind</code> + <code>config</code>，共 11 种）</td></tr>
+                            <tr><td><code>notification_actions</code></td><td>渠道与任务的绑定，含失败阈值 / 仅自动执行 / 标题正文模板</td></tr>
+                            <tr><td rowspan="4">系统</td><td><code>plugins</code></td><td>外部插件二进制与能力声明</td></tr>
                             <tr><td><code>site_settings</code></td><td>站点级运行配置</td></tr>
                             <tr><td><code>audit_logs</code></td><td>审计日志</td></tr>
+                            <tr><td><code>notes</code></td><td>记事本</td></tr>
                         </tbody>
                     </table>
                 </div>

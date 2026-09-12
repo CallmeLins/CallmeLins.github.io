@@ -1,0 +1,76 @@
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">推送与通知</h1>
+                <p class="text-lg text-gray-600 mb-10">
+                    任务成功或失败时把结果推出去：<strong>11 种渠道</strong>、批量绑定、失败阈值、自定义标题与正文模板。
+                </p>
+
+                <h2 id="channels">渠道一览</h2>
+                <p>在「通知」页新建渠道，再绑定到任务即可。系统共支持 <strong>11 种</strong>渠道，服务端自投递 3 种（通用 Webhook、自定义 HTTP、Email），其余 8 种为推送渠道。</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>渠道</th><th>kind</th><th>所需配置</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Webhook</strong></td><td><code>webhook</code></td><td><code>url</code></td><td>向该 URL <code>POST</code> JSON（含 <code>event</code> / <code>task_name</code> / <code>run_id</code> / <code>http_status</code> / <code>error</code>），<strong>仅接受 HTTPS</strong></td></tr>
+                            <tr><td><strong>自定义 HTTP</strong></td><td><code>custom_http</code></td><td><code>url</code>, <code>method</code>(默认 <code>POST</code>), <code>headers</code>(JSON, 可选), <code>body</code>(可选模板)</td><td>完全自定义的请求，可指向自建的 ntfy / Gotify 等；<strong><code>http</code> 与 <code>https</code> 均可</strong>，便于内网服务</td></tr>
+                            <tr><td><strong>Email</strong></td><td><code>email</code></td><td><code>to</code></td><td>经 SMTP 发送，需先配置 <code>QDRUST_SMTP_*</code></td></tr>
+                            <tr><td><strong>Bark</strong></td><td><code>bark</code></td><td><code>url</code></td><td>iOS 推送，形如 <code>https://api.day.app/你的Key</code></td></tr>
+                            <tr><td><strong>Server 酱</strong></td><td><code>serverchan</code></td><td><code>sendkey</code></td><td>微信推送 SendKey</td></tr>
+                            <tr><td><strong>Telegram</strong></td><td><code>telegram</code></td><td><code>token</code>, <code>chat_id</code>, <code>host</code>(可选)</td><td>机器人；<code>host</code> 可指定自建 API 域名</td></tr>
+                            <tr><td><strong>钉钉机器人</strong></td><td><code>dingtalk</code></td><td><code>access_token</code></td><td>自定义机器人 access_token</td></tr>
+                            <tr><td><strong>WxPusher</strong></td><td><code>wxpusher</code></td><td><code>app_token</code>, <code>uid</code></td><td>应用 token 与目标 UID</td></tr>
+                            <tr><td><strong>WxPusher SPT</strong></td><td><code>wxpusher_spt</code></td><td><code>spt</code></td><td>主题推送码（逗号分隔可多个）</td></tr>
+                            <tr><td><strong>企业微信应用</strong></td><td><code>wecom_app</code></td><td><code>corpid</code>, <code>secret</code>, <code>agentid</code>, <code>to_user</code>, <code>proxy</code>(可选)</td><td>自建应用消息；<code>to_user</code> 默认 <code>@all</code>，<code>proxy</code> 可指定 API 代理 / 自定义域名</td></tr>
+                            <tr><td><strong>企业微信群机器人</strong></td><td><code>wecom_webhook</code></td><td><code>key</code></td><td>群机器人 webhook key</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    通知标题与正文由调度器统一渲染，在 Email、自定义 HTTP 与推送渠道之间共享。
+                    <strong>单个渠道投递失败只记录日志，不会中断任务执行。</strong>
+                </p>
+                <p class="text-sm text-gray-500">
+                    <code>kind</code> 列即 <code>POST /api/v1/notification-channels</code> 请求体里的取值，服务端会校验；
+                    写错的 kind 会直接被拒绝，详见<a href="api.html#ep-notifications">API 接口 · 通知渠道与绑定</a>。
+                </p>
+
+                <h2 id="actions">通知动作（绑定到任务）</h2>
+                <p>「通知动作」描述「哪个渠道、在什么时机、推给哪个任务」。除了最基础的成功 / 失败 / 总是触发，还支持：</p>
+                <ul>
+                    <li><strong>批量绑定</strong>：一次为多个任务创建同一个动作，不必逐个任务重复配置，走 <code>POST /api/v1/notification-actions/batch</code>。</li>
+                    <li><strong>失败次数阈值</strong>：连续失败达到阈值后才通知（统计「上次成功之后」的失败次数），过滤偶发网络抖动。</li>
+                    <li><strong>仅自动执行时通知</strong>：手动点「立即运行」不触发，只对定时 / 随机延迟 / 重试触发的运行生效。</li>
+                    <li><strong>自定义标题与正文模板</strong>：见下节变量。</li>
+                </ul>
+
+                <h2 id="templates">标题与正文模板</h2>
+                <p>标题与正文模板可用的变量：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>变量</th><th>含义</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>{event}</code></td><td>触发事件（成功 / 失败 / 总是）</td></tr>
+                            <tr><td><code>{task_id}</code> / <code>{task}</code></td><td>任务 ID 与任务名</td></tr>
+                            <tr><td><code>{run_id}</code></td><td>本次运行 ID</td></tr>
+                            <tr><td><code>{status}</code></td><td>运行状态</td></tr>
+                            <tr><td><code>{error}</code></td><td>错误信息（成功时为空）</td></tr>
+                            <tr><td><code>{log}</code></td><td>QD 模板的运行日志</td></tr>
+                            <tr><td><code>{t}</code></td><td>运行完成时间，按<strong>任务时区</strong>渲染（未设置时区时用 UTC）</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <div class="callout-title">未识别的占位符原样保留</div>
+                    <p>写错的 <code>{...}</code> 不会被替换成空值或报错，而是<strong>原样输出</strong>——所以看到通知里带着一个字面量 <code>{taask}</code>，就是拼错了变量名。</p>
+                </div>
+
+                <h2 id="ops">运维要点</h2>
+                <ul>
+                    <li><strong>Email 渠道依赖 SMTP</strong>：未配置 <code>QDRUST_SMTP_*</code> 时该渠道不可用，其余渠道不受影响。</li>
+                    <li><strong>Webhook 强制 HTTPS</strong>：内网明文投递请改用「自定义 HTTP」渠道。</li>
+                    <li><strong>投递失败不影响任务</strong>：渠道异常只记日志，运行结果本身照常记录。</li>
+                    <li><strong>删除渠道会解除绑定</strong>：<code>DELETE /api/v1/notification-channels/{id}</code> 会同时清理引用它的通知动作。</li>
+                </ul>
+
+                <div class="wiki-meta">
+                    <span>MIT License · Copyright (c) 2026 CallmeLins</span>
+                    <span>最后更新：2026-09-12</span>
+                </div>

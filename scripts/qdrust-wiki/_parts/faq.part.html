@@ -68,6 +68,16 @@
 
                 <h2 id="scheduling">调度与运行</h2>
 
+                <h3 id="task-no-request">新建任务时为什么不用填请求方法 / URL / 请求头 / 请求体？</h3>
+                <p>
+                    因为任务的请求完全由<strong>模板</strong>决定——调度器执行时直接重放模板（多页模板常混合 GET/POST），
+                    任务自带的这几个字段从来不会被使用。所以新建任务必须先选模板，请求方法 / URL 只在任务列表里作为模板首条请求的镜像展示。
+                </p>
+                <p>
+                    唯一例外是<strong>早于该改动的存量任务</strong>（没有绑定模板、自带一条请求），编辑它们时模板下拉会保留「（无模板）」选项，
+                    其原有请求也不会被改动。
+                </p>
+
                 <h3 id="scheduler-precision">调度好像没按我设的时间跑？</h3>
                 <p>
                     <code>SCHEDULER_INTERVAL_SECONDS</code>（默认 15 秒）是调度器轮询间隔，任务触发精度受其影响。如需更精确请相应调小——代价是更频繁的数据库轮询。
@@ -136,5 +146,5 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-10</span>
+                    <span>最后更新：2026-09-12</span>
                 </div>
