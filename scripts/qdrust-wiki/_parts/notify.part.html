@@ -1,6 +1,6 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">推送与通知</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    任务成功或失败时把结果推出去：<strong>11 种渠道</strong>、批量绑定、失败阈值、自定义标题与正文模板。
+                    任务成功或失败时把结果推出去：<strong>11 种渠道</strong>、渠道测试、批量绑定与就地编辑、失败阈值、自定义标题与正文模板。
                 </p>
 
                 <h2 id="channels">渠道一览</h2>
@@ -32,14 +32,33 @@
                     写错的 kind 会直接被拒绝，详见<a href="api.html#ep-notifications">API 接口 · 通知渠道与绑定</a>。
                 </p>
 
+                <h3 id="test">测试渠道</h3>
+                <p>
+                    通知页每个渠道行都有「测试」按钮，点击会立刻用<strong>真实配置</strong>发一条测试消息
+                    （<code>POST /api/v1/notification-channels/{id}/test</code>）。它走的是调度器<strong>同一条投递路径</strong>，所以测试通过就说明凭据与传输都正常；失败时错误原因会直接显示在提示条里。
+                </p>
+                <div class="callout">
+                    <div class="callout-title">渠道级测试验证不了模板</div>
+                    <p>
+                        标题 / 正文模板挂在「任务↔渠道」的<strong>动作</strong>上而不是渠道上，因此渠道级测试只能验证凭据与网络，不能验证某个动作的模板写对没有。
+                    </p>
+                </div>
+
                 <h2 id="actions">通知动作（绑定到任务）</h2>
                 <p>「通知动作」描述「哪个渠道、在什么时机、推给哪个任务」。除了最基础的成功 / 失败 / 总是触发，还支持：</p>
                 <ul>
+                    <li><strong>就地编辑</strong>：渠道与动作都能直接改，不必删了重建（<code>PUT /api/v1/notification-actions/{id}</code>）。</li>
                     <li><strong>批量绑定</strong>：一次为多个任务创建同一个动作，不必逐个任务重复配置，走 <code>POST /api/v1/notification-actions/batch</code>。</li>
                     <li><strong>失败次数阈值</strong>：连续失败达到阈值后才通知（统计「上次成功之后」的失败次数），过滤偶发网络抖动。</li>
                     <li><strong>仅自动执行时通知</strong>：手动点「立即运行」不触发，只对定时 / 随机延迟 / 重试触发的运行生效。</li>
                     <li><strong>自定义标题与正文模板</strong>：见下节变量。</li>
                 </ul>
+                <div class="callout">
+                    <div class="callout-title">列表范围与「勾了哪些任务」无关</div>
+                    <p>
+                        动作列表列出你<strong>全部</strong>任务的绑定，和创建表单里勾了哪些任务无关——刚保存的动作不会因为没勾任何任务而消失。表单里的勾选<strong>只决定这次新建的动作写到哪些任务</strong>（对应 <code>GET /api/v1/notification-actions</code> 列出全部绑定）。
+                    </p>
+                </div>
 
                 <h2 id="templates">标题与正文模板</h2>
                 <p>标题与正文模板可用的变量：</p>
@@ -72,5 +91,5 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-12</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>

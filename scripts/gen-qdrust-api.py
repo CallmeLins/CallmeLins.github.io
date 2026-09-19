@@ -81,6 +81,7 @@ DESC = {
     ("GET", "/api/v1/tasks/{id}/runs"): "列出该任务的运行历史",
     ("DELETE", "/api/v1/tasks/{id}/runs"): "清空该任务的运行历史",
 
+    ("GET", "/api/v1/runs"): "运行日志总览：跨<strong>全部任务</strong>的运行记录，按时间倒序，可按 <code>status</code>（成功 / 失败）与 <code>task_id</code> 筛选，游标分页（<code>limit</code> / <code>before_id</code>）",
     ("GET", "/api/v1/runs/{id}/steps"): "列出一次运行的每个步骤：请求、响应与提取到的变量",
     ("GET", "/api/v1/runs/{id}/steps/live"): "WebSocket 实时推送步骤与状态变更",
     ("POST", "/api/v1/runs/{id}/cancel"): "请求取消运行；由执行器在下一个可中断点停下",
@@ -95,12 +96,20 @@ DESC = {
     ("POST", "/api/v1/subscriptions/{id}/sync"): "立即同步一次，异步执行",
     ("GET", "/api/v1/subscriptions/{id}/syncs"): "列出同步历史与结果",
     ("GET", "/api/v1/subscriptions/{id}/sync/live"): "WebSocket 推送同步进度",
+    ("GET", "/api/v1/library"): "汇总<strong>所有已启用来源</strong>的模板目录，附每个来源的结果与错误；带 90 秒短缓存（按仓库 URL）",
+    ("GET", "/api/v1/subscriptions/{id}/library"): "列出<strong>单个来源</strong>提供的模板，并标记「已导入 / 有更新」",
+    ("GET", "/api/v1/subscriptions/{id}/library/preview"): "取出一个条目的内容供预览，<strong>不落库</strong>；条目名走查询参数（它是来源自起的自由字符串，可能含 <code>/</code>）",
+    ("POST", "/api/v1/subscriptions/{id}/library/apply"): "保存从预览编辑出的 HAR 为本地模板；带 <code>template_id</code> 则原地更新，否则新建，并推进来源记录的版本",
+    ("POST", "/api/v1/subscriptions/{id}/import"): "按条目名<strong>批量直接导入</strong>（不逐个预览），逐条返回成功 / 更新 / 失败",
 
+    ("GET", "/api/v1/notification-actions"): "列出当前用户<strong>全部任务</strong>的渠道绑定（与创建表单勾选无关）",
+    ("PUT", "/api/v1/notification-actions/{id}"): "就地修改一条绑定：触发时机、失败阈值、仅自动执行、标题 / 正文模板",
     ("GET", "/api/v1/notification-channels"): "列出通知渠道",
     ("POST", "/api/v1/notification-channels"): "新建通知渠道",
     ("GET", "/api/v1/notification-channels/{id}"): "获取渠道配置",
     ("PUT", "/api/v1/notification-channels/{id}"): "更新渠道配置",
     ("DELETE", "/api/v1/notification-channels/{id}"): "删除渠道，同时解除任务绑定",
+    ("POST", "/api/v1/notification-channels/{id}/test"): "用真实配置立刻发一条测试消息；走调度器同一条投递路径，失败原因直接返回",
     ("GET", "/api/v1/tasks/{id}/notification-actions"): "列出任务已绑定的通知渠道与触发时机",
     ("POST", "/api/v1/tasks/{id}/notification-actions"): "把渠道绑定到任务，指定在成功 / 失败 / 总是时推送",
     ("POST", "/api/v1/notification-actions/batch"): "批量把同一渠道绑定到多个任务",
@@ -140,7 +149,7 @@ GROUPS = [
     ("templates", "模板", ["/api/v1/templates", "/api/v1/templates/{id}"]),
     ("tasks", "任务", ["/api/v1/tasks", "/api/v1/task-groups"]),
     ("runs", "运行记录", ["/api/v1/runs"]),
-    ("subscriptions", "模板订阅", ["/api/v1/subscriptions"]),
+    ("subscriptions", "模板订阅与模板库", ["/api/v1/subscriptions", "/api/v1/library"]),
     ("notifications", "通知渠道与绑定", ["/api/v1/notification-", "/api/v1/tasks/{id}/notification-actions"]),
     ("public", "公共模板与发布申请", ["/api/v1/public-templates", "/api/v1/push-requests"]),
     ("plugins", "外部插件", ["/api/v1/plugins"]),
@@ -160,14 +169,24 @@ METHOD_CLASS = {"GET": "m-get", "POST": "m-post", "PUT": "m-put", "DELETE": "m-d
 WS_PATHS = {"/api/v1/runs/{id}/steps/live", "/api/v1/subscriptions/{id}/sync/live"}
 
 MODEL_ORDER = ["Task", "Run", "Template", "User", "NotificationChannel", "NotificationAction",
-               "PushRequest", "TemplateSubscription", "SubscriptionSync", "Plugin", "RunEvent", "ApiError"]
+               "PushRequest", "TemplateSubscription", "SubscriptionSync", "TemplateLibrary",
+               "LibraryOverview", "LibraryEntry", "LibrarySourceStatus", "LibraryImportResult",
+               "Plugin", "RunEvent", "ApiError"]
 
 MODEL_NOTES = {
-    "Task": "任务。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。",
+    "Task": "任务。<code>template_id</code> 是请求来源——任务的请求完全由模板决定；<code>method</code> / <code>url</code> / <code>headers</code> / <code>body</code> 只在未绑定模板的存量任务上使用（列表里展示的方法与 URL 是模板首条请求的镜像）。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。",
     "Run": "一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。",
     "Template": "模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。",
     "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。",
     "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 11 种渠道（webhook / custom_http / email + 8 种推送）。",
+    "NotificationAction": "渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板。",
+    "TemplateSubscription": "订阅的模板来源（库地址）。它只登记一个来源目录，<strong>不会</strong>自动把模板拉进本地；是否导入由用户在公共模板列表里逐条决定。",
+    "SubscriptionSync": "一次来源同步的结果记录。",
+    "TemplateLibrary": "单个来源的目录：<code>source_kind</code> 标明它是按清单（<code>manifest</code>）读的还是扫描文件（<code>files</code>）得到的，<code>entries</code> 是条目列表。",
+    "LibraryOverview": "所有已启用来源的汇总：<code>entries</code>（跨来源的条目）、<code>sources</code>（每个来源的结果与错误）、<code>truncated</code>（条目数是否触及上限被截断）。一个读不动的来源不会让整张表变空，它单独出现在 <code>sources</code> 的错误里。",
+    "LibraryEntry": "模板库里的一个条目。<code>installed</code> / <code>installed_template_id</code> / <code>installed_version</code> 由本地库现算，<code>update_available</code> 表示上游版本比本地新。",
+    "LibrarySourceStatus": "汇总视图里单个来源的状态：条目数、是否来自<strong>缓存</strong>（<code>cached</code>），以及该来源自己的 <code>error</code>。",
+    "LibraryImportResult": "批量导入的逐条结果：成功 / 原地更新的条数、写入的模板 id，以及失败清单（<code>failed</code>）。",
     "RunEvent": "WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。",
     "TemplatePage": "模板列表的分页结果。<code>next_cursor</code> 为 null 时表示已到末页。",
     "ApiError": "所有 4xx / 5xx 响应的统一信封。<code>code</code> 是稳定的错误键，前端据此做本地化；<code>message</code> 为英文兜底。",
@@ -500,7 +519,7 @@ def build_part(ops: list[dict], schemas: dict, version: str,
 
     return f"""                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
                 </p>
                 <div class="mb-10">
                     <span class="badge badge-dark">v{version}</span>

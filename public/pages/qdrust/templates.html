@@ -254,7 +254,11 @@
                 </p>
 
                 <h3 id="import">导入与校验</h3>
-                <p>在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code>*.har.json</code> 即可。也可以用命令行先校验：</p>
+                <p>
+                    在 WebUI 的模板页点击导入，选择从旧 QD 导出的 <code>*.har.json</code> 即可；
+                    模板页也可以从<a href="usage.html#library">订阅的模板库</a>里挑模板——那条路是<strong>先预览、保存才入库</strong>。
+                    本地文件同样可以用命令行先校验：
+                </p>
                 <pre><code>cargo run -p qdrust-cli -- validate ./template.har.json
 
 # 执行 HAR，传入变量与整体超时
@@ -378,7 +382,7 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-12</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>
             </main>
 

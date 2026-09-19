@@ -10,12 +10,12 @@ qdrust 的项目介绍站，采用 **Wiki 风格**（侧边目录 + 正文 + 本
 public/pages/qdrust/
 ├── index.html          # 总览：定位、核心特性、与 QD 的关系、快速上手
 ├── deploy.html         # 部署与运维：Docker / Compose、反代到二级目录、环境变量、数据库、通知、备份回滚
-├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、任务、调度与时区、日志、CLI
+├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、订阅模板库、任务、调度与时区、日志总览、列表分页、CLI
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全、API
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、util 工具
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
-├── notify.html         # 推送与通知：11 种渠道、通知动作、标题正文模板变量
-├── api.html            # API 接口：80 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
+├── notify.html         # 推送与通知：11 种渠道、渠道测试、通知动作（批量绑定 / 就地编辑）、标题正文模板变量
+├── api.html            # API 接口：86 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
 ├── faq.html            # 常见问题
 └── README.md           # 本文档
 ```
@@ -74,12 +74,12 @@ qdrust 的 README 已精简为**指路页**，详细内容拆进了仓库的 `do
 |---|---|
 | 总览 | `README.md` 的介绍 / 核心特性 / 与 QD 的差异 / 组成 |
 | 部署与运维 | `docs/deployment.md` + `.env.example` + `compose.yaml` + `docs/operations.md` |
-| 使用指南 | `docs/usage.md` + `docs/authentication.md`（初始化、第三方登录、导入 HAR、任务、调度、日志、CLI） |
+| 使用指南 | `docs/usage.md` + `docs/authentication.md`（初始化、第三方登录、导入 HAR、订阅模板库、任务、调度、日志、分页、CLI） |
 | 推送与通知 | `docs/notifications.md` + `crates/qdrust-server/src/push_channels.rs` 的 `ALL_CHANNEL_KINDS` |
-| 架构设计 | `docs/adr/` + `docs/threat-model.md` + `crates/*` 源码 + `migrations/` |
+| 架构设计 | `docs/adr/` + `docs/design/threat-model.md` + `crates/*` 源码 + `migrations/` |
 | 模板与表达式 | `docs/expressions.md` + `docs/template-schema-v1.md` + `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
 | 浏览器插件 | `docs/browser-plugin.md` + `crates/qdrust-plugin-browser/src/` |
-| API 接口 | `docs/openapi-v1.json` + `crates/qdrust-server/src/api.rs` 路由注册 + `docs/api-error-codes.md` |
+| API 接口 | `docs/openapi-v1.json` + `crates/qdrust-server/src/api.rs` 路由注册 + `docs/reference.md`（错误码约定） |
 | 常见问题 | `docs/faq.md`（wiki 另有分组与补充） |
 
 > 表达式的函数 / 过滤器清单、`api://util/*` 工具清单、浏览器 action 清单、通知渠道 <code>kind</code> 清单均从源码核对得出，与文档的概述性表述有出入时以源码为准。
@@ -108,7 +108,7 @@ python scripts/gen-qdrust-api.py --qdrust D:/code/qdrust
 
 新增端点时只需在脚本的 `DESC` 字典补一条中文说明，`GROUPS` 列表调整分组规则，其余全部随源码自动更新。
 
-> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数（当前 **80**：公开 13 / 需登录 56 / 管理员 11），与上次对比是否异常下降。
+> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数（当前 **86**：公开 13 / 需登录 62 / 管理员 11），与上次对比是否异常下降。
 
 ## 🔗 相关链接
 

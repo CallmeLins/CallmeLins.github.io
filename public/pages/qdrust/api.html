@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 完整 REST API 参考：80 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
+    <meta name="description" content="qdrust 完整 REST API 参考：86 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
     <title>API 接口 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/api.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -189,10 +189,10 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>80 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅同步、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>86 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.11</span>
+                    <span class="badge badge-dark">v0.1.14</span>
                     <span class="badge">REST · JSON</span>
                     <span class="badge">OpenAPI 3.1</span>
                     <span class="badge">Cookie + CSRF</span>
@@ -218,13 +218,13 @@
                             <tr><td><a href="#ep-auth">认证与会话</a></td><td>14</td><td>9</td><td>5</td><td>0</td></tr>
                             <tr><td><a href="#ep-templates">模板</a></td><td>10</td><td>1</td><td>9</td><td>0</td></tr>
                             <tr><td><a href="#ep-tasks">任务</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
-                            <tr><td><a href="#ep-runs">运行记录</a></td><td>5</td><td>0</td><td>5</td><td>0</td></tr>
-                            <tr><td><a href="#ep-subscriptions">模板订阅</a></td><td>8</td><td>0</td><td>8</td><td>0</td></tr>
-                            <tr><td><a href="#ep-notifications">通知渠道与绑定</a></td><td>9</td><td>0</td><td>9</td><td>0</td></tr>
+                            <tr><td><a href="#ep-runs">运行记录</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
+                            <tr><td><a href="#ep-subscriptions">模板订阅与模板库</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
+                            <tr><td><a href="#ep-notifications">通知渠道与绑定</a></td><td>12</td><td>0</td><td>12</td><td>0</td></tr>
                             <tr><td><a href="#ep-public">公共模板与发布申请</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
                             <tr><td><a href="#ep-plugins">外部插件</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-admin">管理员</a></td><td>11</td><td>0</td><td>0</td><td>11</td></tr>
-                            <tr><td><strong>合计</strong></td><td><strong>80</strong></td><td><strong>13</strong></td><td><strong>56</strong></td><td><strong>11</strong></td></tr>
+                            <tr><td><strong>合计</strong></td><td><strong>86</strong></td><td><strong>13</strong></td><td><strong>62</strong></td><td><strong>11</strong></td></tr>
                         </tbody>
                     </table>
 
@@ -255,7 +255,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         <thead><tr><th>级别</th><th>数量</th><th>判定方式</th></tr></thead>
                         <tbody>
                             <tr><td><span class="perm perm-public">公开</span></td><td>13</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
-                            <tr><td><span class="perm perm-user">登录</span></td><td>56</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
+                            <tr><td><span class="perm perm-user">登录</span></td><td>62</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
                             <tr><td><span class="perm perm-admin">管理员</span></td><td>11</td><td>在会话有效的基础上再要求 <code>role == "admin"</code>，否则 <code>403 admin_required</code></td></tr>
                         </tbody>
                     </table>
@@ -303,7 +303,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 
                 <h2 id="endpoints">接口一览</h2>
                 <p>
-                    下表按资源分组列出全部 80 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
+                    下表按资源分组列出全部 86 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
                     路径参数写作 <code>{id}</code>。
                 </p>
 
@@ -372,10 +372,11 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-runs">运行记录 <span class="count">5</span></h3>
+                <h3 id="ep-runs">运行记录 <span class="count">6</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/runs</code></td><td><span class="perm perm-user">登录</span></td><td>运行日志总览：跨<strong>全部任务</strong>的运行记录，按时间倒序，可按 <code>status</code>（成功 / 失败）与 <code>task_id</code> 筛选，游标分页（<code>limit</code> / <code>before_id</code>）</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs</code></td><td><span class="perm perm-user">登录</span></td><td>清空当前用户的全部运行记录</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除单条运行记录</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/runs/{id}/cancel</code></td><td><span class="perm perm-user">登录</span></td><td>请求取消运行；由执行器在下一个可中断点停下</td></tr>
@@ -384,32 +385,37 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-subscriptions">模板订阅 <span class="count">8</span></h3>
+                <h3 id="ep-subscriptions">模板订阅与模板库 <span class="count">10</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/library</code></td><td><span class="perm perm-user">登录</span></td><td>汇总<strong>所有已启用来源</strong>的模板目录，附每个来源的结果与错误；带 90 秒短缓存（按仓库 URL）</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions</code></td><td><span class="perm perm-user">登录</span></td><td>列出已订阅的模板仓库</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions</code></td><td><span class="perm perm-user">登录</span></td><td>新增模板订阅</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取单个订阅</td></tr>
                             <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新订阅地址或启停状态</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/subscriptions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除订阅</td></tr>
-                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/sync</code></td><td><span class="perm perm-user">登录</span></td><td>立即同步一次，异步执行</td></tr>
-                            <tr><td><code class="m-get">WS</code></td><td><code>/api/v1/subscriptions/{id}/sync/live</code></td><td><span class="perm perm-user">登录</span></td><td>WebSocket 推送同步进度</td></tr>
-                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/syncs</code></td><td><span class="perm perm-user">登录</span></td><td>列出同步历史与结果</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/import</code></td><td><span class="perm perm-user">登录</span></td><td>按条目名<strong>批量直接导入</strong>（不逐个预览），逐条返回成功 / 更新 / 失败</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/library</code></td><td><span class="perm perm-user">登录</span></td><td>列出<strong>单个来源</strong>提供的模板，并标记「已导入 / 有更新」</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/library/apply</code></td><td><span class="perm perm-user">登录</span></td><td>保存从预览编辑出的 HAR 为本地模板；带 <code>template_id</code> 则原地更新，否则新建，并推进来源记录的版本</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/library/preview</code></td><td><span class="perm perm-user">登录</span></td><td>取出一个条目的内容供预览，<strong>不落库</strong>；条目名走查询参数（它是来源自起的自由字符串，可能含 <code>/</code>）</td></tr>
                         </tbody>
                     </table>
 
-                <h3 id="ep-notifications">通知渠道与绑定 <span class="count">9</span></h3>
+                <h3 id="ep-notifications">通知渠道与绑定 <span class="count">12</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/notification-actions</code></td><td><span class="perm perm-user">登录</span></td><td>列出当前用户<strong>全部任务</strong>的渠道绑定（与创建表单勾选无关）</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/notification-actions/batch</code></td><td><span class="perm perm-user">登录</span></td><td>批量把同一渠道绑定到多个任务</td></tr>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/notification-actions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>就地修改一条绑定：触发时机、失败阈值、仅自动执行、标题 / 正文模板</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/notification-actions/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>解除绑定</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/notification-channels</code></td><td><span class="perm perm-user">登录</span></td><td>列出通知渠道</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/notification-channels</code></td><td><span class="perm perm-user">登录</span></td><td>新建通知渠道</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取渠道配置</td></tr>
                             <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新渠道配置</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/notification-channels/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除渠道，同时解除任务绑定</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/notification-channels/{id}/test</code></td><td><span class="perm perm-user">登录</span></td><td>用真实配置立刻发一条测试消息；走调度器同一条投递路径，失败原因直接返回</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}/notification-actions</code></td><td><span class="perm perm-user">登录</span></td><td>列出任务已绑定的通知渠道与触发时机</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks/{id}/notification-actions</code></td><td><span class="perm perm-user">登录</span></td><td>把渠道绑定到任务，指定在成功 / 失败 / 总是时推送</td></tr>
                         </tbody>
@@ -483,7 +489,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                 </p>
 
                 <h3 id="model-task"><code>Task</code></h3>
-                <p>任务。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。</p>
+                <p>任务。<code>template_id</code> 是请求来源——任务的请求完全由模板决定；<code>method</code> / <code>url</code> / <code>headers</code> / <code>body</code> 只在未绑定模板的存量任务上使用（列表里展示的方法与 URL 是模板首条请求的镜像）。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -586,6 +592,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-notificationaction"><code>NotificationAction</code></h3>
+                <p>渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -617,6 +624,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-templatesubscription"><code>TemplateSubscription</code></h3>
+                <p>订阅的模板来源（库地址）。它只登记一个来源目录，<strong>不会</strong>自动把模板拉进本地；是否导入由用户在公共模板列表里逐条决定。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -625,23 +633,79 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
                             <tr><td><code>url</code></td><td>string</td><td>是</td></tr>
                             <tr><td><code>enabled</code></td><td>boolean</td><td>是</td></tr>
-                            <tr><td><code>last_synced_at</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
-                            <tr><td><code>last_error</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
                             <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
                         </tbody>
                     </table>
 
-                <h3 id="model-subscriptionsync"><code>SubscriptionSync</code></h3>
+                <h3 id="model-templatelibrary"><code>TemplateLibrary</code></h3>
+                <p>单个来源的目录：<code>source_kind</code> 标明它是按清单（<code>manifest</code>）读的还是扫描文件（<code>files</code>）得到的，<code>entries</code> 是条目列表。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
-                            <tr><td><code>id</code></td><td>int64</td><td>是</td></tr>
                             <tr><td><code>subscription_id</code></td><td>int64</td><td>是</td></tr>
-                            <tr><td><code>status</code></td><td>enum: pending, running, succeeded, failed</td><td>是</td></tr>
-                            <tr><td><code>message</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
-                            <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
-                            <tr><td><code>finished_at</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>source_kind</code></td><td>enum: manifest, files</td><td>是</td></tr>
+                            <tr><td><code>manifest_version</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>entries</code></td><td>array&lt;LibraryEntry></td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-libraryoverview"><code>LibraryOverview</code></h3>
+                <p>所有已启用来源的汇总：<code>entries</code>（跨来源的条目）、<code>sources</code>（每个来源的结果与错误）、<code>truncated</code>（条目数是否触及上限被截断）。一个读不动的来源不会让整张表变空，它单独出现在 <code>sources</code> 的错误里。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>entries</code></td><td>array&lt;LibraryEntry></td><td>是</td></tr>
+                            <tr><td><code>sources</code></td><td>array&lt;LibrarySourceStatus></td><td>是</td></tr>
+                            <tr><td><code>truncated</code></td><td>boolean</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-libraryentry"><code>LibraryEntry</code></h3>
+                <p>模板库里的一个条目。<code>installed</code> / <code>installed_template_id</code> / <code>installed_version</code> 由本地库现算，<code>update_available</code> 表示上游版本比本地新。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>author</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>comments</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>version</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>date</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>filename</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>url</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>comment_url</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>installed</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>installed_template_id</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>installed_version</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>update_available</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>source_id</code></td><td>['integer', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>source_name</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-librarysourcestatus"><code>LibrarySourceStatus</code></h3>
+                <p>汇总视图里单个来源的状态：条目数、是否来自<strong>缓存</strong>（<code>cached</code>），以及该来源自己的 <code>error</code>。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>subscription_id</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>name</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>source_kind</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                            <tr><td><code>entries</code></td><td>int</td><td>是</td></tr>
+                            <tr><td><code>cached</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>error</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-libraryimportresult"><code>LibraryImportResult</code></h3>
+                <p>批量导入的逐条结果：成功 / 原地更新的条数、写入的模板 id，以及失败清单（<code>failed</code>）。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>imported</code></td><td>int</td><td>是</td></tr>
+                            <tr><td><code>updated</code></td><td>int</td><td>是</td></tr>
+                            <tr><td><code>failed</code></td><td>array&lt;LibraryImportFailure></td><td>是</td></tr>
+                            <tr><td><code>templates</code></td><td>array&lt;LibraryImportOutcome></td><td>是</td></tr>
                         </tbody>
                     </table>
 
@@ -736,8 +800,8 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
                 </ul>
                 <p>若你用文档生成客户端 SDK，这些端点需要手动补。</p>
                 <div class="wiki-meta">
-                    <span>基于 qdrust v0.1.11 服务端路由与 OpenAPI 3.1 文档整理</span>
-                    <span>共 80 个端点</span>
+                    <span>基于 qdrust v0.1.14 服务端路由与 OpenAPI 3.1 文档整理</span>
+                    <span>共 86 个端点</span>
                 </div>
             </main>
 

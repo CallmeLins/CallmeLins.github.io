@@ -261,14 +261,15 @@ success_asserts / failed_asserts → 判定成败
                 </div>
 
                 <h2 id="data-model">数据模型</h2>
-                <p>迁移脚本按阶段递增（forward-only），共 <strong>19 张表</strong>：</p>
+                <p>迁移脚本按阶段递增（forward-only），共 <strong>20 张表</strong>：</p>
                 <div class="overflow-x-auto mb-6">
                     <table>
                         <thead><tr><th>分组</th><th>表</th><th>用途</th></tr></thead>
                         <tbody>
                             <tr><td rowspan="2">模板</td><td><code>templates</code></td><td>模板本体，保留原始 HAR JSON</td></tr>
                             <tr><td><code>push_requests</code></td><td>公共模板发布审批</td></tr>
-                            <tr><td rowspan="2">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板仓库</td></tr>
+                            <tr><td rowspan="3">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板来源（库地址）；无「导入方式」列——订阅只登记来源，导入由用户逐条决定</td></tr>
+                            <tr><td><code>template_imports</code></td><td>来源条目到本地模板的映射（订阅 + 条目名 → 模板 + 上游版本），用于判断「已导入 / 有更新」</td></tr>
                             <tr><td><code>subscription_syncs</code></td><td>同步记录</td></tr>
                             <tr><td>任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填（分组是 <code>grp</code> 列，无独立分组表）</td></tr>
                             <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录、状态与租约列（<code>lease_owner</code> / <code>lease_expires_at</code>，租约不单独建表）</td></tr>
@@ -312,7 +313,9 @@ success_asserts / failed_asserts → 判定成败
                             <tr><td>认证</td><td><code>/api/v1/auth/bootstrap</code> · <code>/login</code> · <code>/logout</code> · <code>/register</code> · <code>/session</code></td></tr>
                             <tr><td>模板</td><td><code>/api/v1/templates</code> · <code>/{id}</code> · <code>/import-qd-har</code> · <code>/validate-qd-har</code> · <code>/{id}/publish</code> · <code>/{id}/qd-har</code></td></tr>
                             <tr><td>任务</td><td><code>/api/v1/tasks</code> · <code>/tasks/batch</code> · <code>/task-groups</code> · <code>/tasks/{id}/run</code></td></tr>
-                            <tr><td>运行</td><td><code>/api/v1/runs</code> · <code>/{id}</code> · <code>/{id}/cancel</code> · <code>/{id}/steps</code> · <code>/{id}/steps/live</code>（WebSocket）</td></tr>
+                            <tr><td>订阅与模板库</td><td><code>/api/v1/subscriptions</code> · <code>/{id}/sync</code> · <code>/{id}/sync/live</code>（WebSocket） · <code>/api/v1/library</code> · <code>/api/v1/subscriptions/{id}/library</code> · <code>/library/preview</code> · <code>/library/apply</code> · <code>/{id}/import</code></td></tr>
+                            <tr><td>运行</td><td><code>GET /api/v1/runs</code>（跨任务日志总览） · <code>/{id}</code> · <code>/{id}/cancel</code> · <code>/{id}/steps</code> · <code>/{id}/steps/live</code>（WebSocket）</td></tr>
+                            <tr><td>通知</td><td><code>/api/v1/notification-channels</code> · <code>/{id}/test</code> · <code>/api/v1/notification-actions</code> · <code>/batch</code> · <code>/api/v1/tasks/{id}/notification-actions</code></td></tr>
                             <tr><td>管理员</td><td><code>/api/v1/admin/users</code> · <code>/settings</code> · <code>/backup</code> · <code>/restore</code> · <code>/push-requests</code></td></tr>
                             <tr><td>生态</td><td><code>/api/v1/plugins</code> · <code>/api/v1/public-templates</code></td></tr>
                         </tbody>
@@ -323,6 +326,7 @@ success_asserts / failed_asserts → 判定成败
                 <ul>
                     <li><strong>步骤级回放</strong>：每次运行按步骤记录请求、响应与提取到的变量，可在运行记录里逐步查看。</li>
                     <li><strong>QD 风格运行日志</strong>：文本化日志，便于直接阅读与检索。</li>
+                    <li><strong>跨任务运行日志总览</strong>：<code>GET /api/v1/runs</code> 把所有任务的运行汇到一张表，按状态（成功 / 失败）与任务筛选，走游标分页。</li>
                     <li><strong>WebSocket 实时流</strong>：<code>/api/v1/runs/{id}/steps/live</code> 推送活跃运行的步骤；订阅导入进度同样走 WebSocket。</li>
                     <li><strong>探针</strong>：<code>/health</code> 与 <code>/ready</code> 供 Compose 健康检查与反向代理使用。</li>
                     <li><strong>日志保留</strong>：<code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留）控制已完成运行记录的自动清理，系统每小时执行一次。</li>
@@ -338,7 +342,7 @@ success_asserts / failed_asserts → 判定成败
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-07</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>
             </main>
 

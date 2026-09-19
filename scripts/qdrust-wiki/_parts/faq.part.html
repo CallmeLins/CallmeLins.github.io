@@ -78,6 +78,13 @@
                     其原有请求也不会被改动。
                 </p>
 
+                <h3 id="library-no-auto-import">订阅了模板库，为什么模板没有自动出现在「我的模板」里？</h3>
+                <p>
+                    这是刻意设计：订阅只<strong>登记一个来源目录</strong>，不会自动把上游模板拉进本地——官方库有几百个模板，全量导入会把你自建的模板淹掉。
+                    到模板页的「公共模板」列表里逐条「导入」（点开的是<strong>预览</strong>，保存才入库），或用「批量选择」直接批量导入。
+                    已导入的模板在上游版本变新时会标「有更新」，点「更新」先预览、保存后原地更新，不会生成重名副本。
+                </p>
+
                 <h3 id="scheduler-precision">调度好像没按我设的时间跑？</h3>
                 <p>
                     <code>SCHEDULER_INTERVAL_SECONDS</code>（默认 15 秒）是调度器轮询间隔，任务触发精度受其影响。如需更精确请相应调小——代价是更频繁的数据库轮询。
@@ -146,5 +153,5 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-12</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>

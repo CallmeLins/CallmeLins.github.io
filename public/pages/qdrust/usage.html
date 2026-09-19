@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志与 CLI。">
+    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入）、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。">
     <title>使用指南 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -346,7 +346,7 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     </li>
                     <li>填写变量（模板需要的变量会按 QD 语义自动列出，见<a href="templates.html#variables-derive">模板变量是怎么算出来的</a>）、配置 cron / 间隔调度。</li>
                     <li>用「立即运行」手动触发，或在运行记录中查看每一步的<strong>请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
-                    <li>订阅仓库的任务会<strong>按仓库自动导入并同步</strong>；公共模板经 PushRequest 审批后发布。</li>
+                    <li>模板页提供<strong>两种导入来源</strong>：从本地导入 QD HAR，或从<a href="#library">订阅的模板库</a>里挑——后者是<strong>先预览、保存才入库</strong>。本站公开模板经 PushRequest 审批后发布。</li>
                 </ol>
                 <div class="callout">
                     <div class="callout-title">任务列表里的方法与 URL 只是「镜像」</div>
@@ -386,7 +386,117 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <li>活跃运行的步骤通过 <strong>WebSocket</strong> 实时推送。</li>
                     <li>已完成记录的保留天数由 <code>LOG_RETENTION_DAYS</code> 控制，<code>0</code> 表示永久保留。</li>
                 </ul>
+
+                <h3 id="run-log">运行日志总览</h3>
+                <p>
+                    任务页标题右侧的「运行日志」打开的是一个<strong>宽弹窗</strong>（不是独立页面），把<strong>所有任务</strong>的运行放在同一张表里：
+                </p>
+                <ul>
+                    <li>按时间倒序，可按「全部 / 成功 / 失败」筛选、按任务过滤，能在行内<strong>取消或删除</strong>；</li>
+                    <li>点任务名可直接跳到该任务的运行历史；</li>
+                    <li>弹窗底部有它<strong>自己的分页条</strong>——它是游标分页，只显示「第 N 页」而没有总页数，两个翻页按钮始终可用。每页条数在分页条上设置，不与其他列表互相影响（见下节）。</li>
+                </ul>
+                <p>任务多的时候用它一眼扫完当天所有任务，不必逐个点进任务详情。对应接口 <code>GET /api/v1/runs</code>（<code>status</code> / <code>task_id</code> / <code>limit</code> / <code>before_id</code> 参数，游标分页）。</p>
                 <p class="text-sm text-gray-500">WebSocket 的端点与消息格式见<a href="api.html#websocket">API 接口 · WebSocket 实时接口</a>。</p>
+
+                <h2 id="pagination">列表分页与每页条数</h2>
+                <p>
+                    任务、订阅、我的模板、公共模板（订阅源汇总）与本站公开模板都按页渲染，<strong>默认每页 10 条</strong>。
+                </p>
+                <div class="callout">
+                    <div class="callout-title">分页条始终显示，不随列表长短收起</div>
+                    <p>
+                        分页条在表格下方<strong>始终可见</strong>——它是修改每页条数的<strong>唯一入口</strong>。一旦跟着列表长度收起，选到 100 条之后就再也改不回 10 了。只有一页的列表会隐去中间那段翻页控件，只留左边的总条数与右边的条数选择器。
+                    </p>
+                </div>
+                <p>分页条从左到右是三段：</p>
+                <ol>
+                    <li><strong>总条数</strong>；</li>
+                    <li><strong>上一页 / 第 x / y 页 / 下一页</strong>（列表只有一页时不显示）；</li>
+                    <li><strong>每页条数</strong>：<code>10 / 20 / 50 / 100</code>。</li>
+                </ol>
+                <p>
+                    <strong>每个列表各记各的条数</strong>，改一个不会动到别的——它们读条数的时机和目的都不一样，共用一份只会让人在改 A 的时候顺手把 B、C 也改了。选择按浏览器存在 <code>localStorage</code>，键是 <code>qdrust.pageSize.&lt;列表名&gt;</code>（<code>tasks</code> / <code>subscriptions</code> / <code>templates</code> / <code>publicTemplates</code> / <code>library</code> / <code>runLog</code>）。它是<strong>阅读偏好</strong>而不是站点设置，所以不需要服务端状态，也不需要管理员权限。
+                </p>
+                <p>
+                    旧版用一个共享的 <code>qdrust.pageSize</code>；升级时它仍会被读取，作为各列表<strong>尚未单独设置过</strong>时的起点，但不再被写入。除运行日志外，列表数据本来就整份在浏览器里，改条数只影响渲染、不重新请求；运行日志是<strong>服务端分页</strong>，改条数会重新取数并把<strong>游标重置回第一页</strong>（旧游标是按旧条数切的，不能复用）。
+                </p>
+                <h3 id="pagination-filter">筛选与全选</h3>
+                <ul>
+                    <li>换了筛选条件就回到第 1 页：任务页的搜索 / 分组，模板页的搜索，公共模板库的搜索 / 排序 / 切换来源 / 刷新，以及运行日志的状态 / 任务。</li>
+                    <li>列表变短时页码会自动收回，不会停在已经不存在的页上。</li>
+                    <li>运行日志是<strong>游标分页</strong>，没有「第几页共几页」可回，所以改筛选或改每页条数时<strong>直接清空游标栈重新取数</strong>——旧游标是按上一份结果集切的，留着它只会去问「那份列表的下一页」，而那份列表已经不存在了（这正是「按任务筛选好像没生效」的成因：筛选本身是对的，游标替另一份列表答了话）。</li>
+                    <li><strong>「全选」只覆盖当前页</strong>（任务与公共模板库两处），免得翻页后看不见的行被批量操作带上。</li>
+                </ul>
+
+                <h2 id="library">订阅模板库（汇总与预览）</h2>
+                <p>
+                    除了从本地导入 HAR，模板页还可以<strong>订阅模板库</strong>并从中挑模板：支持官方库
+                    <a href="https://github.com/qd-today/templates" target="_blank">qd-today/templates</a>，以及任何兼容同一规范的第三方库或单个模板文件 URL。
+                    库浏览是<strong>模板页内的一块</strong>，不是独立页面——没有整页跳转，也就没有「返回模板」这一步。
+                </p>
+
+                <h3 id="library-subscribe">1. 添加订阅</h3>
+                <p>
+                    在「模板」页点标题右侧的「添加订阅」，弹窗里填订阅名称与库地址（例如 <code>https://github.com/qd-today/templates</code>）。
+                </p>
+                <div class="callout">
+                    <div class="callout-title">订阅只登记来源，不自动导入</div>
+                    <p>
+                        没有「导入方式」的选择：订阅只是登记一个来源目录，<strong>不会</strong>把模板自动拉进本地——官方库里是几百个模板，全量导入会把你自建的模板淹掉。模板是否导入、何时导入，由你在下方的「公共模板」列表里自己决定。
+                    </p>
+                </div>
+                <p>订阅区域在页面标题下、「我的模板」上方（来源排在它供给的列表之前），行内可随时「编辑 / 启用停用 / 删除」；无订阅时该表格显示为空列表。</p>
+
+                <h3 id="library-browse">2. 浏览汇总</h3>
+                <p>
+                    「公共模板」表默认列出<strong>所有已启用订阅源</strong>的条目（名称、作者、来源、版本、日期、状态），按上游日期倒序，表头可点排序，可搜索名称 / 作者 / 来源。用「订阅源」下拉切到单个来源时，表格多出「订阅源」列，并标出该源是按 <code>tpls_history.json</code> 清单读的还是扫描文件得到的。<strong>停用的订阅不进汇总。</strong>
+                </p>
+
+                <h3 id="library-import">3. 导入是预览，不是直接落库</h3>
+                <p>
+                    点行内「导入」时，服务端把该条目的上游 HAR 取回来但<strong>不落库</strong>，编辑器打开的就是它，<strong>改好保存才写进「我的模板」</strong>——随手点几行不会在模板列表里留下用不上的东西。已导入且无更新的行显示「打开」，直接编辑本地那份、不联网。
+                </p>
+                <ul>
+                    <li>已导入的条目标<strong>「已导入」</strong>；上游版本变新时标<strong>「有更新」</strong>，点「更新」同样先预览上游那一版，保存后<strong>原地更新</strong>本地模板（不会生成重名副本），并把来源记录的版本推进到上游版本。</li>
+                    <li>需要一次预载多个时，点工具栏「批量选择」才展开勾选列与批量导入工具条。<strong>批量导入是直接的，不逐个预览</strong>；汇总视图下勾选可以跨来源，服务端按来源分组调用。入口列会随状态在「导入 / 更新 / 打开」之间切一个主操作。</li>
+                </ul>
+                <blockquote>命名约定：qd-today 语境里的「公共模板」指<strong>订阅源的汇总</strong>，本页沿用该含义；本站用户互相发布的模板另称「本站公开模板」，默认折叠在页尾。</blockquote>
+
+                <h3 id="library-cache">4. 缓存与读取失败</h3>
+                <p>
+                    来源目录有<strong>短缓存</strong>（<strong>90 秒</strong>，按仓库 URL 而不是按订阅或账号——同一仓库被两个订阅或两个账号指向时只读一次）。汇总视图一次要读所有来源，而每个来源是两三个 GitHub 请求，所以缓存目录本身；「已导入 / 有更新」<strong>不进缓存</strong>，每次都由本地库现算，因此刚订阅完立刻就能看到状态变化。工具栏的「刷新」按钮带 <code>refresh</code>，绕过缓存重新读取。
+                </p>
+                <p>
+                    <strong>读取失败不会再把来源清空</strong>：目录抓取最多试 3 次（间隔 300 / 600 毫秒），只重试<strong>传输类</strong>失败——连接被断、超时、body 传了一半；HTTP 状态码是上游给的答复（比如仓库没有清单时的 404），重试只会拿到同一个。库抓取的单次请求超时是 <strong>60 秒</strong>，比其它请求宽：官方清单有 3 MB 且 93% 是内联 HAR，按 API 调用的默认超时收不完 body。缓存过期后重取仍然失败时，会退回用上一份成功读到的目录并标为「缓存」，而不是把该来源变成 0 条——<strong>只有你主动点「刷新」时才如实报错</strong>，因为那时你问的是「现在是什么样」。
+                </p>
+
+                <h3 id="library-discovery">5. 来源的发现规则</h3>
+                <p>与 QD 第三方库规范一致：</p>
+                <ul>
+                    <li>仓库根目录有 <code>tpls_history.json</code> 时按其清单读取：<code>har</code> 以模板名为键，值里的 <code>author</code> / <code>comments</code> / <code>version</code> / <code>date</code> / <code>commenturl</code> 就是展示的元数据；HAR 优先取内联的 base64 <code>content</code>，否则按 <code>url</code>、再否则按 <code>filename</code> 下载。</li>
+                    <li>没有清单时回退为扫描仓库树中的 <code>*.har</code> / <code>*.json</code>，此时条目不携带版本，因此不会提示更新。</li>
+                    <li>变量说明（<code>comments</code>）在服务端被规整为纯文本，不注入到页面里。</li>
+                    <li>上游内容<strong>有两种形状</strong>：标准 HAR（<code>{log:{entries}}</code>）和 QD 导出的请求数组（<code>[{comment, request:{…}, rule:{…}}]</code>）——<code>tpls_history.json</code> 里的 <code>content</code> 就是后者。预览接口按契约原样返回上游文档，所以<strong>转成编辑器认得的 HAR 这一步在前端做</strong>（与本地文件导入共用同一条转换）；服务端的执行链两种形状都吃得下。</li>
+                </ul>
+                <p>
+                    来源记录写在 <code>template_imports</code>（订阅 + 条目名 → 本地模板 + 上游版本），用于判断「已导入 / 有更新」。删除订阅只删除来源记录，<strong>已导入的模板会保留</strong>（导入是复制到你自己的库，不是软链）。一个读不动的仓库不会让整张表变空：它单独列出错误，其余来源照常显示；条目总数触及上限时列表会说明已被截断。
+                </p>
+
+                <h3 id="library-api">6. 对应接口</h3>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>方法</th><th>路径</th><th>作用</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/library</code></td><td>所有已启用来源的汇总（<code>entries</code> 加上每个来源的 <code>sources</code> 结果与错误），<code>refresh=&lt;bool&gt;</code> 绕过缓存</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/library</code></td><td>单个来源的目录</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/subscriptions/{id}/library/preview</code></td><td>取出一条的 HAR 但<strong>不落库</strong>；条目名走查询参数而不是路径段，因为它是来源自己起的自由字符串，可能含 <code>/</code></td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/library/apply</code></td><td>保存编辑器里的 HAR 并写下来源记录；带 <code>template_id</code> 则原地更新，否则新建</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/subscriptions/{id}/import</code></td><td>按名称批量<strong>直接</strong>导入，逐条返回成功 / 更新 / 失败，并给出写入模板的 id 与是否原地更新</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500">完整参数与权限见<a href="api.html#ep-subscriptions">API 接口 · 模板订阅与模板库</a>。</p>
 
                 <h2 id="cli">命令行（CLI）</h2>
                 <p>校验旧 QD HAR：</p>
@@ -402,12 +512,12 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                 <ul>
                     <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。</li>
                     <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
-                    <li><a href="api.html">API 接口</a> —— 80 个 REST 端点的完整契约，适合做外部集成。</li>
+                    <li><a href="api.html">API 接口</a> —— 86 个 REST 端点的完整契约，适合做外部集成。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-12</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>
             </main>
 

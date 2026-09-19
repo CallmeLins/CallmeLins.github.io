@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚。">
+    <meta name="description" content="qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚、发布检查清单。">
     <title>部署与运维 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/deploy.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -323,7 +323,7 @@ QDRUST_BASE_PATH=/qd
                 <h2 id="notify">通知渠道</h2>
                 <p>
                     任务成功或失败时可推送提醒，系统共支持 <strong>11 种</strong>渠道，在「通知」页新建渠道并绑定到任务即可。
-                    渠道清单、各渠道的 <code>kind</code> 与配置项、批量绑定 / 失败阈值 / 仅自动执行、以及标题与正文模板变量，
+                    渠道清单、各渠道的 <code>kind</code> 与配置项、渠道测试、批量绑定 / 就地编辑 / 失败阈值 / 仅自动执行、以及标题与正文模板变量，
                     统一放在<a href="notify.html">推送与通知</a>页。
                 </p>
                 <p>部署侧只需留意两点：<strong>Email 渠道依赖 <code>QDRUST_SMTP_*</code></strong>；<strong>单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
@@ -345,7 +345,7 @@ QDRUST_BASE_PATH=/qd
                 </ol>
                 <div class="callout">
                     <div class="callout-title">健康检查失败怎么办</div>
-                    <p>停新容器 → 恢复升级前的数据库备份 → 启动记录的上一镜像 digest。仅回退镜像而不恢复数据库<strong>不被支持</strong>。详见仓库内的 <code>docs/phase8/OPERATIONS.md</code> 与 <code>docs/phase8/RELEASE_CHECKLIST.md</code>。</p>
+                    <p>停新容器 → 恢复升级前的数据库备份 → 启动记录的上一镜像 digest。仅回退镜像而不恢复数据库<strong>不被支持</strong>。完整的备份 / 恢复与发布门禁清单见仓库内的 <code>docs/operations.md</code>。</p>
                 </div>
 
                 <h2 id="local-dev">本地开发运行</h2>
@@ -360,17 +360,30 @@ cargo run -p qdrust-server</code></pre>
                 <pre><code>cargo run -p qdrust-server      # API，:8923
 npm --prefix webui run dev      # Vite，:5173，API 请求代理到 Rust 服务</code></pre>
 
-                <h2 id="verify">验证清单</h2>
+                <h2 id="verify">发布检查清单</h2>
+                <p>发布验收分三道门，依次通过才打标签。<strong>本地门禁</strong>：</p>
                 <pre><code>cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace --all-targets
+npm --prefix webui ci
+npm --prefix webui run generate:api
 npm --prefix webui run lint
 npm --prefix webui run test
-npm --prefix webui run build</code></pre>
+npm --prefix webui run build
+# 构建 Docker 镜像，验证 /health、/ready 与 /</code></pre>
+                <p><strong>浏览器验收</strong>：初始化首个管理员并登出 / 登录、导入并编辑一份有代表性的旧 QD HAR、建任务并立即运行 / 查看步骤 / 取消、发布并复制公共模板、创建记事本与插件、Webhook 渠道与通知动作；在桌面与移动宽度各走一遍主流程，并确认第二个用户访问不到第一个用户的资源。</p>
+                <p><strong>发布门禁</strong>：</p>
+                <ul>
+                    <li>用 <code>python scripts/bump-version.py &lt;x.y.z&gt;</code> 升版本——它一步更新 workspace 版本、WebUI 包、OpenAPI 文档与两份 lockfile，升完先提交再打标签；</li>
+                    <li>只在全部门禁通过后推<strong>不可变的</strong> <code>vMAJOR.MINOR.PATCH</code> 标签；</li>
+                    <li>确认 GHCR manifest 同时含 amd64 与 arm64，且 provenance 与 SBOM 证明齐备；</li>
+                    <li>确认 Trivy 未报出可修复的 HIGH / CRITICAL 漏洞；</li>
+                    <li>在空白数据卷上安装一次，再演练备份 → 升级 → 恢复 → 回滚。</li>
+                </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-12</span>
+                    <span>最后更新：2026-09-19</span>
                 </div>
             </main>
 

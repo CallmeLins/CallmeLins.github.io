@@ -27,7 +27,7 @@ PAGES = [
         "part": "usage.part.html",
         "nav": "usage.html",
         "title": "使用指南 | qdrust Wiki",
-        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志与 CLI。",
+        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入）、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。",
         "path": "usage.html",
     },
     {
@@ -59,7 +59,7 @@ PAGES = [
         "part": "deploy.part.html",
         "nav": "deploy.html",
         "title": "部署与运维 | qdrust Wiki",
-        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚。",
+        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚、发布检查清单。",
         "path": "deploy.html",
     },
     {
@@ -67,7 +67,7 @@ PAGES = [
         "part": "notify.part.html",
         "nav": "notify.html",
         "title": "推送与通知 | qdrust Wiki",
-        "description": "qdrust 推送与通知：11 种渠道的 kind 与配置项、通知动作的批量绑定 / 失败阈值 / 仅自动执行、标题与正文模板变量。",
+        "description": "qdrust 推送与通知：11 种渠道的 kind 与配置项、渠道测试、通知动作的批量绑定与就地编辑 / 失败阈值 / 仅自动执行、标题与正文模板变量。",
         "path": "notify.html",
     },
     # 注意：api.html 不在此生成——它由 scripts/gen-qdrust-api.py 负责
@@ -78,7 +78,7 @@ PAGES = [
         "part": "faq.part.html",
         "nav": "faq.html",
         "title": "常见问题 | qdrust Wiki",
-        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
+        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
         "path": "faq.html",
     },
 ]
