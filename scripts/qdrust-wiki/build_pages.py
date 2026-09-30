@@ -27,7 +27,7 @@ PAGES = [
         "part": "usage.part.html",
         "nav": "usage.html",
         "title": "使用指南 | qdrust Wiki",
-        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入）、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。",
+        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离）、可视化 HAR 编辑器、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。",
         "path": "usage.html",
     },
     {
@@ -35,7 +35,7 @@ PAGES = [
         "part": "architecture.part.html",
         "nav": "architecture.html",
         "title": "架构设计 | qdrust Wiki",
-        "description": "qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型、API 一览与横向扩展边界。",
+        "description": "qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。",
         "path": "architecture.html",
     },
     {
@@ -43,7 +43,7 @@ PAGES = [
         "part": "templates.part.html",
         "nav": "templates.html",
         "title": "模板与表达式 | qdrust Wiki",
-        "description": "qdrust 模板体系：旧 QD HAR 兼容契约、Template Schema v1、变量与断言、Jinja2 函数与过滤器、api://util/* 内置工具。",
+        "description": "qdrust 模板体系：旧 QD HAR 兼容契约、Template Schema v1、变量（默认值与 _proxy 代理）与断言、Jinja2 函数与过滤器、Python 写法兼容、正则与响应体编码的 Python 读法、api://util/* 内置工具。",
         "path": "templates.html",
     },
     {
@@ -59,7 +59,7 @@ PAGES = [
         "part": "deploy.part.html",
         "nav": "deploy.html",
         "title": "部署与运维 | qdrust Wiki",
-        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表、数据库选型、备份与升级回滚、发布检查清单。",
+        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表（含两个高风险网络开关与默认语言）、反向代理到二级目录、数据库选型、备份与升级回滚、发布检查清单。",
         "path": "deploy.html",
     },
     {
@@ -78,7 +78,7 @@ PAGES = [
         "part": "faq.part.html",
         "nav": "faq.html",
         "title": "常见问题 | qdrust Wiki",
-        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
+        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、默认语言、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
         "path": "faq.html",
     },
 ]

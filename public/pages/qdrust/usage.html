@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入）、创建与运行任务、可视化 HAR 编辑器、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。">
+    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离）、可视化 HAR 编辑器、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。">
     <title>使用指南 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -189,7 +189,7 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
+                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、出站请求与两个高风险网络开关、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
                 </p>
 
                 <h2 id="first-run">首次启动与管理员</h2>
@@ -342,9 +342,16 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                 <ol>
                     <li>
                         <strong>模板必选</strong>：新建任务时先选模板——任务的请求完全由模板决定（多页模板常混合 GET/POST），
-                        任务本身<strong>不携带请求方法 / URL / 请求头 / 请求体</strong>。
+                        任务本身<strong>不携带请求方法 / URL / 请求头 / 请求体</strong>。模板下拉<strong>可输入筛选</strong>，并
+                        <strong>把还没有任何任务的模板排在最前面</strong>（模板库动辄上百个，已绑定的几乎不会是你要找的那个），
+                        每项后面标着「未使用」或「已用 N」，两半内部都按「最后修改的在最前」排列。模板页的「我的模板」另有一列
+                        <strong>任务数</strong>和「只看未使用」筛选，用来一眼找出还没建任务的模板。
                     </li>
-                    <li>填写变量（模板需要的变量会按 QD 语义自动列出，见<a href="templates.html#variables-derive">模板变量是怎么算出来的</a>）、配置 cron / 间隔调度。</li>
+                    <li>
+                        填写变量（模板需要的变量会按 QD 语义自动列出，带 <code>{{name|default("...")}}</code> 的会<strong>预填默认值</strong>，
+                        用户改动优先）、配置 cron / 间隔调度。弹窗里的「<strong>测试</strong>」会立刻用当前变量跑一遍模板
+                        （走调度器同一条执行路径与出站闸门，但<strong>不创建任务、不落运行记录</strong>），确认断言和变量没问题再保存。
+                    </li>
                     <li>用「立即运行」手动触发，或在运行记录中查看每一步的<strong>请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
                     <li>模板页提供<strong>两种导入来源</strong>：从本地导入 QD HAR，或从<a href="#library">订阅的模板库</a>里挑——后者是<strong>先预览、保存才入库</strong>。本站公开模板经 PushRequest 审批后发布。</li>
                 </ol>
@@ -355,6 +362,14 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                         早于该规则的存量任务（未绑定模板、自带一条请求）编辑时仍会保留「（无模板）」选项与其原有请求，不会被改动。
                     </p>
                 </div>
+                <div class="callout">
+                    <div class="callout-title">模板绑定按任务所有者隔离（v0.1.17 起）</div>
+                    <p>
+                        校验任务时，<code>template_id</code> 会先按<strong>调用者自己的归属</strong>查找，之后才考虑请求里带的 URL。
+                        此前 URL 会短路这次查找，于是只要附上任意 URL，就能引用——进而执行——别人的模板。现在指向他人模板的
+                        <code>template_id</code> 一律按「不存在」返回，错误信息也不会泄露它是否存在。
+                    </p>
+                </div>
                 <p class="text-sm text-gray-500">变量、断言与表达式写法见<a href="templates.html#variables">模板与表达式</a>。</p>
 
                 <h2 id="har-editor">可视化 HAR 编辑器</h2>
@@ -363,11 +378,93 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <code>success_asserts</code> 与 <code>extract_variables</code>，无需手改 JSON。
                 </p>
 
+                <h2 id="egress">出站请求与网络开关</h2>
+                <p>
+                    默认<strong>服务端只请求公网地址</strong>：解析结果里只要出现私有网段、回环、链路本地、组播或云元数据地址，
+                    请求会在发出<strong>之前</strong>被拒，报错 <code>private or special-use network target is blocked</code>。
+                    这是 SSRF 防护。
+                </p>
+                <p>
+                    这道闸门覆盖<strong>全部出站请求</strong>，共<strong>五条路径</strong>：模板运行、不绑模板的任务（直接用 URL 建的那种）、
+                    通知渠道与渠道测试、模板订阅抓取，以及模板里 <code>api://util/dddd/...</code> 的验证码识别转发
+                    （它会把请求转给 <code>_server</code> 参数指定的 DdddOCR 服务）。五条共用同一套地址校验、连接固定与重定向策略。
+                    拦截时错误信息里会带上 <code>security.allow_private_network</code>，所以在「测试通知渠道」这类入口就能直接看到该开哪个开关。
+                </p>
+                <div class="callout">
+                    <div class="callout-title">从旧版本升级：通知渠道、订阅源与 DdddOCR 转发现在也受约束</div>
+                    <p>
+                        统一之前，通知渠道与订阅抓取用的是另一个<strong>不带防护</strong>的 HTTP client（旧文档甚至写明「<code>http</code> 与 <code>https</code> 均可，便于内网服务」）。
+                        现在它们与模板走同一策略，因此：
+                    </p>
+                    <ul>
+                        <li><strong>指向内网的渠道 / 订阅源会失败</strong>，报 <code>private or special-use network target is blocked</code>，需要开启下方开关。原来能用的自建 ntfy、内网 GitLab 订阅地址属于这一类。</li>
+                        <li><strong>不再跟随重定向。</strong> 以前共享 client 按 reqwest 默认最多跟 10 跳，现在与模板一致一律不跟随。受影响的典型写法：
+                            <code>https://github.com/{owner}/{repo}/raw/{branch}/tpls_history.json</code> 会 302 到 <code>raw.githubusercontent.com</code>，请直接写最终地址。</li>
+                        <li><strong>每次出站请求各自建一个 client</strong>（地址固定是 client 级的），所以订阅源抓取不再复用连接池；目录本身有 90 秒缓存，影响主要在首次读取。</li>
+                        <li><strong>模板里的 <code>api://util/dddd/...</code> 转发同样受约束。</strong> 它的目标来自模板的 <code>_server</code> 参数（取不到才退回环境变量 <code>QDRUST_DDDDOCR_SERVER</code>），按<strong>用户可控</strong>对待——指向内网或本机的自建 DdddOCR 服务现在需要开启本开关；模板写法不用改，只是会先被闸门拦一次。</li>
+                        <li><strong>不在范围内</strong>（目标由部署者写死，模板改不动）：OIDC 身份提供方、SMTP 投递、浏览器插件的 CDP 端点（<code>QDRUST_BROWSER_URL</code>，官方示例本就是内网地址；模板想用 <code>_browser_url</code> 改目标会被直接拒绝），以及 Redis / 数据库连接。</li>
+                    </ul>
+                </div>
+
+                <h3 id="allow-private-network">允许出站请求访问内网地址（高风险开关）</h3>
+                <p>有些用法确实依赖内网服务——自建的 flaresolverr（<code>http://flaresolverr:8191/v1</code>）、需要登录的局域网页面、内网的自建 ntfy。这些可以在<strong>管理 → 站点设置</strong>里开启「允许出站请求访问内网地址」：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>项</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td>开关位置</td><td>管理页「站点设置」表单，上方有风险提示</td></tr>
+                            <tr><td>存储键</td><td><code>site_settings</code> 表的 <code>security.allow_private_network</code></td></tr>
+                            <tr><td>生效时机</td><td>保存后<strong>下一次运行</strong>立即生效，无需重启</td></tr>
+                            <tr><td>部署时预设</td><td>环境变量 <code>QDRUST_ALLOW_PRIVATE_NETWORK=true</code>，或配置文件里的 <code>allow_private_network</code></td></tr>
+                            <tr><td>优先级</td><td>站点设置 &gt; 配置文件 &gt; 环境变量</td></tr>
+                            <tr><td>审计</td><td>每次修改写一条 <code>admin.setting_changed</code> 审计记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <div class="callout-title">这是高风险开关</div>
+                    <p>
+                        开启后<strong>任何</strong>出站请求都能访问本机网络内的服务——模板运行、任务 URL、通知渠道、订阅抓取、
+                        <code>api://util/dddd</code> 转发都在内——不只是你信任的那一个，也包括云元数据端点（<code>169.254.169.254</code>）。
+                        只在确实需要内网服务时打开，用完关掉。
+                    </p>
+                </div>
+                <p>取值必须是真正的 JSON 布尔值（<code>true</code> / <code>false</code>）。接口收到字符串 <code>"true"</code>、数字 <code>1</code> 之类会<strong>忽略</strong>它，开关保持原状（失败方向是保持关闭）。</p>
+                <p>开关只放宽「地址是否公网」这一项判断。DNS 仍在每次请求前解析并校验，且无代理时连接会被固定到已校验的那个地址（防 DNS rebinding）；请求超时、响应体上限、重定向策略都不受影响。</p>
+
+                <h3 id="allow-invalid-cert">接受无效证书（高风险开关）</h3>
+                <p>默认<strong>校验证书</strong>：自签名、过期、域名不匹配的证书都会让请求失败。目标是只在局域网可达、且从来没配过证书的服务时，可以开启「接受无效证书」：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>项</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td>开关位置</td><td>管理页「站点设置」表单，紧跟在「允许出站请求访问内网地址」下方，上方有风险提示</td></tr>
+                            <tr><td>存储键</td><td><code>site_settings</code> 表的 <code>security.allow_invalid_certificates</code></td></tr>
+                            <tr><td>生效时机</td><td>保存后<strong>下一次运行</strong>立即生效，无需重启</td></tr>
+                            <tr><td>部署时预设</td><td>环境变量 <code>QDRUST_ALLOW_INVALID_CERTIFICATES=true</code>，或配置文件里的 <code>allow_invalid_certificates</code></td></tr>
+                            <tr><td>优先级</td><td>站点设置 &gt; 配置文件 &gt; 环境变量</td></tr>
+                            <tr><td>审计</td><td>每次修改写一条 <code>admin.setting_changed</code> 审计记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout">
+                    <div class="callout-title">这是高风险开关，和上面那个是两回事</div>
+                    <p>
+                        开启后不再校验证书，<strong>任何</strong>出站请求的目标都可以是伪造的——中间人不再需要真证书就能冒充目标站点。
+                        需要访问内网并不代表需要放弃证书校验：只在内网确实没有证书时才打开，用完关掉。取值同样必须是真正的 JSON 布尔值，非布尔值一律忽略。
+                    </p>
+                </div>
+                <p>
+                    两个开关<strong>互相独立</strong>，可以分别开启：只开「访问内网地址」时证书照常校验（自签的内网 HTTPS 依然会失败，报证书错误而不是 SSRF 错误）；
+                    只开「接受无效证书」也仍然打不到内网地址。
+                </p>
+                <p class="text-sm text-gray-500">WebUI 在开启任一高风险设置前会先弹确认。</p>
+
                 <h2 id="scheduling">调度与随机延迟</h2>
                 <ul>
                     <li><strong>两种调度</strong>：固定间隔与 cron，都在可视化调度器中配置。</li>
                     <li><strong>随机延迟</strong>：让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。</li>
-                    <li><strong>变量预填</strong>：模板变量支持在创建任务时预填默认值。</li>
+                    <li><strong>变量预填</strong>：模板里写成 <code>{{name|default("...")}}</code> 的变量，在创建任务时会自动预填该默认值（用户改动优先）。</li>
                 </ul>
 
                 <h3 id="timezone">时区与夏令时</h3>
@@ -397,6 +494,12 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <li>弹窗底部有它<strong>自己的分页条</strong>——它是游标分页，只显示「第 N 页」而没有总页数，两个翻页按钮始终可用。每页条数在分页条上设置，不与其他列表互相影响（见下节）。</li>
                 </ul>
                 <p>任务多的时候用它一眼扫完当天所有任务，不必逐个点进任务详情。对应接口 <code>GET /api/v1/runs</code>（<code>status</code> / <code>task_id</code> / <code>limit</code> / <code>before_id</code> 参数，游标分页）。</p>
+                <p>
+                    <strong>任务状态怎么判</strong>：任务列表的「状态」列有三档 —— <strong>禁用</strong>（<code>disabled</code>，优先于其余两项）、
+                    <strong>失败</strong>、<strong>正常</strong>。「失败」的判据是<strong>上一轮运行是否留下错误</strong>（<code>last_error</code> 非空），
+                    而不是只看 HTTP 状态码：连接层就没成的情况（TLS 握手失败、DNS 解析不了、超时）根本拿不到响应，<code>last_status</code> 是空的——
+                    这类运行此前会被显示成「正常」，现在按「失败」计入。概览卡片的「最近失败」同理。从未运行过的任务是「正常」（两个字段都空）。
+                </p>
                 <p class="text-sm text-gray-500">WebSocket 的端点与消息格式见<a href="api.html#websocket">API 接口 · WebSocket 实时接口</a>。</p>
 
                 <h2 id="pagination">列表分页与每页条数</h2>
@@ -447,6 +550,12 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     </p>
                 </div>
                 <p>订阅区域在页面标题下、「我的模板」上方（来源排在它供给的列表之前），行内可随时「编辑 / 启用停用 / 删除」；无订阅时该表格显示为空列表。</p>
+                <p>
+                    <strong>镜像前缀的 GitHub 地址也接受</strong>：形如 <code>https://gh-proxy.org/https://github.com/owner/repo</code> 的写法
+                    （即 <code>&lt;镜像&gt;/https://github.com/…</code>，公共加速代理惯用的形式）会被解析——镜像前缀被剥下来用于识别仓库、并保留下来用于抓取，
+                    于是访问不到 GitHub 的网络也能通过镜像订阅。镜像只作用于 <code>raw.githubusercontent.com</code> / <code>github.com</code> 这两类它真正代理的地址
+                    （树 API 没有镜像等价物，仍走直连）；清单里若混进别的链接，也不会被无脑加上前缀。
+                </p>
 
                 <h3 id="library-browse">2. 浏览汇总</h3>
                 <p>
@@ -512,12 +621,12 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                 <ul>
                     <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。</li>
                     <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
-                    <li><a href="api.html">API 接口</a> —— 86 个 REST 端点的完整契约，适合做外部集成。</li>
+                    <li><a href="api.html">API 接口</a> —— 88 个 REST 端点的完整契约，适合做外部集成。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>
             </main>
 

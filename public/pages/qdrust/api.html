@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 完整 REST API 参考：86 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
+    <meta name="description" content="qdrust 完整 REST API 参考：88 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
     <title>API 接口 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/api.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -189,10 +189,10 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>86 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>88 个端点</strong>，覆盖部署元数据、认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.14</span>
+                    <span class="badge badge-dark">v0.1.20</span>
                     <span class="badge">REST · JSON</span>
                     <span class="badge">OpenAPI 3.1</span>
                     <span class="badge">Cookie + CSRF</span>
@@ -214,9 +214,9 @@
                     <table>
                         <thead><tr><th>资源</th><th>端点数</th><th>公开</th><th>需登录</th><th>需管理员</th></tr></thead>
                         <tbody>
-                            <tr><td><a href="#ep-system">系统与监控</a></td><td>3</td><td>3</td><td>0</td><td>0</td></tr>
+                            <tr><td><a href="#ep-system">系统与监控</a></td><td>4</td><td>4</td><td>0</td><td>0</td></tr>
                             <tr><td><a href="#ep-auth">认证与会话</a></td><td>14</td><td>9</td><td>5</td><td>0</td></tr>
-                            <tr><td><a href="#ep-templates">模板</a></td><td>10</td><td>1</td><td>9</td><td>0</td></tr>
+                            <tr><td><a href="#ep-templates">模板</a></td><td>11</td><td>1</td><td>10</td><td>0</td></tr>
                             <tr><td><a href="#ep-tasks">任务</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
                             <tr><td><a href="#ep-runs">运行记录</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-subscriptions">模板订阅与模板库</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
@@ -224,7 +224,7 @@
                             <tr><td><a href="#ep-public">公共模板与发布申请</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
                             <tr><td><a href="#ep-plugins">外部插件</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-admin">管理员</a></td><td>11</td><td>0</td><td>0</td><td>11</td></tr>
-                            <tr><td><strong>合计</strong></td><td><strong>86</strong></td><td><strong>13</strong></td><td><strong>62</strong></td><td><strong>11</strong></td></tr>
+                            <tr><td><strong>合计</strong></td><td><strong>88</strong></td><td><strong>14</strong></td><td><strong>63</strong></td><td><strong>11</strong></td></tr>
                         </tbody>
                     </table>
 
@@ -254,8 +254,8 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     <table>
                         <thead><tr><th>级别</th><th>数量</th><th>判定方式</th></tr></thead>
                         <tbody>
-                            <tr><td><span class="perm perm-public">公开</span></td><td>13</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
-                            <tr><td><span class="perm perm-user">登录</span></td><td>62</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
+                            <tr><td><span class="perm perm-public">公开</span></td><td>14</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
+                            <tr><td><span class="perm perm-user">登录</span></td><td>63</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
                             <tr><td><span class="perm perm-admin">管理员</span></td><td>11</td><td>在会话有效的基础上再要求 <code>role == "admin"</code>，否则 <code>403 admin_required</code></td></tr>
                         </tbody>
                     </table>
@@ -303,14 +303,15 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 
                 <h2 id="endpoints">接口一览</h2>
                 <p>
-                    下表按资源分组列出全部 86 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
+                    下表按资源分组列出全部 88 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
                     路径参数写作 <code>{id}</code>。
                 </p>
 
-                <h3 id="ep-system">系统与监控 <span class="count">3</span></h3>
+                <h3 id="ep-system">系统与监控 <span class="count">4</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/meta</code></td><td><span class="perm perm-public">公开</span></td><td>部署元数据：发行版本号与默认 WebUI 语言（<code>QDRUST_DEFAULT_LOCALE</code>）。WebUI 在挂载前读取它</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/openapi.json</code></td><td><span class="perm perm-public">公开</span></td><td>内嵌的 OpenAPI 3.1 文档，可直接喂给 Swagger UI</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/health</code></td><td><span class="perm perm-public">公开</span></td><td>存活探针，固定返回服务标识，不检查依赖</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/ready</code></td><td><span class="perm perm-public">公开</span></td><td>就绪探针，额外检查数据库连通性</td></tr>
@@ -338,7 +339,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-templates">模板 <span class="count">10</span></h3>
+                <h3 id="ep-templates">模板 <span class="count">11</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
@@ -352,6 +353,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates/{id}/publish</code></td><td><span class="perm perm-user">登录</span></td><td>提交发布申请，进入管理员审批队列</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/templates/{id}/publish</code></td><td><span class="perm perm-user">登录</span></td><td>撤回申请或从公共模板市场下架</td></tr>
                             <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/templates/{id}/qd-har</code></td><td><span class="perm perm-user">登录</span></td><td>覆盖模板的 QD HAR 内容</td></tr>
+                            <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/templates/{id}/test</code></td><td><span class="perm perm-user">登录</span></td><td>用当前变量立刻试跑一遍已保存的模板：走调度器<strong>同一条执行路径与出站闸门</strong>（同一套限制与政策），但<strong>不创建任务、不落运行记录</strong>，返回步骤与模板的 <code>__log__</code></td></tr>
                         </tbody>
                     </table>
 
@@ -542,7 +544,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-template"><code>Template</code></h3>
-                <p>模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。</p>
+                <p>模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。<code>variables</code> 是需要填写的变量名，<code>variable_defaults</code> 是其中带默认值的那部分（取自 <code>{{name|default("...")}}</code> 的字面量首参）。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -554,9 +556,31 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code>definition</code></td><td>object</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>qd_har</code></td><td>object</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>variables</code></td><td>array&lt;string></td><td>是</td></tr>
+                            <tr><td><code>variable_defaults</code></td><td>object</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>grp</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
                             <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>task_count</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-testtemplate"><code>TestTemplate</code></h3>
+                <p>试跑模板时传入的变量表（<code>variables</code>，可选）。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>variables</code></td><td>object</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-templatetestresult"><code>TemplateTestResult</code></h3>
+                <p>试跑结果：<code>steps</code>（每一步的请求 / 响应 / 提取）、<code>variables</code>（跑完后最终变量）、<code>log</code>（模板的日志）。<strong>不创建任务、不落运行记录。</strong></p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>steps</code></td><td>array&lt;TemplateTestStep></td><td>是</td></tr>
+                            <tr><td><code>variables</code></td><td>object</td><td>是</td></tr>
+                            <tr><td><code>log</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                         </tbody>
                     </table>
 
@@ -605,6 +629,16 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code>title_template</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>body_template</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-meta"><code>Meta</code></h3>
+                <p>部署元数据，WebUI 挂载前读取：<code>version</code>（发行版本号）与 <code>default_locale</code>（默认语言，来自 <code>QDRUST_DEFAULT_LOCALE</code>）。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>version</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>default_locale</code></td><td>enum: zh-CN, en-US</td><td>是</td></tr>
                         </tbody>
                     </table>
 
@@ -800,8 +834,8 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
                 </ul>
                 <p>若你用文档生成客户端 SDK，这些端点需要手动补。</p>
                 <div class="wiki-meta">
-                    <span>基于 qdrust v0.1.14 服务端路由与 OpenAPI 3.1 文档整理</span>
-                    <span>共 86 个端点</span>
+                    <span>基于 qdrust v0.1.20 服务端路由与 OpenAPI 3.1 文档整理</span>
+                    <span>共 88 个端点</span>
                 </div>
             </main>
 

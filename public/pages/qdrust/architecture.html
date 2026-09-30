@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型、API 一览与横向扩展边界。">
+    <meta name="description" content="qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。">
     <title>架构设计 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/architecture.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -271,7 +271,7 @@ success_asserts / failed_asserts → 判定成败
                             <tr><td rowspan="3">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板来源（库地址）；无「导入方式」列——订阅只登记来源，导入由用户逐条决定</td></tr>
                             <tr><td><code>template_imports</code></td><td>来源条目到本地模板的映射（订阅 + 条目名 → 模板 + 上游版本），用于判断「已导入 / 有更新」</td></tr>
                             <tr><td><code>subscription_syncs</code></td><td>同步记录</td></tr>
-                            <tr><td>任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填（分组是 <code>grp</code> 列，无独立分组表）</td></tr>
+                            <tr><td>任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填、绑定的模板（<code>template_id</code>，分组是 <code>grp</code> 列，无独立分组表）</td></tr>
                             <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录、状态与租约列（<code>lease_owner</code> / <code>lease_expires_at</code>，租约不单独建表）</td></tr>
                             <tr><td><code>run_steps</code></td><td>步骤级请求 / 响应 / 提取变量</td></tr>
                             <tr><td rowspan="6">认证</td><td><code>users</code></td><td>用户</td></tr>
@@ -297,8 +297,8 @@ success_asserts / failed_asserts → 判定成败
                 <ul>
                     <li><strong>认证</strong>：本地为开放注册、bootstrap 初始管理员、忘记/重置密码、可选邮箱验证（<code>REQUIRE_EMAIL_VERIFICATION</code>）；登录有独立限流（默认 5 次 / 60 秒）。自托管还可叠加外部身份提供方（OIDC 授权码 + PKCE，或反向代理 Header 认证），本地账号密码能力始终保留，详见<a href="usage.html#external-login">使用指南 · 第三方登录</a>。</li>
                     <li><strong>会话</strong>：<code>SESSION_TTL_SECONDS</code> 默认 7 天；<strong>CSRF 令牌轮换</strong>；HTTPS 下必须开启 <code>COOKIE_SECURE</code>。可选 Redis 会话缓存（仅加速，非必需）。</li>
-                    <li><strong>归属校验</strong>：所有用户资源（模板、任务、运行、通知渠道）均在服务端执行归属校验，而不是依赖前端过滤。</li>
-                    <li><strong>SSRF 防护</strong>：CLI 默认拒绝私网地址、localhost 与无效 TLS 证书——这是刻意区别于旧 QD 宽松策略的一点。服务端执行不受此限制。</li>
+                    <li><strong>归属校验</strong>：所有用户资源（模板、任务、运行、通知渠道）均在服务端执行归属校验，而不是依赖前端过滤。任务绑定模板时，<code>template_id</code> 也<strong>先按调用者自己的归属查找</strong>、之后才考虑请求里带的 URL——指向他人模板一律按「不存在」返回，错误信息也不泄露其存在性。</li>
+                    <li><strong>SSRF 防护（出站闸门）</strong>：服务端默认只请求公网地址，闸门覆盖<strong>全部出站请求</strong>——模板运行、不绑模板的任务、通知渠道与渠道测试、模板订阅抓取、模板里 <code>api://util/dddd</code> 的转发，共五条路径，共用同一套地址校验、连接固定（防 DNS rebinding）与「不跟随重定向」策略。指向内网 / 回环需管理员开启<a href="usage.html#allow-private-network">允许出站请求访问内网地址</a>；放弃证书校验（自签名 / 过期 / 域名不匹配）则另需开启<a href="usage.html#allow-invalid-cert">接受无效证书</a>。两个高风险开关<strong>互相独立</strong>，非布尔取值一律忽略（失败方向是保持关闭）。CLI 更严格：默认一律拒绝私网、localhost 与无效证书。</li>
                     <li><strong>模板沙箱</strong>：模板是声明式 JSON，<strong>不执行 Python 或任意代码</strong>。Template Schema v1 限制最多 1000 个静态步骤、16 层嵌套、单次 delay 最长 5 分钟；运行时另外限制请求数、循环次数、响应体大小与总时长。</li>
                     <li><strong>插件能力声明</strong>：外部插件二进制需带 manifest，声明 <code>network</code> / <code>read_file</code> / <code>write_file</code> / <code>environment</code> 能力并做 API 版本校验，通过子进程 JSON 协议调用。</li>
                 </ul>
@@ -309,9 +309,9 @@ success_asserts / failed_asserts → 判定成败
                     <table>
                         <thead><tr><th>分组</th><th>端点</th></tr></thead>
                         <tbody>
-                            <tr><td>运维</td><td><code>GET /health</code> · <code>GET /ready</code> · <code>GET /api/v1/openapi.json</code></td></tr>
-                            <tr><td>认证</td><td><code>/api/v1/auth/bootstrap</code> · <code>/login</code> · <code>/logout</code> · <code>/register</code> · <code>/session</code></td></tr>
-                            <tr><td>模板</td><td><code>/api/v1/templates</code> · <code>/{id}</code> · <code>/import-qd-har</code> · <code>/validate-qd-har</code> · <code>/{id}/publish</code> · <code>/{id}/qd-har</code></td></tr>
+                            <tr><td>运维</td><td><code>GET /health</code> · <code>GET /ready</code> · <code>GET /api/v1/meta</code>（部署元数据：版本与默认语言） · <code>GET /api/v1/openapi.json</code></td></tr>
+                            <tr><td>认证</td><td><code>/api/v1/auth/bootstrap</code> · <code>/login</code> · <code>/logout</code> · <code>/register</code> · <code>/session</code> · <code>/config</code> · <code>/oidc/start</code> · <code>/oidc/callback</code></td></tr>
+                            <tr><td>模板</td><td><code>/api/v1/templates</code> · <code>/{id}</code> · <code>/{id}/test</code>（试跑） · <code>/import-qd-har</code> · <code>/validate-qd-har</code> · <code>/{id}/publish</code> · <code>/{id}/qd-har</code></td></tr>
                             <tr><td>任务</td><td><code>/api/v1/tasks</code> · <code>/tasks/batch</code> · <code>/task-groups</code> · <code>/tasks/{id}/run</code></td></tr>
                             <tr><td>订阅与模板库</td><td><code>/api/v1/subscriptions</code> · <code>/{id}/sync</code> · <code>/{id}/sync/live</code>（WebSocket） · <code>/api/v1/library</code> · <code>/api/v1/subscriptions/{id}/library</code> · <code>/library/preview</code> · <code>/library/apply</code> · <code>/{id}/import</code></td></tr>
                             <tr><td>运行</td><td><code>GET /api/v1/runs</code>（跨任务日志总览） · <code>/{id}</code> · <code>/{id}/cancel</code> · <code>/{id}/steps</code> · <code>/{id}/steps/live</code>（WebSocket）</td></tr>
@@ -342,7 +342,7 @@ success_asserts / failed_asserts → 判定成败
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>
             </main>
 

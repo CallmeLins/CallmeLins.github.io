@@ -43,6 +43,7 @@ DESC = {
     ("GET", "/health"): "存活探针，固定返回服务标识，不检查依赖",
     ("GET", "/ready"): "就绪探针，额外检查数据库连通性",
     ("GET", "/api/v1/openapi.json"): "内嵌的 OpenAPI 3.1 文档，可直接喂给 Swagger UI",
+    ("GET", "/api/v1/meta"): "部署元数据：发行版本号与默认 WebUI 语言（<code>QDRUST_DEFAULT_LOCALE</code>）。WebUI 在挂载前读取它",
 
     ("POST", "/api/v1/auth/bootstrap"): "创建首个管理员账号；已有用户时返回 409，整个生命周期只能成功一次",
     ("POST", "/api/v1/auth/register"): "注册普通用户；首个用户请改用 bootstrap",
@@ -67,6 +68,7 @@ DESC = {
     ("POST", "/api/v1/templates/import-qd-har"): "导入旧 QD 的 HAR 生成模板并落库",
     ("POST", "/api/v1/templates/validate-qd-har"): "只校验 HAR 能否导入，不写库；WebUI 用它做实时预检",
     ("PUT", "/api/v1/templates/{id}/qd-har"): "覆盖模板的 QD HAR 内容",
+    ("POST", "/api/v1/templates/{id}/test"): "用当前变量立刻试跑一遍已保存的模板：走调度器<strong>同一条执行路径与出站闸门</strong>（同一套限制与政策），但<strong>不创建任务、不落运行记录</strong>，返回步骤与模板的 <code>__log__</code>",
     ("POST", "/api/v1/templates/{id}/publish"): "提交发布申请，进入管理员审批队列",
     ("DELETE", "/api/v1/templates/{id}/publish"): "撤回申请或从公共模板市场下架",
 
@@ -168,7 +170,8 @@ PERM_LABEL = {"public": ("公开", "perm-public"), "user": ("登录", "perm-user
 METHOD_CLASS = {"GET": "m-get", "POST": "m-post", "PUT": "m-put", "DELETE": "m-del", "PATCH": "m-patch"}
 WS_PATHS = {"/api/v1/runs/{id}/steps/live", "/api/v1/subscriptions/{id}/sync/live"}
 
-MODEL_ORDER = ["Task", "Run", "Template", "User", "NotificationChannel", "NotificationAction",
+MODEL_ORDER = ["Task", "Run", "Template", "TestTemplate", "TemplateTestResult", "User",
+               "NotificationChannel", "NotificationAction", "Meta",
                "PushRequest", "TemplateSubscription", "SubscriptionSync", "TemplateLibrary",
                "LibraryOverview", "LibraryEntry", "LibrarySourceStatus", "LibraryImportResult",
                "Plugin", "RunEvent", "ApiError"]
@@ -176,7 +179,10 @@ MODEL_ORDER = ["Task", "Run", "Template", "User", "NotificationChannel", "Notifi
 MODEL_NOTES = {
     "Task": "任务。<code>template_id</code> 是请求来源——任务的请求完全由模板决定；<code>method</code> / <code>url</code> / <code>headers</code> / <code>body</code> 只在未绑定模板的存量任务上使用（列表里展示的方法与 URL 是模板首条请求的镜像）。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。",
     "Run": "一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。",
-    "Template": "模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。",
+    "Template": "模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。<code>variables</code> 是需要填写的变量名，<code>variable_defaults</code> 是其中带默认值的那部分（取自 <code>{{name|default(\"...\")}}</code> 的字面量首参）。",
+    "TestTemplate": "试跑模板时传入的变量表（<code>variables</code>，可选）。",
+    "TemplateTestResult": "试跑结果：<code>steps</code>（每一步的请求 / 响应 / 提取）、<code>variables</code>（跑完后最终变量）、<code>log</code>（模板的日志）。<strong>不创建任务、不落运行记录。</strong>",
+    "Meta": "部署元数据，WebUI 挂载前读取：<code>version</code>（发行版本号）与 <code>default_locale</code>（默认语言，来自 <code>QDRUST_DEFAULT_LOCALE</code>）。",
     "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。",
     "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 11 种渠道（webhook / custom_http / email + 8 种推送）。",
     "NotificationAction": "渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板。",
@@ -519,7 +525,7 @@ def build_part(ops: list[dict], schemas: dict, version: str,
 
     return f"""                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖部署元数据、认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
                 </p>
                 <div class="mb-10">
                     <span class="badge badge-dark">v{version}</span>

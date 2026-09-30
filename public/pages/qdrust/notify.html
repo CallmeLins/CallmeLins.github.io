@@ -199,7 +199,7 @@
                         <thead><tr><th>渠道</th><th>kind</th><th>所需配置</th><th>说明</th></tr></thead>
                         <tbody>
                             <tr><td><strong>Webhook</strong></td><td><code>webhook</code></td><td><code>url</code></td><td>向该 URL <code>POST</code> JSON（含 <code>event</code> / <code>task_name</code> / <code>run_id</code> / <code>http_status</code> / <code>error</code>），<strong>仅接受 HTTPS</strong></td></tr>
-                            <tr><td><strong>自定义 HTTP</strong></td><td><code>custom_http</code></td><td><code>url</code>, <code>method</code>(默认 <code>POST</code>), <code>headers</code>(JSON, 可选), <code>body</code>(可选模板)</td><td>完全自定义的请求，可指向自建的 ntfy / Gotify 等；<strong><code>http</code> 与 <code>https</code> 均可</strong>，便于内网服务</td></tr>
+                            <tr><td><strong>自定义 HTTP</strong></td><td><code>custom_http</code></td><td><code>url</code>, <code>method</code>(默认 <code>POST</code>), <code>headers</code>(JSON, 可选), <code>body</code>(可选模板)</td><td>完全自定义的请求，可指向自建的 ntfy / Gotify 等；<strong><code>http</code> 与 <code>https</code> 均可</strong>。但内网 / 回环地址受<strong>出站闸门</strong>约束，需开启<a href="usage.html#allow-private-network">允许出站请求访问内网地址</a>，且一律不跟随重定向</td></tr>
                             <tr><td><strong>Email</strong></td><td><code>email</code></td><td><code>to</code></td><td>经 SMTP 发送，需先配置 <code>QDRUST_SMTP_*</code></td></tr>
                             <tr><td><strong>Bark</strong></td><td><code>bark</code></td><td><code>url</code></td><td>iOS 推送，形如 <code>https://api.day.app/你的Key</code></td></tr>
                             <tr><td><strong>Server 酱</strong></td><td><code>serverchan</code></td><td><code>sendkey</code></td><td>微信推送 SendKey</td></tr>
@@ -274,13 +274,14 @@
                 <ul>
                     <li><strong>Email 渠道依赖 SMTP</strong>：未配置 <code>QDRUST_SMTP_*</code> 时该渠道不可用，其余渠道不受影响。</li>
                     <li><strong>Webhook 强制 HTTPS</strong>：内网明文投递请改用「自定义 HTTP」渠道。</li>
+                    <li><strong>投递也过出站闸门</strong>：渠道与渠道测试和模板请求走<strong>同一套</strong>地址校验与重定向策略。指向内网 / 回环的渠道（自建 ntfy、内网 GitLab 之类）默认会被拒，报 <code>private or special-use network target is blocked</code>，需开启<a href="usage.html#allow-private-network">允许出站请求访问内网地址</a>；且一律<strong>不跟随重定向</strong>，请直接写最终地址。</li>
                     <li><strong>投递失败不影响任务</strong>：渠道异常只记日志，运行结果本身照常记录。</li>
                     <li><strong>删除渠道会解除绑定</strong>：<code>DELETE /api/v1/notification-channels/{id}</code> 会同时清理引用它的通知动作。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>
             </main>
 

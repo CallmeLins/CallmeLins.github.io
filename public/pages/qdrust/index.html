@@ -192,7 +192,7 @@
                     用 Rust + Vue 3 重写的 <strong>QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.14</span>
+                    <span class="badge badge-dark">v0.1.20</span>
                     <span class="badge">Rust 2024 · 1.85+</span>
                     <span class="badge">MIT</span>
                     <span class="badge">linux / amd64 / arm64</span>
@@ -224,11 +224,12 @@
                     <li><strong>订阅模板库</strong>：订阅官方 QD 模板库（qd-today/templates）或任意兼容规范的第三方库，跨来源汇总浏览、可搜索排序；<strong>点「导入」先预览、保存才入库</strong>，也支持批量直接导入，已导入的模板在新版本出现时可就地更新。详见<a href="usage.html#library">使用指南 · 订阅模板库</a>。</li>
                     <li><strong>双后端数据库</strong>：SQLite（开箱即用）与 MySQL（按 <code>DATABASE_URL</code> 自动选择）。</li>
                     <li><strong>完整通知体系</strong>：Webhook + 自定义 HTTP + Email + 8 种推送渠道，共 <strong>11 种</strong>；支持批量绑定、失败次数阈值、仅自动执行触发与自定义标题 / 正文模板，详见<a href="notify.html">推送与通知</a>。</li>
-                    <li><strong>模板表达式</strong>：minijinja 驱动的 Jinja2 语法，37 个全局函数与 51 个过滤器，外加 <code>api://util/*</code> 内置工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / OCR）。</li>
+                    <li><strong>模板表达式</strong>：minijinja 驱动的 Jinja2 语法，54 个全局函数与 76 个过滤器（含 TOTP / AES / 各类编解码与哈希），外加 <code>api://util/*</code> 内置工具（时间 / 编码 / 哈希 / 正则 / TOTP / JSON / RSA / OCR）。模板变量支持 <code>{{name|default("...")}}</code> 默认值预填，并可用 <code>_proxy</code> 指定单模板代理。</li>
                     <li><strong>无头浏览器插件</strong>（可选）：<code>api://browser/*</code> 通过 CDP 驱动远程无头浏览器，支持跨步骤存活的会话复用与 <code>type</code> / <code>click</code> DOM 操作。</li>
-                    <li><strong>任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。任务的请求完全由<strong>模板</strong>决定（多页模板常混合 GET/POST），任务级不携带请求方法 / URL / 请求头 / 请求体。</li>
-                    <li><strong>运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流，以及跨<strong>全部任务</strong>的「运行日志总览」（可按成功 / 失败与任务筛选、行内取消 / 删除）。列表统一支持分页与每页条数（10 / 20 / 50 / 100，各列表独立记忆）。</li>
-                    <li><strong>安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验。</li>
+                    <li><strong>任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。任务的请求完全由<strong>模板</strong>决定（多页模板常混合 GET/POST），任务级不携带请求方法 / URL / 请求头 / 请求体。模板下拉可输入筛选并把<strong>未使用</strong>的模板排在最前，「我的模板」另带任务数一列与「只看未使用」筛选。</li>
+                    <li><strong>运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流，以及跨<strong>全部任务</strong>的「运行日志总览」（可按成功 / 失败与任务筛选、行内取消 / 删除）。任务状态按「上一轮是否留下错误」判定，连接层失败（超时 / DNS / TLS）也计入「失败」。列表统一支持分页与每页条数（10 / 20 / 50 / 100，各列表独立记忆）。</li>
+                    <li><strong>安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验（任务绑定模板也按所有者隔离）。<strong>统一出站闸门</strong>覆盖全部出站请求——模板运行、无模板任务、通知渠道与测试、订阅抓取、DdddOCR 转发共五条路径，默认只请求公网地址；指向内网或接受无效证书需管理员分别开启两个高风险开关。</li>
+                    <li><strong>中英文界面</strong>：WebUI 支持语言切换，部署时可用 <code>QDRUST_DEFAULT_LOCALE</code> 设定首次访问者的默认语言。</li>
                     <li><strong>外部身份登录</strong>（可选）：OIDC 授权码 + PKCE 对接 authentik / authelia / keycloak / pocket-id，或反向代理 Header 认证（forward-auth）。<strong>本地账号密码始终保留</strong>，详见<a href="usage.html#external-login">使用指南</a>。</li>
                     <li><strong>运维友好</strong>：Docker 镜像（amd64 / arm64）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。</li>
                 </ul>
@@ -267,7 +268,7 @@
                 </div>
 
                 <p>
-                    服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、模板（搜索/分组/分页、可视化 HAR 编辑器、公共发布审批 PushRequest、订阅模板库的汇总 / 预览 / 选择性导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填）、运行记录与步骤、跨任务运行日志总览、WebSocket 实时步骤流、租约恢复、插件系统、11 种通知渠道与渠道测试、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI。
+                    服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、模板（搜索/分组/分页、可视化 HAR 编辑器、试跑测试、公共发布审批 PushRequest、订阅模板库的汇总 / 预览 / 选择性导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填、归属隔离）、运行记录与步骤、跨任务运行日志总览、WebSocket 实时步骤流、租约恢复、插件系统、11 种通知渠道与渠道测试、统一出站闸门与两个高风险网络开关、中英文界面、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI。
                 </p>
 
                 <h2 id="quickstart">30 秒跑起来</h2>
@@ -287,11 +288,11 @@ docker run -d --name qdrust -p 8923:8923 \
                 <div class="card-grid">
                     <a href="deploy.html" class="wiki-card">
                         <h4>部署与运维 →</h4>
-                        <p>Compose 生产配置、反代到二级目录、环境变量全表、数据库选型、备份与升级回滚。</p>
+                        <p>Compose 生产配置、反代到二级目录、环境变量全表（含两个高风险网络开关与默认语言）、数据库选型、备份与升级回滚。</p>
                     </a>
                     <a href="usage.html" class="wiki-card">
                         <h4>使用指南 →</h4>
-                        <p>初始化管理员、导入旧 QD 模板、订阅模板库、创建与运行任务、调度与随机延迟、cron 时区与夏令时、列表分页、CLI。</p>
+                        <p>初始化管理员、导入旧 QD 模板、订阅模板库、创建与运行任务、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、列表分页、CLI。</p>
                     </a>
                     <a href="architecture.html" class="wiki-card">
                         <h4>架构设计 →</h4>
@@ -299,7 +300,7 @@ docker run -d --name qdrust -p 8923:8923 \
                     </a>
                     <a href="templates.html" class="wiki-card">
                         <h4>模板与表达式 →</h4>
-                        <p>HAR 兼容契约、Template Schema v1、变量与断言、函数/过滤器、<code>api://util/*</code> 工具。</p>
+                        <p>HAR 兼容契约、Template Schema v1、变量与断言、函数/过滤器、Python 写法与正则的读法、<code>api://util/*</code> 工具。</p>
                     </a>
                     <a href="browser.html" class="wiki-card">
                         <h4>浏览器插件 →</h4>
@@ -311,7 +312,7 @@ docker run -d --name qdrust -p 8923:8923 \
                     </a>
                     <a href="api.html" class="wiki-card">
                         <h4>API 接口 →</h4>
-                        <p>86 个 REST 端点的完整契约：认证、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
+                        <p>88 个 REST 端点的完整契约：认证、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
                     </a>
                 </div>
 
@@ -322,7 +323,7 @@ docker run -d --name qdrust -p 8923:8923 \
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>
             </main>
 

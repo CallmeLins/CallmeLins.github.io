@@ -103,6 +103,7 @@ QDRUST_BASE_PATH=/qd
                             <tr><td><code>LOGIN_RATE_LIMIT_ATTEMPTS</code><br><code>LOGIN_RATE_LIMIT_WINDOW_SECONDS</code></td><td><code>5</code> / <code>60</code></td><td>登录限流</td></tr>
                             <tr><td><code>LOG_RETENTION_DAYS</code></td><td><code>0</code></td><td>已完成运行记录保留天数（<code>0</code> = 永久）</td></tr>
                             <tr><td><code>QDRUST_DEFAULT_TIMEZONE</code></td><td><code>Asia/Shanghai</code></td><td>未显式设时区的任务按此时区求值 cron（<strong>DST 感知</strong>）。欧美部署可设如 <code>America/New_York</code>。详见<a href="usage.html#timezone">时区与夏令时</a></td></tr>
+                            <tr><td><code>QDRUST_DEFAULT_LOCALE</code></td><td><code>zh-CN</code></td><td><strong>首次访问者</strong>看到的 WebUI 语言：<code>zh-CN</code> 或 <code>en-US</code>（也接受裸 <code>zh</code> / <code>en</code>）。它<strong>只是默认值</strong>：页头语言切换器选过的语言存在该浏览器里，已存偏好永远优先，所以不会覆盖老用户的语言。WebUI 在挂载前经 <code>GET /api/v1/meta</code> 读取它</td></tr>
                             <tr><td><code>QDRUST_BASE_PATH</code></td><td>空</td><td>反代到二级目录时设为该前缀（如 <code>/qd</code>，伺服 <code>https://host/qd</code>）。WebUI 以相对 base 构建、运行时自适应，<strong>无需</strong>为每个前缀重建。置空 = 根路径。详见<a href="#subpath">反向代理到二级目录</a></td></tr>
                             <tr><td><code>QDRUST_SMTP_*</code></td><td>空</td><td>邮件发送（重置密码 / 邮箱验证 / Email 渠道）：<code>_HOST</code> <code>_PORT</code> <code>_USERNAME</code> <code>_PASSWORD</code> <code>_FROM</code></td></tr>
                             <tr><td><code>QDRUST_BASE_URL</code></td><td><code>http://localhost:8923</code></td><td>密码重置 / 邮箱验证邮件中的链接基址</td></tr>
@@ -113,9 +114,15 @@ QDRUST_BASE_PATH=/qd
                             <tr><td><code>QDRUST_AUTH_MODE</code></td><td><code>local</code></td><td>认证模式：<code>local</code> / <code>hybrid</code> / <code>oidc</code>。<code>oidc</code> 会关闭本地登录入口，需保留应急入口时另设 <code>QDRUST_LOCAL_LOGIN_ENABLED=true</code></td></tr>
                             <tr><td><code>QDRUST_OIDC_ENABLED</code><br><code>QDRUST_HEADER_AUTH_ENABLED</code></td><td><code>false</code></td><td>外部登录的独立开关，与 <code>QDRUST_AUTH_MODE</code> 叠加生效</td></tr>
                             <tr><td><code>QDRUST_BROWSER_URL</code></td><td>空</td><td>浏览器插件的 CDP 端点，配置后启用 <code>api://browser/*</code>（客户端为进程内 chromiumoxide，<strong>无需</strong>额外子进程）。取值形如 <code>http://localhost:9222</code> / <code>ws://localhost:3000</code> / <code>wss://chrome.browserless.io?token=...</code>，详见<a href="browser.html#endpoints">端点后端三选一</a></td></tr>
+                            <tr><td><code>QDRUST_ALLOW_PRIVATE_NETWORK</code></td><td><code>false</code></td><td><strong>高风险</strong>：允许<strong>全部出站请求</strong>（模板运行、直接填 URL 的任务、通知渠道、订阅抓取、模板里的 <code>api://util/dddd</code> 转发）访问内网 / 回环 / 链路本地地址。仅在确实依赖内网服务（自建 flaresolverr、内网 ntfy、内网 DdddOCR）时开启。也可在管理页「站点设置」里运行时开关，优先级高于本变量。详见<a href="usage.html#allow-private-network">允许出站请求访问内网地址</a></td></tr>
+                            <tr><td><code>QDRUST_ALLOW_INVALID_CERTIFICATES</code></td><td><code>false</code></td><td><strong>高风险</strong>：不再校验证书（自签名 / 过期 / 域名不匹配都接受）。与上一个开关<strong>互相独立</strong>，可分别开启。同样可在管理页运行时开关，优先级高于本变量。详见<a href="usage.html#allow-invalid-cert">接受无效证书</a></td></tr>
                         </tbody>
                     </table>
                 </div>
+                <p>
+                    末尾两个 <code>QDRUST_ALLOW_*</code> 是<strong>高风险网络开关</strong>的部署时预设：默认关闭，只在确实依赖内网服务或自签证书时打开，
+                    且都能在管理页「站点设置」里运行时改（优先级高于环境变量）。完整风控与升级影响见<a href="usage.html#egress">使用指南 · 出站请求与网络开关</a>。
+                </p>
                 <p>
                     OIDC 与反向代理 Header 认证各自还有一组变量（issuer、client secret、trusted proxies、组到角色的映射等），
                     完整清单与配置示例见<a href="usage.html#external-login">使用指南 · 第三方登录</a>。
@@ -194,5 +201,5 @@ npm --prefix webui run build
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>

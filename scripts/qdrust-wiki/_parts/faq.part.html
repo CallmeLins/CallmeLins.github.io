@@ -60,10 +60,20 @@
 
                 <h3 id="util-missing">插件 / <code>api://util</code> 工具不全？</h3>
                 <p>
-                    <code>api://util/*</code> 已对齐 QD 的核心工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / GB2312 / 字符串替换 / OCR）。
+                    <code>api://util/*</code> 已对齐 QD 的核心工具（时间 / 编码 / 哈希 / 正则 / JSON / RSA / GB2312 / 字符串替换 / OCR / <strong>TOTP</strong>）。
+                    TOTP（RFC 6238）在本地算码，<strong>2FA 密钥不出网</strong>，表达式侧也可以写 <code>{{ totp(secret) }}</code>。
                 </p>
                 <p>
                     旧 QD 的 <em>toolbox</em> 与 <em>notepad</em> 属于 Web 工具箱页面，不在模板 API 范围内，<strong>未移植</strong>。
+                </p>
+
+                <h3 id="template-owner-break">升级后任务忽然报「模板不存在」，或想引用同事的模板报 404？</h3>
+                <p>
+                    v0.1.17 起<strong>模板绑定按任务所有者隔离</strong>：校验任务时，<code>template_id</code> 先按调用者<strong>自己的归属</strong>查找，之后才考虑请求里带的 URL。
+                    此前 URL 会短路这次查找——只要附上任意 URL，就能引用乃至执行<strong>别人的模板</strong>。这是安全修复，同时是<strong>破坏性</strong>的。
+                </p>
+                <p>
+                    指向他人模板的 <code>template_id</code> 现在一律按「不存在」返回（错误信息也不会确认它是否存在）。如果你确实需要共享模板，用「公共模板」发布 / 复制机制，而不是直接引用对方的模板 id。
                 </p>
 
                 <h2 id="scheduling">调度与运行</h2>
@@ -93,17 +103,41 @@
                 <h3 id="log-retention">运行记录越来越多，能自动清理吗？</h3>
                 <p>设置 <code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留），系统每小时清理超出天数的已完成运行。也可以在任务详情页手动清空某个任务的运行历史。</p>
 
+                <h3 id="task-status">任务没拿到响应（超时 / DNS 失败），状态为什么是「失败」？</h3>
+                <p>
+                    「失败」的判据是<strong>上一轮运行是否留下错误</strong>（<code>last_error</code> 非空），而不是只看 HTTP 状态码。
+                    连接层就没成的情况（TLS 握手失败、DNS 解析不了、超时）根本拿不到响应，<code>last_status</code> 是空的——这类运行此前会被显示成「正常」，现在按「失败」计入。
+                    概览卡片的「最近失败」同理。从未运行过的任务是「正常」（两个字段都空）。
+                </p>
+                <p>任务列表的「状态」列还有第三档「<strong>禁用</strong>」（<code>disabled</code>），它优先于「失败」与「正常」。</p>
+
                 <h3 id="random-delay">为什么需要「随机延迟」？</h3>
                 <p>
                     它让同一任务的多次执行在时间上打散，避免被目标站点识别为固定节奏。对于签到类任务，这是一个实用而非装饰性的功能。可视化调度器里直接开启即可。
                 </p>
 
-                <h2 id="network">网络与安全</h2>
+                <h2 id="network">网络、安全与模板行为</h2>
 
                 <h3 id="cli-network">CLI 报网络被拒绝（私网 / localhost / 证书）？</h3>
                 <p>
-                    这是<strong>刻意的安全策略</strong>——CLI 默认拒绝私网、localhost 和无效 TLS 证书，不像旧 QD 那样宽松。服务端执行不受此限制，所以把模板放进服务端运行即可正常工作。
+                    CLI 是<strong>刻意的更严格策略</strong>——默认拒绝私网、localhost 和无效 TLS 证书，不像旧 QD 那样宽松。
                 </p>
+                <p>
+                    <strong>服务端现在也有闸门</strong>：默认只请求公网地址，覆盖模板运行、不绑模板的任务、通知渠道与测试、订阅抓取、<code>api://util/dddd</code> 转发共五条路径。
+                    指向内网 / 回环或使用自签证书时，需要在管理页开启对应的高风险开关——见<a href="#egress-blocked">下一个问题</a>。
+                </p>
+
+                <h3 id="egress-blocked">任务 / 渠道 / 订阅突然报 <code>private or special-use network target is blocked</code>？</h3>
+                <p>
+                    这是 SSRF 防护在起作用（v0.1.16 起<strong>统一覆盖全部出站请求</strong>，不再只是模板）。升级后原先能用的<strong>内网通知渠道</strong>（自建 ntfy）、
+                    <strong>内网 GitLab 订阅源</strong>、<strong>自建 DdddOCR 服务</strong>都会失败，需要到管理页「站点设置」开启
+                    <a href="usage.html#allow-private-network">允许出站请求访问内网地址</a>。
+                </p>
+                <p>
+                    另外两点容易忽略：<strong>出站请求一律不再跟随重定向</strong>（<code>.../raw/...</code> 这类会 302 到 <code>raw.githubusercontent.com</code> 的地址要直接写最终地址）；
+                    代理地址（模板里的 <code>_proxy</code>）<strong>本身也要过同一道闸门</strong>，指向内网需同样开启开关。
+                </p>
+                <p class="text-sm text-gray-500">自签 / 过期证书报的是证书错误而不是 SSRF 错误，那需要另一个开关：<a href="usage.html#allow-invalid-cert">接受无效证书</a>。</p>
 
                 <h3 id="template-sandbox">模板里能写 Python 吗？</h3>
                 <p>
@@ -111,6 +145,21 @@
                 </p>
                 <p>
                     同时有硬性上限：最多 1000 个静态步骤、16 层嵌套、单次 delay 最长 5 分钟，运行期另外限制请求数、循环次数、响应体大小与总时长。
+                </p>
+
+                <h3 id="regex-invalid">模板报 <code>invalid QD regular expression</code>？</h3>
+                <p>
+                    先看报错里点名了什么构造，两类含义相反。以下写法是<strong>旧 QD 的 Python <code>re</code> 认、这里的引擎不认（或会读成别的意思）</strong>的，
+                    需要改写该 <code>re</code>：<code>{m,n}</code> 里 <code>m &gt; n</code>、<code>\N{...}</code>（Python 命名字符）、<code>(?a)</code>（ASCII 内联 flag）。
+                </p>
+                <p>
+                    而 <code>(?&lt;name&gt;…)</code>、<code>(*FAIL)</code> 这类回溯动词、<code>(?-i)</code> 这种「组外关 flag」是<strong>反方向</strong>：
+                    Python 本来就不认，只有这里的引擎会接受——报错是在提醒你这个 <code>re</code> 在 QD 上本来也跑不起来，一并改掉。
+                </p>
+                <p>
+                    <strong>已经支持</strong>、不必再绕开的：lookaround（<code>(?=</code> <code>(?!</code> <code>(?&lt;=</code> <code>(?&lt;!</code>）、反向引用（<code>\1</code>）、
+                    八进制转义（<code>\012</code> / <code>\123</code> / <code>[\1]</code>）与条件组 <code>(?(id)yes|no)</code>。若弹的是「needed more backtracking」，
+                    说明该 <code>re</code> 在回溯引擎里代价过高，改写它就能过。完整规则见<a href="templates.html#regex">模板与表达式 · 正则</a>。
                 </p>
 
                 <h2 id="browser">浏览器插件</h2>
@@ -140,6 +189,12 @@
 
                 <h2 id="misc">其他</h2>
 
+                <h3 id="default-locale">想让首次访问的人默认看到英文界面？</h3>
+                <p>
+                    设 <code>QDRUST_DEFAULT_LOCALE=en-US</code>（也接受裸 <code>en</code>；默认 <code>zh-CN</code>）。它<strong>只是默认值</strong>：
+                    页头语言切换器选过的语言存在该浏览器里，<strong>已存偏好永远优先</strong>，所以它不会把老用户的语言改回去。WebUI 在挂载前经 <code>GET /api/v1/meta</code> 读取它。
+                </p>
+
                 <h3 id="project-status">项目目前处于什么状态？</h3>
                 <p>
                     Phase 0–8 代码与容器已实现完成。首次 GHCR 标签发布与浏览器主要工作流的人工验收需要外部环境执行，项目选择<strong>不在未运行时标记为通过</strong>。
@@ -153,5 +208,5 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-19</span>
+                    <span>最后更新：2026-09-30</span>
                 </div>
