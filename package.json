@@ -58,7 +58,7 @@
     "@iconify-json/simple-icons": "^1.2.93",
     "@lezer/highlight": "^1.2.3",
     "@lucide/svelte": "^1.41.0",
-    "@shikijs/rehype": "^4.0.2",
+    "@shikijs/rehype": "^4.5.0",
     "@types/node": "^26.4.1",
     "emoji-picker-element": "^1.29.1",
     "emoji-picker-element-data": "^1.8.0",
