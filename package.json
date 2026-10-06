@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@aws-sdk/client-s3": "^3.1127.0",
     "@lucide/astro": "^1.41.0",
     "astro": "^7.3.1",
