@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 推送与通知：11 种渠道的 kind 与配置项、渠道测试、通知动作的批量绑定与就地编辑 / 失败阈值 / 仅自动执行、标题与正文模板变量。">
+    <meta name="description" content="qdrust 推送与通知：11 种渠道的 kind 与配置项、渠道测试、绑定预览、账号默认模板、通知动作（批量绑定 / 按任务聚合 / 失败阈值 / 仅自动执行）、标题与正文模板变量。">
     <title>推送与通知 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/notify.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -173,6 +173,7 @@
                 <div class="wiki-nav-title">进阶</div>
                 <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
                 <a href="notify.html" class="wiki-nav-link is-active">推送与通知</a>
+                <a href="mcp.html" class="wiki-nav-link">MCP server</a>
 
                 <div class="wiki-nav-title">参考</div>
                 <a href="api.html" class="wiki-nav-link">API 接口</a>
@@ -189,7 +190,7 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">推送与通知</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    任务成功或失败时把结果推出去：<strong>11 种渠道</strong>、渠道测试、批量绑定与就地编辑、失败阈值、自定义标题与正文模板。
+                    任务成功或失败时把结果推出去：<strong>11 种渠道</strong>、渠道测试与绑定预览、账号级默认模板、批量绑定与按任务聚合、失败阈值、自定义标题与正文模板。
                 </p>
 
                 <h2 id="channels">渠道一览</h2>
@@ -230,12 +231,50 @@
                     <div class="callout-title">渠道级测试验证不了模板</div>
                     <p>
                         标题 / 正文模板挂在「任务↔渠道」的<strong>动作</strong>上而不是渠道上，因此渠道级测试只能验证凭据与网络，不能验证某个动作的模板写对没有。
+                        要检查模板，用下面的「<a href="#preview">预览</a>」。
                     </p>
                 </div>
+
+                <h3 id="preview">预览绑定会「说出什么」</h3>
+                <p>
+                    要检查某个绑定<strong>会说出什么</strong>，在该行点「预览」（<code>GET /api/v1/notification-actions/{id}/preview</code>）：
+                    服务端按<strong>「绑定模板 → 你的默认模板 → 内置模板」</strong>的顺序渲染出标题与正文，<strong>不投递给任何渠道</strong>。
+                    默认拿该任务最近一次运行的真实 <code>{status}</code> / <code>{error}</code> / <code>{log}</code>；任务从未运行时响应里 <code>source</code> 为 <code>sample</code>，
+                    这些变量为空，弹窗会直接说明这一点，免得空的 <code>{log}</code> 看起来像模板写错了。
+                </p>
+                <h4><code>always</code> 绑定的预览</h4>
+                <p>
+                    <code>always</code> 是<strong>绑定的属性</strong>——它在每个终态各推送一次——所以一次投递永远是以 <code>success</code> 或 <code>failure</code> 的身份发出的，
+                    调度器也总是按那一次的真实结果去解析默认模板与 <code>{event}</code> / <code>{status_cn}</code>。预览没有「那一次」，因此默认取
+                    <strong>被预览那次运行的自身结果</strong>（该 run 的 <code>status</code> 为 <code>failed</code> 就按失败渲染，其余按成功；任务从未运行则按成功），也可以自己指定：
+                </p>
+                <pre><code>GET /api/v1/notification-actions/{id}/preview?event=failure</code></pre>
+                <p>
+                    可取值只有 <code>success</code> / <code>failure</code>，其余（包括 <code>always</code>）报 422 —— <code>always</code> 不是一种投递身份。
+                    弹窗在 <code>always</code> 绑定下会给一对「成功 / 失败」按钮，非 <code>always</code> 绑定不显示：它只会以自己那一种结果发出，指定另一种没有意义。
+                    响应里的 <code>event</code> 是<strong>实际渲染用的那个结果</strong>，不是绑定上的 <code>always</code>。
+                </p>
+
+                <h2 id="bind">在哪里绑定（三处入口）</h2>
+                <p><strong>不只有通知页能绑定。</strong>两个就近入口省去来回切页：</p>
+                <ul>
+                    <li>
+                        <strong>任务列表行内的铃铛</strong>：实心＝该任务已绑至少一个渠道，斜线＝没绑。点一下切换——开着时一键清空该任务的全部绑定，
+                        关着时把<strong>所有已启用渠道</strong>各绑一条（默认「失败时」、阈值 1）；一个渠道都没建时会提示先去通知页。
+                        列表行还同时从服务端拿 <code>notification_action_count</code>，所以状态不靠刷新猜。
+                    </li>
+                    <li>
+                        <strong>新建 / 编辑任务弹窗的「开启通知」</strong>：勾上后多选渠道（同样默认「失败时」、阈值 1），建任务和配通知一次完成。
+                        保存时只改<strong>差量</strong>：新勾的渠道加绑定，取消勾的渠道删绑定，<strong>仍勾着的渠道不动</strong>，所以通知页里调过的 event / 阈值 / 标题正文模板不会被这个开关覆盖。
+                        新建任务时绑定在任务创建之后落库（那时才有任务 id）。
+                    </li>
+                </ul>
+                <p>更细的 event / 失败阈值 / 标题正文模板仍在「通知」页的「通知动作」里调。</p>
 
                 <h2 id="actions">通知动作（绑定到任务）</h2>
                 <p>「通知动作」描述「哪个渠道、在什么时机、推给哪个任务」。除了最基础的成功 / 失败 / 总是触发，还支持：</p>
                 <ul>
+                    <li><strong>列表按任务聚合</strong>：绑定列表按任务分组，一个任务一行——任务名、渠道 chip（形如 <code>渠道 · 失败</code>）、绑定条数；该任务几条绑定的事件 / 阈值 / 模板不完全相同时，额外标一个「N 种配置」。多于一条绑定的任务默认折叠，展开后逐条显示，行内可预览 / 编辑 / 删除；只有一个绑定的任务直接展开。行尾的垃圾桶清掉该任务的全部绑定（与任务列表铃铛的「关」是同一个接口），不必回到任务弹窗。</li>
                     <li><strong>就地编辑</strong>：渠道与动作都能直接改，不必删了重建（<code>PUT /api/v1/notification-actions/{id}</code>）。</li>
                     <li><strong>批量绑定</strong>：一次为多个任务创建同一个动作，不必逐个任务重复配置，走 <code>POST /api/v1/notification-actions/batch</code>。</li>
                     <li><strong>失败次数阈值</strong>：连续失败达到阈值后才通知（统计「上次成功之后」的失败次数），过滤偶发网络抖动。</li>
@@ -255,7 +294,8 @@
                     <table>
                         <thead><tr><th>变量</th><th>含义</th></tr></thead>
                         <tbody>
-                            <tr><td><code>{event}</code></td><td>触发事件（成功 / 失败 / 总是）</td></tr>
+                            <tr><td><code>{event}</code></td><td>触发事件（机器值 <code>success</code> / <code>failure</code>）</td></tr>
+                            <tr><td><code>{status_cn}</code></td><td>事件的中文说法：成功 / 失败 / 测试</td></tr>
                             <tr><td><code>{task_id}</code> / <code>{task}</code></td><td>任务 ID 与任务名</td></tr>
                             <tr><td><code>{run_id}</code></td><td>本次运行 ID</td></tr>
                             <tr><td><code>{status}</code></td><td>运行状态</td></tr>
@@ -270,6 +310,38 @@
                     <p>写错的 <code>{...}</code> 不会被替换成空值或报错，而是<strong>原样输出</strong>——所以看到通知里带着一个字面量 <code>{taask}</code>，就是拼错了变量名。</p>
                 </div>
 
+                <h2 id="defaults">默认通知模板（按账号，每个事件一份）</h2>
+                <p>
+                    通知页的「默认通知模板」区可分别给「成功」和「失败」写一套标题 / 正文
+                    （<code>GET</code> / <code>PUT /api/v1/notification-defaults[/{event}]</code>）。绑定自己没有写模板时就用它，三个层级依次回落：
+                </p>
+                <pre><code>绑定自己的模板  →  你的默认模板（同事件）  →  内置模板</code></pre>
+                <p>
+                    所以同一套说法不必在十几个任务的几十条绑定里各写一遍；改默认模板只影响<strong>没写自己模板</strong>的绑定，
+                    <strong>已经单独写过的绑定不受影响</strong>。两项都留空即回到内置模板（输入框里的灰色占位符显示的就是内置模板本身，可以直接抄下来改）。
+                </p>
+                <p>
+                    默认模板只有「成功」「失败」两份，<strong>没有 <code>always</code></strong>：默认模板是<em>某个确定结果的措辞</em>，而 <code>always</code> 是绑定的属性
+                    （它决定这个绑定两种结果都推）。投递时调度器一定是以其中一种结果的身份发出的，所以 <code>always</code> 绑定永远会落到对应的那一份默认模板上，不需要第三份
+                    ——这一点也是 <code>always</code> 预览曾经和真实发送对不上的原因。
+                </p>
+
+                <h3 id="builtin">内置模板</h3>
+                <p>最后兜底的内置模板（<code>failure</code> 与 <code>success</code> 共用一套）：</p>
+                <pre><code>[qdrust] Task "{task}" {event}
+Task: {task}
+Event: {event}
+Run: #{run_id}
+HTTP status: {status}
+Error: {error}
+Time: {t}
+Log: {log}</code></pre>
+                <p>
+                    <code>{log}</code> 就在其中——默认文案现在也带上运行日志。内置模板是一串<strong>模板文本</strong>而不是拼好的字符串，
+                    因此它与用户自己写的模板走同一条渲染路径；两处措辞与旧版不同：标题里的状态词从 <code>succeeded</code> / <code>failed</code> 改成与正文一致的机器值
+                    <code>{event}</code>（<code>success</code> / <code>failure</code>），空变量渲染成空串而不是旧的 <code>-</code>。想要旧措辞的话，把上面两行抄进「默认通知模板」再改即可。
+                </p>
+
                 <h2 id="ops">运维要点</h2>
                 <ul>
                     <li><strong>Email 渠道依赖 SMTP</strong>：未配置 <code>QDRUST_SMTP_*</code> 时该渠道不可用，其余渠道不受影响。</li>
@@ -281,7 +353,7 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-30</span>
+                    <span>最后更新：2026-10-12</span>
                 </div>
             </main>
 

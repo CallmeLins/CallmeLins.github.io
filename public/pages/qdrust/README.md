@@ -8,14 +8,15 @@ qdrust 的项目介绍站，采用 **Wiki 风格**（侧边目录 + 正文 + 本
 
 ```
 public/pages/qdrust/
-├── index.html          # 总览：定位、核心特性、与 QD 的关系、快速上手
-├── deploy.html         # 部署与运维：Docker / Compose、反代到二级目录、环境变量、数据库、通知、备份回滚
-├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、订阅模板库、任务、出站请求与网络开关、调度与时区、日志总览、列表分页、CLI
+├── index.html          # 总览：定位、核心特性、与 QD 的关系、项目组成、快速上手
+├── deploy.html         # 部署与运维：Docker / Compose、反代到二级目录、环境变量、数据库、通知、程序化接入、备份回滚
+├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、订阅模板库、任务、记事本（跨运行状态）、出站请求与网络开关、调度与 cron 段数、日志总览、列表分页、CLI
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全（出站闸门）、API
-├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器、Python 写法、正则与编码、util 工具
+├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器（含参数）、Python 写法、正则与编码、util 工具、记事本
 ├── browser.html        # 浏览器插件：api://browser/* 的 action、会话用法、生命周期与限制
-├── notify.html         # 推送与通知：11 种渠道、渠道测试、通知动作（批量绑定 / 就地编辑）、标题正文模板变量
-├── api.html            # API 接口：88 个 REST 端点的路径与权限、认证、错误码、数据模型、调用示例
+├── mcp.html            # MCP server：安装、客户端配置、让 AI 代配的提示词、27 个工具、排障与限制
+├── notify.html         # 推送与通知：11 种渠道、渠道测试、绑定预览、账号默认模板、通知动作（批量绑定 / 按任务聚合 / 就地编辑）、标题正文模板变量
+├── api.html            # API 接口：99 个 REST 端点的路径与权限、认证与 API 令牌、错误码、数据模型、调用示例
 ├── faq.html            # 常见问题
 └── README.md           # 本文档
 ```
@@ -48,7 +49,7 @@ npm run build
 
 ### 页面的更新方式
 
-成品页由**外壳 + 正文片段**拼装而成，**不要直接改** `architecture / templates / browser / notify / deploy / usage / faq` 这 7 个 HTML——改了会被下次生成覆盖：
+成品页由**外壳 + 正文片段**拼装而成，**不要直接改** `usage / architecture / templates / browser / mcp / deploy / notify / faq` 这 8 个 HTML——改了会被下次生成覆盖：
 
 | 改什么 | 改哪里 |
 |---|---|
@@ -79,12 +80,13 @@ qdrust 的 README 已精简为**指路页**，详细内容拆进了仓库的 `do
 | 架构设计 | `docs/adr/`（尤其 `0008-ssrf-dns.md`）+ `docs/design/threat-model.md` + `crates/*` 源码 + `migrations/` |
 | 模板与表达式 | `docs/expressions.md` + `docs/reference.md`（正则与兼容范围）+ `crates/qdrust-core/src/expression.rs`、`plugin.rs` |
 | 浏览器插件 | `docs/browser-plugin.md` + `crates/qdrust-plugin-browser/src/` |
+| MCP server | `docs/mcp.md` + `mcp/`（`pyproject.toml`、`src/`、`tests/test_server.py` 的 `EXPECTED_TOOLS`） |
 | API 接口 | `docs/openapi-v1.json` + `crates/qdrust-server/src/api.rs` 路由注册 + `docs/reference.md`（错误码约定） |
 | 常见问题 | `docs/faq.md`（wiki 另有分组与补充） |
 
 > 表达式的函数 / 过滤器清单、`api://util/*` 工具清单、浏览器 action 清单、通知渠道 <code>kind</code> 清单均从源码核对得出，与文档的概述性表述有出入时以源码为准。
 >
-> 关于文档与源码不一致：`docs/expressions.md` 的概述写「27 个过滤器 + 39 个函数」，与源码实际注册数（wiki 采用的）不符——实际是 **54 个全局函数 / 76 个过滤器**，其中 **43 个**通过 `qd_fn!` 同时注册为函数与过滤器（另有 `__qd_list` 等 3 个 `__` 开头的引擎内部辅助项不计入）。`docs/notifications.md` 还把 `custom_http` 写成「`http` 与 `https` 均可，便于内网服务」，但 v0.1.16 起通知渠道也受统一出站闸门约束——指向内网需开启开关，wiki 已按实现表述。
+> 关于文档与源码不一致：`docs/expressions.md` 的概述写「27 个过滤器 + 39 个函数」，与源码实际注册数（wiki 采用的）不符——实际是 **54 个全局函数 / 76 个过滤器**，其中 **43 个**通过 `qd_fn!` 同时注册为函数与过滤器（另有 `__qd_list` 等 3 个 `__` 开头的引擎内部辅助项不计入）。`docs/notifications.md` 还把 `custom_http` 写成「`http` 与 `https` 均可，便于内网服务」，但 v0.1.16 起通知渠道也受统一出站闸门约束——指向内网需开启开关，wiki 已按实现表述。`docs/mcp.md` 写「23 个工具」，实际是 **27 个**（以 `mcp/tests/test_server.py` 的 `EXPECTED_TOOLS` 为准），mcp.html 已点明。
 
 ### API 页面的更新方式
 
@@ -104,11 +106,11 @@ python scripts/gen-qdrust-api.py --qdrust D:/code/qdrust
    路由注册在源码里分两段，脚本都扫：inner（`Router::new()` 到 `let state = AppState {`，含 API 与 SPA）与 root（`let mut root = Router::new()` 到 `root.with_state`，只含 `/health`、`/ready` 探针——它们刻意留在根路径，不受 `QDRUST_BASE_PATH` 影响）。
 2. `docs/openapi-v1.json` —— 给出参数、请求体、响应与 `components.schemas`。
 
-脚本会自动补两份数据的缺口：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，源码里已注册却未进文档的端点也会一并补入，并在页面末尾的「与 OpenAPI 文档的差异」列出——**条数与清单都是动态生成的**，不用手改（当前 5 处：`DELETE /admin/users/{id}`、3 个 OIDC 登录端点、`POST /notification-actions/batch`）。
+脚本会自动补两份数据的缺口：OpenAPI 不收录文档自身端点 `/api/v1/openapi.json`，源码里已注册却未进文档的端点也会一并补入，并在页面末尾的「与 OpenAPI 文档的差异」列出——**条数与清单都是动态生成的**，不用手改（当前 6 处：`DELETE /api/v1/admin/users/{id}`、`DELETE /api/v1/tasks/{id}/notification-actions`、`GET /api/v1/auth/config`、`GET /api/v1/auth/oidc/callback`、`GET /api/v1/auth/oidc/start`、`POST /api/v1/notification-actions/batch`）。
 
 新增端点时只需在脚本的 `DESC` 字典补一条中文说明，`GROUPS` 列表调整分组规则，其余全部随源码自动更新。
 
-> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数（当前 **88**：公开 14 / 需登录 63 / 管理员 11，对应 qdrust v0.1.20），与上次对比是否异常下降。
+> ⚠️ 脚本靠**字符串锚点**定位路由段，qdrust 若重构这段代码（比如改名 `inner` / `root`、调整 `AppState` 构造位置）会导致解析失败或静默漏端点。报错时先核对上述锚点是否还在；跑完也请留意输出的端点总数（当前 **99**：公开 14 / 需登录 74 / 管理员 11，对应 qdrust v0.1.25），与上次对比是否异常下降。
 
 ## 🔗 相关链接
 

@@ -45,6 +45,15 @@ DESC = {
     ("GET", "/api/v1/openapi.json"): "内嵌的 OpenAPI 3.1 文档，可直接喂给 Swagger UI",
     ("GET", "/api/v1/meta"): "部署元数据：发行版本号与默认 WebUI 语言（<code>QDRUST_DEFAULT_LOCALE</code>）。WebUI 在挂载前读取它",
 
+    ("GET", "/api/v1/tokens"): "列出当前用户的 API 令牌：只返回名称、创建 / 最近使用 / 过期时间，<strong>不返回密钥</strong>",
+    ("POST", "/api/v1/tokens"): "新建 API 令牌：明文 <code>qd_…</code> <strong>只在响应里出现一次</strong>（服务端只存 SHA-256），可选 <code>expires_in_days</code>。等同属主账号的完整权限",
+    ("DELETE", "/api/v1/tokens/{id}"): "吊销一个令牌，下一次请求即生效（<code>401</code>）；创建与吊销各写一条审计记录",
+
+    ("GET", "/api/v1/notepads"): "列出本账号的记事本槽位（按槽位号升序），每项带 <code>preview</code> / <code>content_size</code> / <code>updated_at</code>；完整内容在打开某个槽位时才取",
+    ("GET", "/api/v1/notepads/{notepad_id}"): "读取一个槽位的完整内容；不存在返回 <code>404</code>",
+    ("PUT", "/api/v1/notepads/{notepad_id}"): "写入一个槽位：<strong>不存在则创建</strong>（<code>201</code>），已存在则覆盖（<code>200</code>）。单次写入上限 256 KiB（模板侧写同一个槽位可到 5 MiB）",
+    ("DELETE", "/api/v1/notepads/{notepad_id}"): "删除一个槽位；不存在返回 <code>404</code>",
+
     ("POST", "/api/v1/auth/bootstrap"): "创建首个管理员账号；已有用户时返回 409，整个生命周期只能成功一次",
     ("POST", "/api/v1/auth/register"): "注册普通用户；首个用户请改用 bootstrap",
     ("POST", "/api/v1/auth/login"): "登录并下发会话 Cookie；失败会计入限流窗口",
@@ -94,10 +103,7 @@ DESC = {
     ("POST", "/api/v1/subscriptions"): "新增模板订阅",
     ("GET", "/api/v1/subscriptions/{id}"): "获取单个订阅",
     ("PUT", "/api/v1/subscriptions/{id}"): "更新订阅地址或启停状态",
-    ("DELETE", "/api/v1/subscriptions/{id}"): "删除订阅",
-    ("POST", "/api/v1/subscriptions/{id}/sync"): "立即同步一次，异步执行",
-    ("GET", "/api/v1/subscriptions/{id}/syncs"): "列出同步历史与结果",
-    ("GET", "/api/v1/subscriptions/{id}/sync/live"): "WebSocket 推送同步进度",
+    ("DELETE", "/api/v1/subscriptions/{id}"): "删除订阅，并清除其来源记录（<strong>已导入的模板会保留</strong>）。订阅只是「登记来源」，没有「同步 / 自动导入」这一步",
     ("GET", "/api/v1/library"): "汇总<strong>所有已启用来源</strong>的模板目录，附每个来源的结果与错误；带 90 秒短缓存（按仓库 URL）",
     ("GET", "/api/v1/subscriptions/{id}/library"): "列出<strong>单个来源</strong>提供的模板，并标记「已导入 / 有更新」",
     ("GET", "/api/v1/subscriptions/{id}/library/preview"): "取出一个条目的内容供预览，<strong>不落库</strong>；条目名走查询参数（它是来源自起的自由字符串，可能含 <code>/</code>）",
@@ -114,8 +120,12 @@ DESC = {
     ("POST", "/api/v1/notification-channels/{id}/test"): "用真实配置立刻发一条测试消息；走调度器同一条投递路径，失败原因直接返回",
     ("GET", "/api/v1/tasks/{id}/notification-actions"): "列出任务已绑定的通知渠道与触发时机",
     ("POST", "/api/v1/tasks/{id}/notification-actions"): "把渠道绑定到任务，指定在成功 / 失败 / 总是时推送",
+    ("DELETE", "/api/v1/tasks/{id}/notification-actions"): "解除该任务的<strong>全部</strong>通知绑定（任务列表行内铃铛的「关」走这里）",
     ("POST", "/api/v1/notification-actions/batch"): "批量把同一渠道绑定到多个任务",
     ("DELETE", "/api/v1/notification-actions/{id}"): "解除绑定",
+    ("GET", "/api/v1/notification-actions/{id}/preview"): "渲染某条绑定<strong>会发出的</strong>标题与正文，<strong>不投递</strong>：按「绑定模板 → 账号默认模板 → 内置模板」逐级回落，默认取该任务最近一次运行的真实值。<code>always</code> 绑定须用 <code>event=success|failure</code> 指定按哪种结果渲染",
+    ("GET", "/api/v1/notification-defaults"): "读取本账号按事件（成功 / 失败）设置的<strong>默认标题 / 正文模板</strong>，并附带兜底的内置模板",
+    ("PUT", "/api/v1/notification-defaults/{event}"): "写入某个事件（<code>success</code> / <code>failure</code>）的默认模板；传空串即清除、回落到内置模板。只影响没写自己模板的绑定",
 
     ("GET", "/api/v1/public-templates"): "列出公共模板市场已通过审批的模板",
     ("POST", "/api/v1/public-templates/{id}/copy"): "把公共模板复制到自己的模板库",
@@ -148,10 +158,12 @@ DESC = {
 GROUPS = [
     ("system", "系统与监控", []),
     ("auth", "认证与会话", ["/api/v1/auth/"]),
+    ("tokens", "API 令牌", ["/api/v1/tokens"]),
     ("templates", "模板", ["/api/v1/templates", "/api/v1/templates/{id}"]),
     ("tasks", "任务", ["/api/v1/tasks", "/api/v1/task-groups"]),
     ("runs", "运行记录", ["/api/v1/runs"]),
     ("subscriptions", "模板订阅与模板库", ["/api/v1/subscriptions", "/api/v1/library"]),
+    ("notepads", "记事本", ["/api/v1/notepads"]),
     ("notifications", "通知渠道与绑定", ["/api/v1/notification-", "/api/v1/tasks/{id}/notification-actions"]),
     ("public", "公共模板与发布申请", ["/api/v1/public-templates", "/api/v1/push-requests"]),
     ("plugins", "外部插件", ["/api/v1/plugins"]),
@@ -168,11 +180,13 @@ EXACT = {
 
 PERM_LABEL = {"public": ("公开", "perm-public"), "user": ("登录", "perm-user"), "admin": ("管理员", "perm-admin")}
 METHOD_CLASS = {"GET": "m-get", "POST": "m-post", "PUT": "m-put", "DELETE": "m-del", "PATCH": "m-patch"}
-WS_PATHS = {"/api/v1/runs/{id}/steps/live", "/api/v1/subscriptions/{id}/sync/live"}
+WS_PATHS = {"/api/v1/runs/{id}/steps/live"}
 
 MODEL_ORDER = ["Task", "Run", "Template", "TestTemplate", "TemplateTestResult", "User",
-               "NotificationChannel", "NotificationAction", "Meta",
-               "PushRequest", "TemplateSubscription", "SubscriptionSync", "TemplateLibrary",
+               "NotificationChannel", "NotificationAction", "NotificationDefaults",
+               "NotificationDefaultTemplate", "NotificationPreview",
+               "Meta", "ApiToken", "CreateApiToken", "IssuedApiToken", "SetNotepad",
+               "PushRequest", "TemplateSubscription", "TemplateLibrary",
                "LibraryOverview", "LibraryEntry", "LibrarySourceStatus", "LibraryImportResult",
                "Plugin", "RunEvent", "ApiError"]
 
@@ -185,9 +199,15 @@ MODEL_NOTES = {
     "Meta": "部署元数据，WebUI 挂载前读取：<code>version</code>（发行版本号）与 <code>default_locale</code>（默认语言，来自 <code>QDRUST_DEFAULT_LOCALE</code>）。",
     "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。",
     "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 11 种渠道（webhook / custom_http / email + 8 种推送）。",
-    "NotificationAction": "渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板。",
+    "NotificationAction": "渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板（留空则回落到账号默认模板）。",
+    "NotificationDefaults": "账号级的默认通知模板：<code>defaults</code> 是每个事件各自的模板，<code>builtin</code> 是没设默认值时兜底的内置模板。渲染顺序为「绑定自己的模板 → 这里的默认模板 → 内置模板」。",
+    "NotificationDefaultTemplate": "某个事件（<code>success</code> / <code>failure</code>）的默认标题与正文模板，模板变量见推送 / 通知页。",
+    "NotificationPreview": "一次「预览」的结果：渲染出的 <code>title</code> / <code>body</code>、实际使用的 <code>event</code>，以及取值的 <code>source</code>（<code>latest_run</code> 真实运行 / <code>sample</code> 样例）。<strong>预览不投递</strong>。",
+    "ApiToken": "一个 API 令牌的元数据（<strong>不含密钥</strong>）：<code>name</code>、<code>created_at</code>、<code>last_used_at</code>、<code>expires_at</code>。",
+    "CreateApiToken": "新建令牌的请求体：<code>name</code> 必填，<code>expires_in_days</code> 可选（留空不过期）。",
+    "IssuedApiToken": "新建令牌的响应：在 <code>ApiToken</code> 之外多一个 <code>token</code> 字段，即明文 <code>qd_…</code>，<strong>只在此处出现一次</strong>。",
+    "SetNotepad": "写入一个记事本槽位的请求体（<code>content</code>）。页面写入上限 256 KiB；模板侧 <code>api://util/toolbox/notepad</code> 可写到 5 MiB。",
     "TemplateSubscription": "订阅的模板来源（库地址）。它只登记一个来源目录，<strong>不会</strong>自动把模板拉进本地；是否导入由用户在公共模板列表里逐条决定。",
-    "SubscriptionSync": "一次来源同步的结果记录。",
     "TemplateLibrary": "单个来源的目录：<code>source_kind</code> 标明它是按清单（<code>manifest</code>）读的还是扫描文件（<code>files</code>）得到的，<code>entries</code> 是条目列表。",
     "LibraryOverview": "所有已启用来源的汇总：<code>entries</code>（跨来源的条目）、<code>sources</code>（每个来源的结果与错误）、<code>truncated</code>（条目数是否触及上限被截断）。一个读不动的来源不会让整张表变空，它单独出现在 <code>sources</code> 的错误里。",
     "LibraryEntry": "模板库里的一个条目。<code>installed</code> / <code>installed_template_id</code> / <code>installed_version</code> 由本地库现算，<code>update_available</code> 表示上游版本比本地新。",
@@ -525,7 +545,7 @@ def build_part(ops: list[dict], schemas: dict, version: str,
 
     return f"""                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖部署元数据、认证、模板、任务调度、运行记录、订阅模板库、通知、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>{n} 个端点</strong>，覆盖部署元数据、认证与 API 令牌、模板、任务调度、运行记录、订阅模板库、通知、记事本、插件与站点管理。
                 </p>
                 <div class="mb-10">
                     <span class="badge badge-dark">v{version}</span>
@@ -557,7 +577,7 @@ def build_part(ops: list[dict], schemas: dict, version: str,
 
                 <h2 id="auth">认证与会话</h2>
                 <p>
-                    认证走 <strong>Cookie</strong>，不使用 Bearer Token。登录成功后服务端下发两个 Cookie：
+                    浏览器侧走 <strong>Cookie</strong>。登录成功后服务端下发两个 Cookie：
                 </p>
                     <table>
                         <thead><tr><th>Cookie</th><th>属性</th><th>作用</th></tr></thead>
@@ -570,12 +590,21 @@ def build_part(ops: list[dict], schemas: dict, version: str,
                     <strong>写操作需带 CSRF 头</strong>：<code>POST</code> / <code>PUT</code> / <code>PATCH</code> / <code>DELETE</code> 必须携带
                     <code>x-csrf-token</code>，其值与 <code>qd_csrf</code> Cookie 完全一致。服务端会做两件事——比对 Cookie 与头是否相同，再校验其哈希是否与会话中记录的相符，任一不符即 <code>403 csrf_validation_failed</code>。比对用常量时间，不泄漏时序信息。
                 </p>
+                <div class="callout">
+                    <div class="callout-title">脚本 / CI 用 Bearer 令牌，不走 Cookie</div>
+                    <p>
+                        在「设置 → API 令牌」新建的个人访问令牌（<code>qd_…</code>）用请求头
+                        <code>Authorization: Bearer qd_…</code> 调用，<strong>不需要 Cookie、也跳过 CSRF 校验</strong>——浏览器不会自动携带该头，没有跨站可利用的东西。
+                        令牌等同属主账号的完整权限（目前<strong>没有 scope</strong>），请当作密码保管；明文只在创建时返回一次，服务端只存 SHA-256。
+                        管理接口见下表的 <a href="#ep-tokens">API 令牌</a>分组；MCP server 就是靠它接入的（见 <a href="mcp.html">MCP server</a>）。
+                    </p>
+                </div>
                 <pre><code># 浏览器里取出 CSRF Cookie 并回写
 curl -X POST http://localhost:5000/api/v1/tasks \\
   -b "qd_session=$SESSION; qd_csrf=$CSRF" \\
   -H "x-csrf-token: $CSRF" \\
   -H "Content-Type: application/json" \\
-  -d '{{"name":"签到","cron":"0 9 * * *","url":"https://example.com"}}'</code></pre>
+  -d '{{"name":"签到","cron":"0 0 9 * * *","url":"https://example.com"}}'</code></pre>
 
                 <h3 id="auth-levels">三种权限级别</h3>
                     <table>
@@ -637,14 +666,13 @@ curl -X POST http://localhost:5000/api/v1/tasks \\
 {chr(10).join(tables)}
                 <h2 id="websocket">WebSocket 实时接口</h2>
                 <p>
-                    两个实时端点都用<strong>普通 HTTP 握手升级</strong>，因此仍走同一套 Cookie 鉴权——浏览器可直接连，非浏览器客户端带上 <code>qd_session</code> 即可。
+                    实时端点用<strong>普通 HTTP 握手升级</strong>，因此仍走同一套 Cookie 鉴权——浏览器可直接连，非浏览器客户端带上 <code>qd_session</code> 即可。
                     服务端以文本帧推送 JSON，客户端无需发送任何消息。
                 </p>
                     <table>
                         <thead><tr><th>端点</th><th>推送内容</th></tr></thead>
                         <tbody>
                             <tr><td><code>/api/v1/runs/{{id}}/steps/live</code></td><td>该次运行的步骤明细与状态变更</td></tr>
-                            <tr><td><code>/api/v1/subscriptions/{{id}}/sync/live</code></td><td>模板订阅的同步进度</td></tr>
                         </tbody>
                     </table>
                 <p>
@@ -681,7 +709,7 @@ curl -b jar.txt -X POST http://localhost:5000/api/v1/templates/import-qd-har \\
 # 4) 建任务，绑定模板并配 cron
 curl -b jar.txt -X POST http://localhost:5000/api/v1/tasks \\
   -H "x-csrf-token: $CSRF" -H "Content-Type: application/json" \\
-  -d '{{"name":"签到","cron":"0 9 * * *","template_id":1,"timezone":"Asia/Shanghai"}}'
+  -d '{{"name":"签到","cron":"0 0 9 * * *","template_id":1,"timezone":"Asia/Shanghai"}}'
 
 # 5) 立刻跑一次（202 表示已入队，不等待执行）
 curl -b jar.txt -X POST http://localhost:5000/api/v1/tasks/1/run \\

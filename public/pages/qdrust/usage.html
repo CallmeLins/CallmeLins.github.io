@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离）、可视化 HAR 编辑器、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。">
+    <meta name="description" content="qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离、就地开关通知）、可视化 HAR 编辑器、模板跨运行状态（记事本）、出站请求与两个高风险网络开关、调度与随机延迟、cron 六段格式与时区、运行日志总览、列表分页与 CLI。">
     <title>使用指南 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/usage.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -173,6 +173,7 @@
                 <div class="wiki-nav-title">进阶</div>
                 <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
                 <a href="notify.html" class="wiki-nav-link">推送与通知</a>
+                <a href="mcp.html" class="wiki-nav-link">MCP server</a>
 
                 <div class="wiki-nav-title">参考</div>
                 <a href="api.html" class="wiki-nav-link">API 接口</a>
@@ -189,7 +190,7 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、可视化编辑 HAR、出站请求与两个高风险网络开关、配置调度与随机延迟、cron 时区与夏令时、查看运行日志，以及命令行工具。
+                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、用记事本让模板跨运行记住状态、可视化编辑 HAR、出站请求与两个高风险网络开关、配置调度与随机延迟、cron 格式与时区、查看运行日志，以及命令行工具。
                 </p>
 
                 <h2 id="first-run">首次启动与管理员</h2>
@@ -352,6 +353,11 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                         用户改动优先）、配置 cron / 间隔调度。弹窗里的「<strong>测试</strong>」会立刻用当前变量跑一遍模板
                         （走调度器同一条执行路径与出站闸门，但<strong>不创建任务、不落运行记录</strong>），确认断言和变量没问题再保存。
                     </li>
+                    <li>
+                        <strong>要推通知</strong>就勾弹窗里的「开启通知」并多选渠道（默认「失败时」、阈值 1），建任务和配通知一次完成；
+                        任务列表行内的<strong>铃铛</strong>显示该任务当前有没有绑定，点一下可一键开关（开启＝把<strong>所有已启用渠道</strong>各绑一条）。
+                        更细的 event / 阈值 / 标题正文模板见<a href="notify.html">推送与通知</a>。
+                    </li>
                     <li>用「立即运行」手动触发，或在运行记录中查看每一步的<strong>请求 / 响应 / 提取变量</strong>；支持取消正在执行的运行。</li>
                     <li>模板页提供<strong>两种导入来源</strong>：从本地导入 QD HAR，或从<a href="#library">订阅的模板库</a>里挑——后者是<strong>先预览、保存才入库</strong>。本站公开模板经 PushRequest 审批后发布。</li>
                 </ol>
@@ -376,6 +382,30 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                 <p>
                     WebUI 提供可视化编辑器，可直接增删改请求、设置<strong>请求头 / 表单 / 鉴权</strong>、编写
                     <code>success_asserts</code> 与 <code>extract_variables</code>，无需手改 JSON。
+                </p>
+
+                <h2 id="notepad">模板怎么跨运行记住状态（记事本）</h2>
+                <p>
+                    任务的<strong>变量表</strong>是运行期的<strong>只读种子</strong>：模板能读它，跑完不会把新值写回。要让模板自己记住东西（QD 里最常见的是 cookie 滑动续期，
+                    其次是记页码、累计次数、去重 id），用 <code>api://util/toolbox/notepad</code> —— 和 QD 同一个接口、同一套参数。
+                </p>
+                <pre><code>读：  api://util/toolbox/notepad?f=read&amp;id_notepad=1
+写：  api://util/toolbox/notepad?f=write&amp;id_notepad=1&amp;data={{新值}}
+追加：api://util/toolbox/notepad?f=append&amp;id_notepad=1&amp;data={{新值}}</code></pre>
+                <ul>
+                    <li><strong>不管读写，响应体都是操作之后的当前值</strong>。所以 <code>f=write</code> 那一步既存下了新值，又能被 <code>extract_variables</code> 提取出来给后面的步骤用——
+                        一个步骤顶两步，「存」与「取」不会对不上。</li>
+                    <li><strong>槽位默认是 1，第一次读它就会自动创建</strong>，不用担心首次运行槽位不存在。其它槽位缺失会报「记事本不存在」；
+                        要在槽位 2 以上存东西，先在<strong>记事本页面</strong>上新建，或让模板用 <code>api://util/toolbox/notepad/list?f=add</code> 建出来。</li>
+                    <li>一个账号最多 <strong>20</strong> 个槽位，单个槽位最多 <strong>5 MiB</strong>。</li>
+                    <li><strong>账号取自这次运行</strong>，不读 URL 里的 <code>email</code> / <code>pwd</code>。QD 模板带着这两个参数也能跑，但它们不会被使用——不必为了迁移把账号密码写进模板。</li>
+                    <li><strong>「测试」按钮跑模板一样会写状态</strong>。测试走的是调度器同一条执行路径，所以试跑一个续期 cookie 的模板，用的就是那份真实槽位。
+                        要试而不改，先把 <code>f=write</code> / <code>f=append</code> 那几步的 <code>f</code> 改成 <code>read</code>。</li>
+                </ul>
+                <p class="text-sm text-gray-500">
+                    Web 侧另有<strong>记事本页面</strong>（侧边栏入口），可查看、新建、编辑、删除槽位，与模板侧共用同一份 <code>(账号, 槽位)</code> 数据；
+                    侧边栏页面把写入限制在 256 KiB（模板侧可写 5 MiB）。完整语义与与 QD 的刻意差异见
+                    <a href="templates.html#notepad">模板与表达式 · 记事本</a>，接口见 <a href="api.html#ep-notepads">API 接口 · 记事本</a>。
                 </p>
 
                 <h2 id="egress">出站请求与网络开关</h2>
@@ -467,10 +497,30 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <li><strong>变量预填</strong>：模板里写成 <code>{{name|default("...")}}</code> 的变量，在创建任务时会自动预填该默认值（用户改动优先）。</li>
                 </ul>
 
+                <h3 id="cron-fields">cron 要写几段</h3>
+                <p>
+                    <code>cron</code> 必须是 <strong>6 段或 7 段，第一段是秒</strong>：<code>秒 分 时 日 月 周 [年]</code>，此外也接受 <code>@daily</code> 这类单 token 简写。
+                    这跟旧 QD 常见的 <strong>5 段</strong>（<code>分 时 日 月 周</code>）<strong>不通用</strong>，从 QD 迁过来的任务要在最前面补一个秒位：
+                </p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>旧 QD（5 段）</th><th>这里（6 段）</th><th>含义</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>21 03 * * *</code></td><td><code>0 21 03 * * *</code></td><td>每天 03:21</td></tr>
+                            <tr><td><code>0 9 * * *</code></td><td><code>0 0 9 * * *</code></td><td>每天 09:00</td></tr>
+                            <tr><td><code>*/30 * * * *</code></td><td><code>0 */30 * * * *</code></td><td>每 30 分钟</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    段数不对会当场被拒（<code>422 validation_error</code>，message 形如 <code>invalid cron expression "0 9 * * *": expected 6-7 fields (sec min hour day-of-month month day-of-week [year]) or a shorthand like @daily</code>）。
+                    WebUI 的可视化调度器生成的就是 7 段格式，只有手工填写或脚本批量导入时才需要注意这一点。
+                </p>
+
                 <h3 id="timezone">时区与夏令时</h3>
                 <p>cron 按<strong>每个任务各自的 IANA 时区</strong>（<code>timezone</code> 字段）求值，<strong>DST 感知</strong>：</p>
                 <ul>
-                    <li>设 <code>America/New_York</code> 的任务，<code>0 9 * * *</code> 会全年在当地 09:00 触发，<strong>无需</strong>为冬令 / 夏令手动改 cron。</li>
+                    <li>设 <code>America/New_York</code> 的任务，<code>0 0 9 * * *</code> 会全年在当地 09:00 触发，<strong>无需</strong>为冬令 / 夏令手动改 cron。</li>
                     <li>任务未设 <code>timezone</code> 时，使用服务端 <code>QDRUST_DEFAULT_TIMEZONE</code>（默认 <code>Asia/Shanghai</code>）。</li>
                     <li>WebUI 中任务列表与运行历史的「上次运行 / 开始时间」也按该任务时区展示；未设时区则用查看者浏览器本地时区。</li>
                 </ul>
@@ -619,14 +669,15 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
 
                 <h2 id="next">下一步</h2>
                 <ul>
-                    <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具。</li>
+                    <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具与记事本。</li>
                     <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
-                    <li><a href="api.html">API 接口</a> —— 88 个 REST 端点的完整契约，适合做外部集成。</li>
+                    <li><a href="mcp.html">MCP server</a> —— 用 API 令牌把 qdrust 接进 Claude Desktop / Cursor，让模型直接建任务、跑任务。</li>
+                    <li><a href="api.html">API 接口</a> —— 99 个 REST 端点的完整契约，适合做外部集成。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-30</span>
+                    <span>最后更新：2026-10-12</span>
                 </div>
             </main>
 

@@ -145,6 +145,17 @@ QDRUST_BASE_PATH=/qd
                     统一放在<a href="notify.html">推送与通知</a>页。
                 </p>
                 <p>部署侧只需留意两点：<strong>Email 渠道依赖 <code>QDRUST_SMTP_*</code></strong>；<strong>单个渠道投递失败只记录日志，不会中断任务执行</strong>。</p>
+                <p>渠道级「测试」验证凭据，绑定级「预览」验证模板——两者都见<a href="notify.html">推送与通知</a>。</p>
+
+                <h2 id="api-access">程序化接入（API 令牌 / MCP）</h2>
+                <p>
+                    部署侧<strong>无需额外配置</strong>：脚本 / CI 用「设置 → API 令牌」新建的个人访问令牌（请求头 <code>Authorization: Bearer qd_…</code>）调用，
+                    不经 Cookie、跳过 CSRF；<a href="mcp.html">MCP server</a> 是在 MCP 客户端侧用 <code>uvx</code> 拉起的纯 Python 进程，宿主机装 uv 即可，不算 qdrust 部署的一部分。
+                </p>
+                <p>
+                    唯一要留意的是<strong>反代前缀</strong>：MCP 客户端的 <code>QDRUST_URL</code> 必须指到 API 的实际前缀——反代到<a href="#subpath">二级目录</a>时漏掉前缀，
+                    请求会落到 WebUI 的页面（返回 HTML）而不是 JSON。
+                </p>
 
                 <h2 id="backup">备份、升级与回滚</h2>
                 <p>qdrust 使用不可变语义版本镜像标签。升级步骤：</p>
@@ -201,5 +212,5 @@ npm --prefix webui run build
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-30</span>
+                    <span>最后更新：2026-10-12</span>
                 </div>

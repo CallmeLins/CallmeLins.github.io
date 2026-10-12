@@ -1,6 +1,6 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">模板与表达式</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    HAR 兼容契约、Template Schema v1、变量与断言、Jinja2 函数与过滤器、Python 写法的兼容、正则与编码的 Python 读法，以及 <code>api://util/*</code> 内置工具。
+                    HAR 兼容契约、Template Schema v1、变量与断言、Jinja2 函数与过滤器（含 <code>urlencode</code> / <code>default</code> 参数）、Python 写法的兼容、正则与编码的 Python 读法，以及 <code>api://util/*</code> 内置工具与记事本。
                 </p>
 
                 <h2 id="two-forms">两种模板形态</h2>
@@ -186,6 +186,30 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
                 </div>
                 <p class="text-sm text-gray-500">● = 同时可作为函数调用（<code>{{ md5(x) }}</code>）与过滤器使用（<code>{{ x|md5 }}</code>）。<code>d</code> 是 QD 中 <code>default</code> 的短别名。此外还有 27 个 minijinja 自带的过滤器（<code>upper</code> / <code>lower</code> / <code>replace</code> / <code>split</code> / <code>join</code> / <code>sort</code> / <code>unique</code> / <code>tojson</code> / <code>fromjson</code> 等），与上面这张表合起来构成完整的可用集合。</p>
 
+                <h3 id="filter-args">带参数的过滤器：<code>urlencode</code> 与 <code>default</code></h3>
+                <p>
+                    QD 把 <code>qdl.utils.urlencode_with_encoding</code> 作为过滤器暴露给模板，Jinja2 自己又内建了 <code>default</code>。
+                    两者的参数位在 qdrust 里同样保留，从 QD 抄来的写法不必删参数：
+                </p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>写法</th><th>语义</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>{{ x | urlencode }}</code></td><td>百分号编码，等价 <code>urlencode(x, 'utf-8', false)</code></td></tr>
+                            <tr><td><code>{{ x | urlencode('gbk') }}</code> / <code>urlencode(encoding='gbk')</code></td><td>指定字符集。<strong>只支持 <code>utf-8</code></strong>：QD 的 <code>url_quote</code> 能按任意 Python 编码逐字节编码，而这里没有那套编码表，与其悄悄按 UTF-8 编出发错的串，不如报 <code>urlencode only supports utf-8, got "gbk"</code></td></tr>
+                            <tr><td><code>{{ x | urlencode(for_qs=True) }}</code></td><td>把这段值当作查询串用：<code>/</code> 也编成 <code>%2F</code>。默认 <code>false</code> 时 <code>/</code> 保持字面（跟 <code>urllib.parse.quote</code> 的默认一致）。<strong>两种模式下空格都是 <code>%20</code></strong> —— 这里不是 <code>quote_plus</code>，不产生 <code>+</code></td></tr>
+                            <tr><td><code>{{ d | urlencode }}</code>（<code>d</code> 为字典或键值对列表）</td><td>拼成 <code>k=v&amp;k=v</code>，两侧都编码、<code>/</code> 也编码（QD <code>urlencode_with_encoding</code> 对 dict / iterable 的分支）</td></tr>
+                            <tr><td><code>{{ x | default('兜底') }}</code></td><td>值为<strong>未定义</strong>时替换（Jinja2 语义，空串与 <code>0</code> 不替换）</td></tr>
+                            <tr><td><code>{{ x | default('兜底', true) }}</code> / <code>default('兜底', boolean=True)</code></td><td><code>boolean=True</code> 时<strong>假值</strong>也替换——空串、<code>0</code>、<code>[]</code>、<code>{}</code> 都会用兜底值</td></tr>
+                            <tr><td><code>{{ x | d('兜底') }}</code></td><td><code>default</code> 的别名，参数同上</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    多个参数一起写也可以（<code>{{ d | urlencode('utf-8', true) }}</code>）；传了不认识的关键字（例如对 <code>default</code> 写 <code>boolean</code> 之外的名字）
+                    会报出<strong>可接受的名字列表</strong>，而不是只说一句类型不对。
+                </p>
+
                 <h2 id="python">Python 写法：方法、<code>%</code> 格式化与列表就地修改</h2>
                 <p>QD 模板是 Python，qdrust 在渲染前把这些写法改写成等价的引擎调用，模板可原样迁移：</p>
                 <div class="overflow-x-auto mb-6">
@@ -293,14 +317,69 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
                             <tr><td><code>rsa</code></td><td>PKCS1 v1.5 加解密</td></tr>
                             <tr><td><code>json</code></td><td>parse / stringify / pretty</td></tr>
                             <tr><td><code>dddd/*</code></td><td>OCR / 验证码识别，转发到外部 DdddOCR 服务（目标由 <code>_server</code> 参数或 <code>QDRUST_DDDDOCR_SERVER</code> 指定）。这是唯一会出网的 <code>util</code> 动作，因此和模板请求走同一道闸门：默认拒绝内网 / 回环地址</td></tr>
+                            <tr><td><code>toolbox/notepad</code></td><td>记事本槽位读写：<code>?f=read|write|append&amp;id_notepad=N&amp;data=…</code>。<strong>不管读写，响应体都是操作之后的当前值</strong>，所以写与提取可以在同一步完成。槽位默认 <code>1</code> 且首次读取自动创建，其它槽位缺失回 400；单槽位上限 5 MiB、单账号最多 20 槽</td></tr>
+                            <tr><td><code>toolbox/notepad/list</code></td><td>槽位管理：<code>?f=list|add|delete</code>，响应体是 QD 自己的 Python 列表字面量（<code>[1, 2]</code>）或「添加成功, id_notepad: N」这类文本。该路由<strong>不能凭空建第一个槽位</strong>（首次创建靠模板侧首次读取或记事本页面）</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <p>
-                    这套工具已与 QD 的核心语义对齐。旧 QD 的 <em>toolbox</em> 与 <em>notepad</em> 属于 Web 工具箱页面，不在模板 API 范围内，qdrust 未移植。
-                    <code>dddd/*</code> 是其中唯一会出网的动作（转发到外部 DdddOCR 服务），因此和模板请求走同一道出站闸门，指向内网 / 本机自建服务时需要开启
+                    这套工具已与 QD 的核心语义对齐。旧 QD 的 <em>toolbox</em> 是一个聚合入口页，其中各项在此各有落点——<strong>记事本两侧都已就位</strong>：模板侧就是上面的
+                    <code>api://util/toolbox/notepad</code>（与 <code>/list</code>），Web 侧是侧边栏的<a href="#notepad-page">记事本页面</a>。
+                    <code>dddd/*</code> 则是唯一会出网的 <code>util</code> 动作（转发到外部 DdddOCR 服务），因此和模板请求走同一道出站闸门，指向内网 / 本机自建服务时需要开启
                     <a href="usage.html#allow-private-network">允许出站请求访问内网地址</a>。
                 </p>
+
+                <h2 id="notepad">记事本：模板的跨运行状态</h2>
+                <p>
+                    任务的<strong>变量表</strong>是运行期的只读种子，跑完不会写回。要让模板自己记住东西（cookie 滑动续期、页码、累计次数、去重 id），用
+                    <code>api://util/toolbox/notepad</code>：一张 <code>(账号, 槽位)</code> 的表，值是一整块文本。
+                </p>
+                <h3 id="notepad-params">参数与行为</h3>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>参数</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>f</code></td><td><code>write</code> / <code>append</code> / 其它（读）。<strong>按子串判断，且先判 <code>write</code></strong>，所以 <code>f=writeappend</code> 是写、<code>f=read</code> 是读</td></tr>
+                            <tr><td><code>id_notepad</code></td><td>槽位号，默认 <code>1</code>（<code>list</code> 路由默认「未指定」）。<strong>编号在账号之间是复用的</strong>，唯一键是 <code>(账号, 槽位)</code></td></tr>
+                            <tr><td><code>data</code></td><td>要写入的文本，默认空串。GET query 或 POST 表单体都行（表单体会并入查询串）</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul>
+                    <li><strong>槽位 1 按需创建</strong>，其它槽位缺失一律回 400「记事本不存在」——所以读一次就会建出槽位 1。</li>
+                    <li><strong><code>append</code> 用 CRLF 拼接，且只在已有内容时才加分隔符</strong>：QD 自己创建的槽位内容是 NULL，往它 append 不会以空行开头；显式写入空串则下次 append 会带分隔符。</li>
+                    <li><strong><code>add</code> / <code>delete</code> 怎么决定编号</strong>：<code>add</code> 不带编号取「当前最大编号 + 1」，显式给一个已存在的编号回「记事本编号已存在」；<code>delete</code> 不能删槽位 1（「默认记事本不能删除」）。</li>
+                    <li><strong>失败是 400 响应而不是中断</strong>：QD 捕获异常、把消息写进响应体并置 400，模板照样拿到响应、由自己的断言决定这意味着什么。</li>
+                </ul>
+                <h3 id="notepad-diff">与 QD 的三处刻意不同</h3>
+                <ol>
+                    <li><strong>账号取自这次运行</strong>，不读 URL 里的 <code>email</code> / <code>pwd</code>。QD 用它们做鉴权，那等于把账号密码放进模板；模板带着它们也能跑，只是不被使用，而没有它们的模板同样能跑。</li>
+                    <li><strong>写入有上限</strong>（5 MiB，与默认 <code>response_limit</code> 一致），超限回 400。QD 不设上限。</li>
+                    <li><strong>槽位上限 20</strong> 是常量而非环境变量——20 个槽位已远超模板所需，这不是部署需要改的数。</li>
+                </ol>
+                <p>
+                    另有一处并发说明：<code>f=write</code> 是单条 upsert，本身原子；<code>f=append</code> 是「读—拼—写回」，两次运行同时 append 同一槽位会丢一次（QD 同样如此）。
+                    <strong>写入值不进运行记录</strong>：notepad 的成功响应<em>就是</em>槽位内容（通常是 cookie），所以它在失败信息的预览里只留一个字节数说明；要读回完整内容就上<a href="#notepad-page">记事本页面</a>。
+                </p>
+
+                <h2 id="notepad-page">记事本页面（Web 侧）</h2>
+                <p>QD 的记事本是「工具箱」里的一个按钮；这里是一个侧边栏入口，背后是四个接口。能力对齐，形态按这一侧的设计走：</p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>接口</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code class="m-get">GET</code> <code>/api/v1/notepads</code></td><td>本账号的槽位，按槽位号升序；每项带 <code>preview</code> / <code>content_size</code> / <code>updated_at</code></td></tr>
+                            <tr><td><code class="m-get">GET</code> <code>/api/v1/notepads/{notepad_id}</code></td><td>一个槽位的完整内容；不存在回 404</td></tr>
+                            <tr><td><code class="m-put">PUT</code> <code>/api/v1/notepads/{notepad_id}</code></td><td>写入一个槽位；<strong>不存在则创建</strong>（201），已存在则覆盖（200）</td></tr>
+                            <tr><td><code class="m-del">DELETE</code> <code>/api/v1/notepads/{notepad_id}</code></td><td>删除；不存在回 404</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul>
+                    <li><strong>读写删都走会话身份</strong>，不填账号密码——模板侧走 executor 的动作臂，HTTP 面完全独立，所以页面直接用登录身份。</li>
+                    <li><strong>「新建槽位」是显式动作</strong>，不像 QD 把首次创建藏在页面 GET 的副作用里；<strong>列表给预览与大小</strong>，完整内容在打开某个槽位时才取。</li>
+                    <li><strong>页面写入上限 256 KiB</strong>，比模板侧（5 MiB）小：axum 默认最多缓冲 2 MiB 请求体，这组路由没抬高它。模板写进槽位的大值，页面照样<strong>读</strong>得回来——只限制页面自己的写入。</li>
+                </ul>
 
                 <h2 id="external-plugins">外部插件二进制</h2>
                 <p>
@@ -312,5 +391,5 @@ cargo run -p qdrust-cli -- run ./template.har.json --var token=abc --timeout 60<
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-30</span>
+                    <span>最后更新：2026-10-12</span>
                 </div>

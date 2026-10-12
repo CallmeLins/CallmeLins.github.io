@@ -27,7 +27,7 @@ PAGES = [
         "part": "usage.part.html",
         "nav": "usage.html",
         "title": "使用指南 | qdrust Wiki",
-        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离）、可视化 HAR 编辑器、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、运行日志总览、列表分页与 CLI。",
+        "description": "qdrust 使用指南：初始化管理员、导入 QD HAR 模板、订阅模板库（汇总与预览导入、镜像前缀地址）、创建与运行任务（模板测试与归属隔离、就地开关通知）、可视化 HAR 编辑器、模板跨运行状态（记事本）、出站请求与两个高风险网络开关、调度与随机延迟、cron 六段格式与时区、运行日志总览、列表分页与 CLI。",
         "path": "usage.html",
     },
     {
@@ -35,7 +35,7 @@ PAGES = [
         "part": "architecture.part.html",
         "nav": "architecture.html",
         "title": "架构设计 | qdrust Wiki",
-        "description": "qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。",
+        "description": "qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型（21 张表）、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。",
         "path": "architecture.html",
     },
     {
@@ -43,7 +43,7 @@ PAGES = [
         "part": "templates.part.html",
         "nav": "templates.html",
         "title": "模板与表达式 | qdrust Wiki",
-        "description": "qdrust 模板体系：旧 QD HAR 兼容契约、Template Schema v1、变量（默认值与 _proxy 代理）与断言、Jinja2 函数与过滤器、Python 写法兼容、正则与响应体编码的 Python 读法、api://util/* 内置工具。",
+        "description": "qdrust 模板体系：旧 QD HAR 兼容契约、Template Schema v1、变量（默认值与 _proxy 代理）与断言、Jinja2 函数与过滤器（含 urlencode / default 参数）、Python 写法兼容、正则与响应体编码的 Python 读法、api://util/* 内置工具与记事本。",
         "path": "templates.html",
     },
     {
@@ -53,6 +53,14 @@ PAGES = [
         "title": "浏览器插件 | qdrust Wiki",
         "description": "qdrust 无头浏览器插件 api://browser/*：启用方式、action 一览、混合签到模板写法、会话生命周期与行为限制。",
         "path": "browser.html",
+    },
+    {
+        "file": "mcp.html",
+        "part": "mcp.part.html",
+        "nav": "mcp.html",
+        "title": "MCP server | qdrust Wiki",
+        "description": "qdrust MCP server（qdrust-mcp）：纯 Python、uvx 直接跑，把 REST API 暴露给 Claude Desktop / Cursor 等 MCP 客户端。含客户端配置、让 AI 代配的提示词、27 个工具一览、排障与限制。",
+        "path": "mcp.html",
     },
     {
         "file": "deploy.html",
@@ -67,7 +75,7 @@ PAGES = [
         "part": "notify.part.html",
         "nav": "notify.html",
         "title": "推送与通知 | qdrust Wiki",
-        "description": "qdrust 推送与通知：11 种渠道的 kind 与配置项、渠道测试、通知动作的批量绑定与就地编辑 / 失败阈值 / 仅自动执行、标题与正文模板变量。",
+        "description": "qdrust 推送与通知：11 种渠道的 kind 与配置项、渠道测试、绑定预览、账号默认模板、通知动作（批量绑定 / 按任务聚合 / 失败阈值 / 仅自动执行）、标题与正文模板变量。",
         "path": "notify.html",
     },
     # 注意：api.html 不在此生成——它由 scripts/gen-qdrust-api.py 负责
@@ -78,7 +86,7 @@ PAGES = [
         "part": "faq.part.html",
         "nav": "faq.html",
         "title": "常见问题 | qdrust Wiki",
-        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、默认语言、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
+        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、记事本与跨运行状态、MCP server、API 令牌、cron 段数、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
         "path": "faq.html",
     },
 ]

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。">
+    <meta name="description" content="qdrust 架构设计：单进程 Tokio 运行时、执行链路、调度与租约队列、数据模型（21 张表）、安全模型（统一出站闸门与两个高风险开关）、API 一览与横向扩展边界。">
     <title>架构设计 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/architecture.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -173,6 +173,7 @@
                 <div class="wiki-nav-title">进阶</div>
                 <a href="browser.html" class="wiki-nav-link">浏览器插件</a>
                 <a href="notify.html" class="wiki-nav-link">推送与通知</a>
+                <a href="mcp.html" class="wiki-nav-link">MCP server</a>
 
                 <div class="wiki-nav-title">参考</div>
                 <a href="api.html" class="wiki-nav-link">API 接口</a>
@@ -201,9 +202,10 @@
 │   ├── qdrust-server/          # Axum API、认证、调度、运行管理
 │   └── qdrust-plugin-browser/  # chromiumoxide 无头浏览器插件
 ├── webui/                      # Vue 3 + TypeScript + Vite
+├── mcp/                        # 纯 Python 的 stdio MCP server（qdrust-mcp，uvx 运行）
 ├── migrations/                 # SQLite 迁移
 ├── migrations-mysql/           # MySQL 迁移
-├── docs/                       # OpenAPI、模板 schema、各阶段设计文档
+├── docs/                       # 用户指南、OpenAPI、ADR 与已完工设计档案
 └── tests/fixtures/             # 旧 QD HAR 兼容样本</code></pre>
                 <p>
                     依赖方向是单向的：<code>server</code> 与 <code>cli</code> 都依赖 <code>core</code>，而 <code>core</code> 不依赖任何服务端概念。这意味着「解析并执行一个 HAR」这件事可以脱离 Web 服务独立存在——CLI 就是这条路线的产物。
@@ -261,31 +263,32 @@ success_asserts / failed_asserts → 判定成败
                 </div>
 
                 <h2 id="data-model">数据模型</h2>
-                <p>迁移脚本按阶段递增（forward-only），共 <strong>20 张表</strong>：</p>
+                <p>迁移脚本按阶段递增（forward-only），共 <strong>21 张表</strong>：</p>
                 <div class="overflow-x-auto mb-6">
                     <table>
                         <thead><tr><th>分组</th><th>表</th><th>用途</th></tr></thead>
                         <tbody>
                             <tr><td rowspan="2">模板</td><td><code>templates</code></td><td>模板本体，保留原始 HAR JSON</td></tr>
                             <tr><td><code>push_requests</code></td><td>公共模板发布审批</td></tr>
-                            <tr><td rowspan="3">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板来源（库地址）；无「导入方式」列——订阅只登记来源，导入由用户逐条决定</td></tr>
+                            <tr><td rowspan="2">订阅</td><td><code>template_subscriptions</code></td><td>订阅的模板来源（库地址）；无「导入方式」列——订阅只登记来源，导入由用户逐条决定</td></tr>
                             <tr><td><code>template_imports</code></td><td>来源条目到本地模板的映射（订阅 + 条目名 → 模板 + 上游版本），用于判断「已导入 / 有更新」</td></tr>
-                            <tr><td><code>subscription_syncs</code></td><td>同步记录</td></tr>
                             <tr><td>任务</td><td><code>tasks</code></td><td>任务实例、调度配置、变量预填、绑定的模板（<code>template_id</code>，分组是 <code>grp</code> 列，无独立分组表）</td></tr>
                             <tr><td rowspan="2">运行</td><td><code>runs</code></td><td>运行记录、状态与租约列（<code>lease_owner</code> / <code>lease_expires_at</code>，租约不单独建表）</td></tr>
                             <tr><td><code>run_steps</code></td><td>步骤级请求 / 响应 / 提取变量</td></tr>
-                            <tr><td rowspan="6">认证</td><td><code>users</code></td><td>用户</td></tr>
+                            <tr><td rowspan="7">认证</td><td><code>users</code></td><td>用户</td></tr>
                             <tr><td><code>sessions</code></td><td>会话</td></tr>
                             <tr><td><code>password_reset_tokens</code></td><td>重置密码令牌</td></tr>
                             <tr><td><code>email_verification_tokens</code></td><td>邮箱验证令牌</td></tr>
                             <tr><td><code>external_identities</code></td><td>外部身份（OIDC / Header）到本地账号的映射</td></tr>
                             <tr><td><code>oidc_login_states</code></td><td>OIDC 授权码 + PKCE 的中间状态</td></tr>
-                            <tr><td rowspan="2">通知</td><td><code>notification_channels</code></td><td>通知渠道配置（<code>kind</code> + <code>config</code>，共 11 种）</td></tr>
+                            <tr><td><code>api_tokens</code></td><td>个人访问令牌（只存 SHA-256，供脚本 / CI / MCP server 用）</td></tr>
+                            <tr><td rowspan="3">通知</td><td><code>notification_channels</code></td><td>通知渠道配置（<code>kind</code> + <code>config</code>，共 11 种）</td></tr>
                             <tr><td><code>notification_actions</code></td><td>渠道与任务的绑定，含失败阈值 / 仅自动执行 / 标题正文模板</td></tr>
-                            <tr><td rowspan="4">系统</td><td><code>plugins</code></td><td>外部插件二进制与能力声明</td></tr>
+                            <tr><td><code>notification_default_templates</code></td><td>按账号、按事件（成功 / 失败）的默认标题 / 正文模板，回落顺序的最低一层用户可编辑项</td></tr>
+                            <tr><td>记事本</td><td><code>notepads</code></td><td>模板跨运行状态：<code>(账号, 槽位)</code> → 一整块文本，由 <code>api://util/toolbox/notepad</code> 与记事本页面共用</td></tr>
+                            <tr><td rowspan="3">系统</td><td><code>plugins</code></td><td>外部插件二进制与能力声明</td></tr>
                             <tr><td><code>site_settings</code></td><td>站点级运行配置</td></tr>
                             <tr><td><code>audit_logs</code></td><td>审计日志</td></tr>
-                            <tr><td><code>notes</code></td><td>记事本</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -311,11 +314,13 @@ success_asserts / failed_asserts → 判定成败
                         <tbody>
                             <tr><td>运维</td><td><code>GET /health</code> · <code>GET /ready</code> · <code>GET /api/v1/meta</code>（部署元数据：版本与默认语言） · <code>GET /api/v1/openapi.json</code></td></tr>
                             <tr><td>认证</td><td><code>/api/v1/auth/bootstrap</code> · <code>/login</code> · <code>/logout</code> · <code>/register</code> · <code>/session</code> · <code>/config</code> · <code>/oidc/start</code> · <code>/oidc/callback</code></td></tr>
+                            <tr><td>API 令牌</td><td><code>/api/v1/tokens</code> · <code>/{id}</code>（<code>DELETE</code>）——个人访问令牌，供脚本 / CI / MCP server 用</td></tr>
                             <tr><td>模板</td><td><code>/api/v1/templates</code> · <code>/{id}</code> · <code>/{id}/test</code>（试跑） · <code>/import-qd-har</code> · <code>/validate-qd-har</code> · <code>/{id}/publish</code> · <code>/{id}/qd-har</code></td></tr>
                             <tr><td>任务</td><td><code>/api/v1/tasks</code> · <code>/tasks/batch</code> · <code>/task-groups</code> · <code>/tasks/{id}/run</code></td></tr>
-                            <tr><td>订阅与模板库</td><td><code>/api/v1/subscriptions</code> · <code>/{id}/sync</code> · <code>/{id}/sync/live</code>（WebSocket） · <code>/api/v1/library</code> · <code>/api/v1/subscriptions/{id}/library</code> · <code>/library/preview</code> · <code>/library/apply</code> · <code>/{id}/import</code></td></tr>
+                            <tr><td>订阅与模板库</td><td><code>/api/v1/subscriptions</code> · <code>/api/v1/library</code> · <code>/api/v1/subscriptions/{id}/library</code> · <code>/library/preview</code> · <code>/library/apply</code> · <code>/{id}/import</code>（订阅只登记来源，无「同步 / 自动导入」端点）</td></tr>
                             <tr><td>运行</td><td><code>GET /api/v1/runs</code>（跨任务日志总览） · <code>/{id}</code> · <code>/{id}/cancel</code> · <code>/{id}/steps</code> · <code>/{id}/steps/live</code>（WebSocket）</td></tr>
-                            <tr><td>通知</td><td><code>/api/v1/notification-channels</code> · <code>/{id}/test</code> · <code>/api/v1/notification-actions</code> · <code>/batch</code> · <code>/api/v1/tasks/{id}/notification-actions</code></td></tr>
+                            <tr><td>通知</td><td><code>/api/v1/notification-channels</code> · <code>/{id}/test</code> · <code>/api/v1/notification-actions</code> · <code>/{id}/preview</code> · <code>/batch</code> · <code>/api/v1/notification-defaults</code> · <code>/api/v1/tasks/{id}/notification-actions</code></td></tr>
+                            <tr><td>记事本</td><td><code>/api/v1/notepads</code> · <code>/{notepad_id}</code>（<code>GET</code> / <code>PUT</code> / <code>DELETE</code>）——模板跨运行状态的 Web 侧入口</td></tr>
                             <tr><td>管理员</td><td><code>/api/v1/admin/users</code> · <code>/settings</code> · <code>/backup</code> · <code>/restore</code> · <code>/push-requests</code></td></tr>
                             <tr><td>生态</td><td><code>/api/v1/plugins</code> · <code>/api/v1/public-templates</code></td></tr>
                         </tbody>
@@ -327,7 +332,7 @@ success_asserts / failed_asserts → 判定成败
                     <li><strong>步骤级回放</strong>：每次运行按步骤记录请求、响应与提取到的变量，可在运行记录里逐步查看。</li>
                     <li><strong>QD 风格运行日志</strong>：文本化日志，便于直接阅读与检索。</li>
                     <li><strong>跨任务运行日志总览</strong>：<code>GET /api/v1/runs</code> 把所有任务的运行汇到一张表，按状态（成功 / 失败）与任务筛选，走游标分页。</li>
-                    <li><strong>WebSocket 实时流</strong>：<code>/api/v1/runs/{id}/steps/live</code> 推送活跃运行的步骤；订阅导入进度同样走 WebSocket。</li>
+                    <li><strong>WebSocket 实时流</strong>：<code>/api/v1/runs/{id}/steps/live</code> 推送活跃运行的步骤与状态变更。</li>
                     <li><strong>探针</strong>：<code>/health</code> 与 <code>/ready</code> 供 Compose 健康检查与反向代理使用。</li>
                     <li><strong>日志保留</strong>：<code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留）控制已完成运行记录的自动清理，系统每小时执行一次。</li>
                 </ul>
@@ -342,7 +347,7 @@ success_asserts / failed_asserts → 判定成败
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-09-30</span>
+                    <span>最后更新：2026-10-12</span>
                 </div>
             </main>
 
