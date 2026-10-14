@@ -636,16 +636,29 @@ curl -X POST http://localhost:5000/api/v1/tasks \\
                             <tr><td><code>task_not_found</code></td><td>404</td><td>任务不存在</td></tr>
                             <tr><td><code>run_not_found</code></td><td>404</td><td>运行不存在，或不属于当前用户</td></tr>
                             <tr><td><code>template_not_found</code></td><td>404</td><td>模板不存在</td></tr>
-                            <tr><td><code>validation_error</code></td><td>422</td><td>请求体或领域校验失败，看 <code>field_errors</code></td></tr>
+                            <tr><td><code>validation_error</code></td><td>422</td><td>请求体或领域校验失败，看 <code>field_errors</code>（注册时用户名不合规也在这一步拦下，且发生在密码哈希与入库之前）</td></tr>
                             <tr><td><code>authentication_required</code></td><td>401</td><td>会话缺失、过期、被吊销或账号已禁用</td></tr>
                             <tr><td><code>invalid_credentials</code></td><td>401</td><td>用户名或密码不对</td></tr>
                             <tr><td><code>csrf_validation_failed</code></td><td>403</td><td>CSRF 三元组（Cookie / 头 / 会话哈希）校验失败</td></tr>
                             <tr><td><code>admin_required</code></td><td>403</td><td>需要管理员角色</td></tr>
                             <tr><td><code>bootstrap_already_completed</code></td><td>409</td><td>首个管理员已存在，不可重复初始化</td></tr>
+                            <tr><td><code>username_taken</code></td><td>409</td><td>用户名已被注册——<strong>只在真正的唯一性冲突时</strong>返回（v0.1.26 起；此前一切注册失败都落到这里）</td></tr>
                             <tr><td><code>login_rate_limited</code></td><td>429</td><td>该用户名登录失败过多，暂时限流</td></tr>
                             <tr><td><code>internal_error</code></td><td>500</td><td>未预期的内部错误</td></tr>
                         </tbody>
                     </table>
+
+                    <div class="callout">
+                        <div class="callout-title">注册失败为什么分三种码</div>
+                        <p>
+                            v0.1.26 把三条互不相干的失败路径拆开了：用户名不合规 → <code>422 validation_error</code>（调用方的输入错误）；
+                            用户名已存在 → <code>409 username_taken</code>（唯一性冲突）；其余情况（数据库只读、磁盘满、IO 错误）→ <code>500 internal_error</code>，只写日志。
+                        </p>
+                        <p>
+                            在此之前三者共用一句 409「already registered or invalid」，于是<strong>一个只读的 <code>/data</code> 会把全新用户名报成「已被占用」</strong>——
+                            调用方没有任何线索区分「名字撞了」与「一个字节都没落盘」。服务端现在也会在启动时拒绝不可写的数据库，这类故障不会再以注册错误的形式出现。
+                        </p>
+                    </div>
 
                 <h3 id="pagination">分页与限流</h3>
                 <p>

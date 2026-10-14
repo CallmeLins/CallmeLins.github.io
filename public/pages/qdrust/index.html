@@ -193,7 +193,7 @@
                     用 Rust + Vue 3 重写的 <strong>QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.25</span>
+                    <span class="badge badge-dark">v0.1.26</span>
                     <span class="badge">Rust 2024 · 1.85+</span>
                     <span class="badge">MIT</span>
                     <span class="badge">linux / amd64 / arm64</span>
@@ -236,7 +236,7 @@
                     <li><strong>API 令牌</strong>：账号可签发 <code>qd_…</code> Bearer 令牌（服务端只存 SHA-256 摘要），给脚本、CI 与其他程序调用 REST API 用；权限与账号等同、不受 CSRF 约束，可随时吊销。详见<a href="api.html#ep-tokens">API 接口 · API 令牌</a>。</li>
                     <li><strong>MCP server</strong>（可选）：随仓库附带的 <code>qdrust-mcp</code> 是纯 Python 实现，<code>uvx</code> 直接跑，把 27 个常用操作暴露成 MCP 工具，供 Claude Desktop / Cursor 这类客户端对话式驱动。详见<a href="mcp.html">MCP server</a>。</li>
                     <li><strong>外部身份登录</strong>（可选）：OIDC 授权码 + PKCE 对接 authentik / authelia / keycloak / pocket-id，或反向代理 Header 认证（forward-auth）。<strong>本地账号密码始终保留</strong>，详见<a href="usage.html#external-login">使用指南</a>。</li>
-                    <li><strong>运维友好</strong>：Docker 镜像（amd64 / arm64）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。</li>
+                    <li><strong>运维友好</strong>：Docker 镜像（amd64 / arm64，以 uid 10001 运行、启动时自动修正数据目录属主）、管理员备份恢复、运行时配置热更新、可选 Redis 会话缓存。数据库不可写时<strong>拒绝启动</strong>，而不是带着一个只读库跑。</li>
                 </ul>
 
                 <h2 id="vs-qd">与 QD 的关系</h2>
@@ -283,7 +283,7 @@
 docker run -d --name qdrust -p 8923:8923 \
   -v qdrust-data:/data \
   ghcr.io/callmelins/qdrust:latest</code></pre>
-                <p>然后访问 <code>http://localhost:8923/</code>，首次打开会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code>data/qd.db</code>。</p>
+                <p>然后访问 <code>http://localhost:8923/</code>，首次打开会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入容器内的 <code>/data/qdrust.db</code>（上面已挂到命名卷 <code>qdrust-data</code>）；直接跑二进制时默认是 <code>data/qd.db</code>。</p>
 
                 <div class="callout">
                     <div class="callout-title">HTTPS 部署请注意</div>
@@ -294,7 +294,7 @@ docker run -d --name qdrust -p 8923:8923 \
                 <div class="card-grid">
                     <a href="deploy.html" class="wiki-card">
                         <h4>部署与运维 →</h4>
-                        <p>Compose 生产配置、反代到二级目录、环境变量全表（含两个高风险网络开关与默认语言）、数据库选型、备份与升级回滚。</p>
+                        <p>Compose 生产配置、数据目录属主与写权限排障、反代到二级目录、环境变量全表（含两个高风险网络开关与默认语言）、数据库选型与热拷贝、备份与升级回滚。</p>
                     </a>
                     <a href="usage.html" class="wiki-card">
                         <h4>使用指南 →</h4>
@@ -333,7 +333,7 @@ docker run -d --name qdrust -p 8923:8923 \
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-12</span>
+                    <span>最后更新：2026-10-14</span>
                 </div>
             </main>
 

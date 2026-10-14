@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、记事本与跨运行状态、MCP server、API 令牌、cron 段数、调度精度、CLI 网络策略、模板沙箱与浏览器插件。">
+    <meta name="description" content="qdrust 常见问题：HTTPS 会话、数据目录不可写（注册报「用户名已被占用」）、注册 409 与 422 的区别、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、记事本与跨运行状态、MCP server、API 令牌、cron 段数、调度精度、CLI 网络策略、模板沙箱与浏览器插件。">
     <title>常见问题 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/faq.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -198,6 +198,26 @@
                 <h3 id="cookie-secure">HTTPS 部署后登录会话不生效 / 一直被登出？</h3>
                 <p>生产环境必须把 <code>COOKIE_SECURE</code> 设为 <code>true</code>，否则安全 Cookie 不会被浏览器接受。</p>
 
+                <h3 id="data-not-writable">容器起来了、<code>/ready</code> 也是 200，但写入失败（注册说「用户名已被占用」）？</h3>
+                <p>
+                    先看日志里有没有 <code>database file … is not writable by this process</code>。qdrust 从 <strong>v0.1.26</strong> 起会在启动时探一次数据库写权限，不可写就<strong>直接退出</strong>，
+                    不再带病启动——所以在新版本上，这种情况是「起不来」而不是「看起来正常」。
+                </p>
+                <p>
+                    原因几乎总是<strong>属主</strong>而不是权限位：镜像以 <strong>uid 10001</strong> 运行，而 WAL 模式还要写 <code>-wal</code> / <code>-shm</code> 两个附属文件。
+                    把 <code>/data</code> 从别的容器拷过来（尤其从以 root 跑 SQLite 的服务迁移过来）会把属主留在原身份上。修法：
+                </p>
+                <pre><code>chown 10001:10001 /data/qdrust.db /data/qdrust.db-wal /data/qdrust.db-shm
+chown -R 10001:10001 /data          # 或直接改整个目录，容器下次启动也会自己修</code></pre>
+                <p>
+                    新镜像本来就会自己修 <code>/data</code> 的属主（以 root 启动一小段，改完用 <code>setpriv</code> 降回 10001 再跑服务）。若仍在报错，多半是挂了只读卷，
+                    或者你自己用 <code>user:</code> / <code>QDRUST_CHOWN=0</code> 把这一步关掉了。
+                </p>
+                <p class="text-sm text-gray-500">
+                    <strong>v0.1.26 之前</strong>没有这道检查：服务正常起来、<code>/ready</code> 200、读也正常，只有写入静默失败，注册会回一句「用户名已被占用或非法」——让人往用户名上找原因。
+                    在旧版本上遇到这个现象，先怀疑 <code>/data</code> 属主。另见<a href="deploy.html#data-owner">部署与运维 · 数据目录的属主</a>。
+                </p>
+
                 <h3 id="smtp">邮件相关功能（重置密码、邮箱验证、Email 渠道）用不了？</h3>
                 <p>
                     需要先配置 <code>QDRUST_SMTP_*</code> 系列环境变量，并确认 <code>QDRUST_BASE_URL</code> 指向对外可访问的地址（邮件里的链接以此拼接）。
@@ -234,6 +254,15 @@
                 <p>
                     可选配 <code>QDRUST_OIDC_POST_LOGOUT_REDIRECT_URI</code> 让 IdP 登出后跳回应用——<strong>仅当该地址已在 IdP 的
                     OIDC 客户端登记过</strong>才配，否则多数 IdP 会拒绝未登记的回跳参数。
+                </p>
+
+                <h3 id="register-error-code">注册失败该看 <code>409</code> 还是 <code>422</code>？</h3>
+                <p>
+                    v0.1.26 起两者分开了：<strong>用户名不合规</strong>（长度、字符集）在密码哈希之前就返回 <code>422 validation_error</code>——那是调用方的输入错误；
+                    <strong>用户名已被注册</strong>才是 <code>409 username_taken</code>（真正的唯一性冲突）；其余数据库层面的失败改报 <code>500 internal_error</code> 并写日志，不再伪装成「你填错了」。
+                </p>
+                <p>
+                    在这个拆分之前三者共用一个 409 文案「用户名已被占用或非法」，于是一个<strong>只读的数据库</strong>会把全新用户名也说成「已被占用」。详见<a href="#data-not-writable">数据目录那问</a>。
                 </p>
 
                 <h2 id="migration">迁移与升级</h2>
@@ -448,7 +477,7 @@
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-12</span>
+                    <span>最后更新：2026-10-14</span>
                 </div>
             </main>
 

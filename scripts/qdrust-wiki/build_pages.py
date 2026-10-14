@@ -67,7 +67,7 @@ PAGES = [
         "part": "deploy.part.html",
         "nav": "deploy.html",
         "title": "部署与运维 | qdrust Wiki",
-        "description": "qdrust 部署与运维：Docker 快速启动、生产 Compose 配置、环境变量全表（含两个高风险网络开关与默认语言）、反向代理到二级目录、数据库选型、备份与升级回滚、发布检查清单。",
+        "description": "qdrust 部署与运维：Docker 快速启动、数据目录属主（uid 10001）与数据库不可写排障、生产 Compose 配置、环境变量全表（含两个高风险网络开关、默认语言与 QDRUST_CHOWN）、反向代理到二级目录、数据库选型与热拷贝、备份与升级回滚、发布检查清单。",
         "path": "deploy.html",
     },
     {
@@ -86,7 +86,7 @@ PAGES = [
         "part": "faq.part.html",
         "nav": "faq.html",
         "title": "常见问题 | qdrust Wiki",
-        "description": "qdrust 常见问题：HTTPS 会话、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、记事本与跨运行状态、MCP server、API 令牌、cron 段数、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
+        "description": "qdrust 常见问题：HTTPS 会话、数据目录不可写（注册报「用户名已被占用」）、注册 409 与 422 的区别、SMTP 配置、迁移与回滚范围、订阅模板库为何不自动导入、模板归属隔离、任务状态判定、出站闸门被拒、正则报错、记事本与跨运行状态、MCP server、API 令牌、cron 段数、调度精度、CLI 网络策略、模板沙箱与浏览器插件。",
         "path": "faq.html",
     },
 ]

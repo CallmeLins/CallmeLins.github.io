@@ -1,6 +1,6 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">部署与运维</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    Docker 快速启动、生产 Compose 配置、反向代理到二级目录、环境变量全表、数据库选型、通知渠道，以及备份与升级回滚。
+                    Docker 快速启动、数据目录属主与写权限排障、生产 Compose 配置、反向代理到二级目录、环境变量全表、数据库选型与热拷贝，以及备份与升级回滚。
                 </p>
 
                 <h2 id="requirements">环境要求</h2>
@@ -18,7 +18,41 @@
 docker run -d --name qdrust -p 8923:8923 \
   -v qdrust-data:/data \
   ghcr.io/callmelins/qdrust:latest</code></pre>
-                <p>服务默认监听 <code>http://localhost:8923</code>。首次打开 WebUI 会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code>data/qd.db</code>。</p>
+                <p>服务默认监听 <code>http://localhost:8923</code>。首次打开 WebUI 会引导创建<strong>初始管理员账号</strong>；之后其他用户走开放注册流程。运行数据默认写入 <code>data/qd.db</code>（<strong>镜像里</strong>由 <code>DATABASE_URL</code> 指定为 <code>/data/qdrust.db</code>）。</p>
+
+                <h3 id="data-owner">数据目录的属主（uid 10001）</h3>
+                <p>
+                    镜像以 <strong>uid 10001</strong>（用户 <code>qdrust</code>）运行，而 SQLite 的 WAL 模式要同时写库文件和 <code>-wal</code>、<code>-shm</code> 两个附属文件——
+                    三个文件都得对 10001 可写。把 <code>/data</code> 从一个容器拷出来、挂进另一个容器时，属主会停留在「拷贝它的那个身份」上，这是这类问题最常见的来源。
+                </p>
+                <p>
+                    所以容器启动时先以 root 检查一次：<code>/data</code> 的属主不是 10001，就把整个目录改过来，随后立刻用 <code>setpriv</code> 降回 10001 再启动服务——
+                    <strong>服务进程本身任何时候都不是 root</strong>，root 只存在于启动脚本执行的那一小段里。因此跨容器搬 <code>/data</code> 可以直接用，不必在宿主上 <code>chown</code>。
+                    递归只在<strong>目录本身</strong>属主不对时才发生：顶层正确时每次启动只多一次 <code>stat</code>，你自己挂在 <code>/data</code> 下的东西也不会被反复改属主；只读挂载上修不了也不致命，服务会自己报出不可写的库。
+                </p>
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead><tr><th>做法</th><th>效果</th></tr></thead>
+                        <tbody>
+                            <tr><td>默认（什么都不配）</td><td>以 root 启动 → 必要时修 <code>/data</code> 属主 → 降权到 10001 运行服务</td></tr>
+                            <tr><td>compose 里加 <code>user: "10001:10001"</code></td><td>跳过整个 root 阶段（<code>id -u</code> 不是 0，入口脚本直接 <code>exec</code>）</td></tr>
+                            <tr><td><code>QDRUST_CHOWN=0</code></td><td>仍以 root 启动，只跳过那次 <code>chown</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>顶层属主已经正确、只有个别文件不对时脚本不递归，手动修这三个文件：</p>
+                <pre><code>chown 10001:10001 /data/qdrust.db /data/qdrust.db-wal /data/qdrust.db-shm</code></pre>
+                <div class="callout">
+                    <div class="callout-title">数据库不可写时，服务拒绝启动</div>
+                    <p>
+                        启动时会先探一次数据库的写权限——判据是「按写方式打开」加一次真实写入再回滚，而不是读 mode 位（组属主、ACL、只读挂载都能如实反映），失败就<strong>直接退出</strong>，
+                        错误里写明是哪个文件、属主是谁、以及该跑哪条 <code>chown</code>。这道检查发生在迁移之前，所以报的是「挂载不对」而不是「迁移失败」。
+                    </p>
+                    <p>
+                        没有它的时候，SQLite 会照常打开一个只读库：<code>/ready</code> 返回 200、读接口全部正常，只有写入静默失败——注册会回一句「用户名已被占用或非法」，而真相是磁盘上一个字节都没落。
+                        MySQL 后端不需要这道检查：连接时就报 <code>access denied</code>。
+                    </p>
+                </div>
 
                 <h2 id="compose">生产 Compose 配置</h2>
                 <pre><code># docker-compose.yml
@@ -29,6 +63,8 @@ services:
     ports:
       - "8923:8923"
     volumes:
+      # 启动时先以 root 修正 /data 属主（不是 10001 时），再降权到 10001 运行服务；
+      # `user: "10001:10001"` 可跳过整个 root 阶段，`QDRUST_CHOWN: "0"` 只跳过修正
       - qdrust-data:/data
     environment:
       DATABASE_URL: sqlite:///data/qdrust.db
@@ -116,6 +152,7 @@ QDRUST_BASE_PATH=/qd
                             <tr><td><code>QDRUST_BROWSER_URL</code></td><td>空</td><td>浏览器插件的 CDP 端点，配置后启用 <code>api://browser/*</code>（客户端为进程内 chromiumoxide，<strong>无需</strong>额外子进程）。取值形如 <code>http://localhost:9222</code> / <code>ws://localhost:3000</code> / <code>wss://chrome.browserless.io?token=...</code>，详见<a href="browser.html#endpoints">端点后端三选一</a></td></tr>
                             <tr><td><code>QDRUST_ALLOW_PRIVATE_NETWORK</code></td><td><code>false</code></td><td><strong>高风险</strong>：允许<strong>全部出站请求</strong>（模板运行、直接填 URL 的任务、通知渠道、订阅抓取、模板里的 <code>api://util/dddd</code> 转发）访问内网 / 回环 / 链路本地地址。仅在确实依赖内网服务（自建 flaresolverr、内网 ntfy、内网 DdddOCR）时开启。也可在管理页「站点设置」里运行时开关，优先级高于本变量。详见<a href="usage.html#allow-private-network">允许出站请求访问内网地址</a></td></tr>
                             <tr><td><code>QDRUST_ALLOW_INVALID_CERTIFICATES</code></td><td><code>false</code></td><td><strong>高风险</strong>：不再校验证书（自签名 / 过期 / 域名不匹配都接受）。与上一个开关<strong>互相独立</strong>，可分别开启。同样可在管理页运行时开关，优先级高于本变量。详见<a href="usage.html#allow-invalid-cert">接受无效证书</a></td></tr>
+                            <tr><td><code>QDRUST_CHOWN</code></td><td><code>1</code></td><td><strong>只由容器入口脚本读取</strong>（不是服务端配置项）：设为 <code>0</code> 则跳过启动时对 <code>/data</code> 的属主修正——容器仍以 root 启动再降权。想彻底不要 root 阶段，用 compose 的 <code>user: "10001:10001"</code>。详见<a href="#data-owner">数据目录的属主</a></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -137,6 +174,22 @@ QDRUST_BASE_PATH=/qd
                     <li><strong>MySQL</strong>：设置 <code>DATABASE_URL=mysql://...</code> 即自动切换；迁移脚本位于 <code>migrations-mysql/</code>。</li>
                     <li><strong>迁移是前向 only（forward-only）</strong>：升级前务必备份数据库——不存在「降级迁移」，回滚只能靠备份还原。</li>
                 </ul>
+
+                <h3 id="hot-copy">直接复制数据库文件（热拷贝）</h3>
+                <p>停掉服务再拷最稳妥。运行中直接拷走 <code>qdrust.db</code> + <code>qdrust.db-wal</code> + <code>qdrust.db-shm</code> 也行，但有前提：</p>
+                <ul>
+                    <li><strong>三个文件必须同一时刻拷齐</strong>——只拷 <code>.db</code> 会丢掉还在 WAL 里、尚未 checkpoint 的数据；</li>
+                    <li>拷贝过程中若发生 checkpoint，<code>.db</code> 与 <code>-wal</code> 会互相不一致，库可能损坏，低峰期做风险最低；</li>
+                    <li><code>-shm</code> 拷不拷都行，它会自行重建；</li>
+                    <li>三个文件在同一容器里、属主一致时，新容器起来即可用（属主见<a href="#data-owner">数据目录的属主</a>）。</li>
+                </ul>
+                <p>若在意一致性，可以让 SQLite 自己产出一个自洽的单文件快照，只拷这一个文件：</p>
+                <pre><code># 需要 SQLite 3.27+；镜像里没有 sqlite3 命令，在装了它的机器上执行
+sqlite3 /data/qdrust.db "VACUUM INTO '/data/snapshot.db'"</code></pre>
+                <p>
+                    跨后端、且完全不碰文件的做法是管理页的<strong>备份 / 恢复</strong>（<code>GET /api/v1/admin/backup</code>），导出的是全表 JSON，SQLite 与 MySQL 通用。
+                    两条路各自独立，取舍见仓库内的 <code>docs/operations.md</code>。
+                </p>
 
                 <h2 id="notify">通知渠道</h2>
                 <p>
@@ -161,7 +214,7 @@ QDRUST_BASE_PATH=/qd
                 <p>qdrust 使用不可变语义版本镜像标签。升级步骤：</p>
                 <ol>
                     <li>
-                        <strong>停止写入并备份数据库</strong>（迁移前向 only，回滚必须连同数据库一起恢复）：
+                        <strong>停止写入并备份数据库</strong>（迁移前向 only，回滚必须连同数据库一起恢复；运行中直接拷文件的前提见<a href="#hot-copy">热拷贝</a>）：
                         <pre><code>pwsh -File scripts/backup-db.ps1 -Database data/qdrust.db \
   -Output backups/qdrust-$(Get-Date -Format yyyyMMdd-HHmmss).db</code></pre>
                     </li>
@@ -212,5 +265,5 @@ npm --prefix webui run build
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-12</span>
+                    <span>最后更新：2026-10-14</span>
                 </div>

@@ -333,7 +333,7 @@ success_asserts / failed_asserts → 判定成败
                     <li><strong>QD 风格运行日志</strong>：文本化日志，便于直接阅读与检索。</li>
                     <li><strong>跨任务运行日志总览</strong>：<code>GET /api/v1/runs</code> 把所有任务的运行汇到一张表，按状态（成功 / 失败）与任务筛选，走游标分页。</li>
                     <li><strong>WebSocket 实时流</strong>：<code>/api/v1/runs/{id}/steps/live</code> 推送活跃运行的步骤与状态变更。</li>
-                    <li><strong>探针</strong>：<code>/health</code> 与 <code>/ready</code> 供 Compose 健康检查与反向代理使用。</li>
+                    <li><strong>探针</strong>：<code>/health</code> 与 <code>/ready</code> 供 Compose 健康检查与反向代理使用。注意<strong>探针通过不等于能写</strong>——启动时会先探一次 SQLite 的写权限（按写方式打开，再走一次真实写入并回滚），不可写就直接退出，不会留下「<code>/ready</code> 200、读正常、写入静默失败」的带病进程。</li>
                     <li><strong>日志保留</strong>：<code>LOG_RETENTION_DAYS</code>（默认 <code>0</code> 永久保留）控制已完成运行记录的自动清理，系统每小时执行一次。</li>
                 </ul>
 
@@ -347,7 +347,7 @@ success_asserts / failed_asserts → 判定成败
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-12</span>
+                    <span>最后更新：2026-10-14</span>
                 </div>
             </main>
 

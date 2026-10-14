@@ -9,7 +9,7 @@ qdrust 的项目介绍站，采用 **Wiki 风格**（侧边目录 + 正文 + 本
 ```
 public/pages/qdrust/
 ├── index.html          # 总览：定位、核心特性、与 QD 的关系、项目组成、快速上手
-├── deploy.html         # 部署与运维：Docker / Compose、反代到二级目录、环境变量、数据库、通知、程序化接入、备份回滚
+├── deploy.html         # 部署与运维：Docker / Compose、数据目录属主与写权限、反代到二级目录、环境变量、数据库与热拷贝、通知、程序化接入、备份回滚
 ├── usage.html          # 使用指南：初始化管理员、第三方登录（OIDC / Header）、导入 HAR、订阅模板库、任务、记事本（跨运行状态）、出站请求与网络开关、调度与 cron 段数、日志总览、列表分页、CLI
 ├── architecture.html   # 架构设计：运行时模型、执行链路、调度与租约、数据模型、安全（出站闸门）、API
 ├── templates.html      # 模板与表达式：HAR 契约、Schema v1、变量断言、函数过滤器（含参数）、Python 写法、正则与编码、util 工具、记事本
