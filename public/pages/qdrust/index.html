@@ -193,7 +193,7 @@
                     用 Rust + Vue 3 重写的 <strong>QD 兼容 HTTP 定时任务自动执行框架</strong>，基于 HAR 编辑器与 Axum 服务。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.26</span>
+                    <span class="badge badge-dark">v0.1.28</span>
                     <span class="badge">Rust 2024 · 1.85+</span>
                     <span class="badge">MIT</span>
                     <span class="badge">linux / amd64 / arm64</span>
@@ -230,7 +230,7 @@
                     <li><strong>跨运行状态（记事本）</strong>：模板可在服务端记事本里读写小块 JSON，用来记住「上次签到到第几天」「上轮抓到的 token」这类需要跨运行延续的状态；模板侧走 <code>api://util/toolbox/notepad</code>，Web 侧有对应页面，详见<a href="templates.html#notepad">模板与表达式 · 记事本</a>。</li>
                     <li><strong>无头浏览器插件</strong>（可选）：<code>api://browser/*</code> 通过 CDP 驱动远程无头浏览器，支持跨步骤存活的会话复用与 <code>type</code> / <code>click</code> DOM 操作。</li>
                     <li><strong>任务调度</strong>：分组、批量操作、可视化调度器（含随机延迟）、模板变量预填。cron 采用 <strong>6–7 段</strong>格式（首段是秒），与旧 QD 的 5 段写法不通用。任务的请求完全由<strong>模板</strong>决定（多页模板常混合 GET/POST），任务级不携带请求方法 / URL / 请求头 / 请求体。模板下拉可输入筛选并把<strong>未使用</strong>的模板排在最前，「我的模板」另带任务数一列与「只看未使用」筛选。</li>
-                    <li><strong>运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流，以及跨<strong>全部任务</strong>的「运行日志总览」（可按成功 / 失败与任务筛选、行内取消 / 删除）。任务状态按「上一轮是否留下错误」判定，连接层失败（超时 / DNS / TLS）也计入「失败」。列表统一支持分页与每页条数（10 / 20 / 50 / 100，各列表独立记忆）。</li>
+                    <li><strong>运行可观测</strong>：QD 风格运行日志、按任务查看运行历史、WebSocket 实时步骤流（每个请求步骤先推「开始」再推「完成」，执行进度实时可见）、<strong>失败诊断 trace</strong>（最近一次失败运行的完整 trace，纯文本可复制）、<strong>签到日历</strong>（按天聚合运行次数，失败涂红），以及跨<strong>全部任务</strong>的「运行日志总览」（可按成功 / 失败与任务筛选、行内取消 / 删除）。任务状态按「上一轮是否留下错误」判定，连接层失败（超时 / DNS / TLS）也计入「失败」。列表统一支持分页与每页条数（10 / 20 / 50 / 100，各列表独立记忆）。</li>
                     <li><strong>安全与多租户</strong>：开放注册 / 忘记密码 / 邮箱验证 / CSRF 轮换；所有用户资源均做服务端归属校验（任务绑定模板也按所有者隔离）。<strong>统一出站闸门</strong>覆盖全部出站请求——模板运行、无模板任务、通知渠道与测试、订阅抓取、DdddOCR 转发共五条路径，默认只请求公网地址；指向内网或接受无效证书需管理员分别开启两个高风险开关。</li>
                     <li><strong>中英文界面</strong>：WebUI 支持语言切换，部署时可用 <code>QDRUST_DEFAULT_LOCALE</code> 设定首次访问者的默认语言。</li>
                     <li><strong>API 令牌</strong>：账号可签发 <code>qd_…</code> Bearer 令牌（服务端只存 SHA-256 摘要），给脚本、CI 与其他程序调用 REST API 用；权限与账号等同、不受 CSRF 约束，可随时吊销。详见<a href="api.html#ep-tokens">API 接口 · API 令牌</a>。</li>
@@ -274,7 +274,7 @@
                 </div>
 
                 <p>
-                    服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、API 令牌（<code>qd_…</code> Bearer 令牌的签发与吊销）、模板（搜索/分组/分页、可视化 HAR 编辑器、试跑测试、公共发布审批 PushRequest、订阅模板库的汇总 / 预览 / 选择性导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填、归属隔离）、运行记录与步骤、跨任务运行日志总览、WebSocket 实时步骤流、租约恢复、插件系统、记事本（模板跨运行状态）、11 种通知渠道与渠道测试、通知绑定预览与账号级默认模板、统一出站闸门与两个高风险网络开关、中英文界面、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI；对外另有一个 MCP server 把上述 API 封装成 27 个工具。
+                    服务端已覆盖：用户认证与会话（开放注册、忘记/重置密码、邮箱验证、CSRF 轮换、<strong>内置头像选择</strong>）、管理员 API（用户管理、站点设置、日志清理、备份/恢复）、API 令牌（<code>qd_…</code> Bearer 令牌的签发与吊销）、模板（搜索/分组/分页、可视化 HAR 编辑器、试跑测试、公共发布审批 PushRequest、订阅模板库的汇总 / 预览 / 选择性导入）、任务（分组/批量操作、可视化调度器含随机延迟、模板变量预填、归属隔离）、运行记录与步骤、跨任务运行日志总览、WebSocket 实时步骤流（含<strong>执行进度实时推送</strong>与<strong>失败诊断 trace</strong>）、<strong>签到日历</strong>、租约恢复、插件系统、记事本（模板跨运行状态）、11 种通知渠道与渠道测试、通知绑定预览与账号级默认模板、统一出站闸门与两个高风险网络开关、中英文界面、可选 Redis 会话缓存、GA 注入、运行时配置热更新以及 OpenAPI；对外另有一个 MCP server 把上述 API 封装成 27 个工具。
                 </p>
 
                 <h2 id="quickstart">30 秒跑起来</h2>
@@ -298,7 +298,7 @@ docker run -d --name qdrust -p 8923:8923 \
                     </a>
                     <a href="usage.html" class="wiki-card">
                         <h4>使用指南 →</h4>
-                        <p>初始化管理员、导入旧 QD 模板、订阅模板库、创建与运行任务、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、列表分页、CLI。</p>
+                        <p>初始化管理员、导入旧 QD 模板、订阅模板库、创建与运行任务、出站请求与两个高风险网络开关、调度与随机延迟、cron 时区与夏令时、运行日志（实时进度 / 失败 trace / 签到日历）、列表分页、CLI。</p>
                     </a>
                     <a href="architecture.html" class="wiki-card">
                         <h4>架构设计 →</h4>
@@ -322,7 +322,7 @@ docker run -d --name qdrust -p 8923:8923 \
                     </a>
                     <a href="api.html" class="wiki-card">
                         <h4>API 接口 →</h4>
-                        <p>99 个 REST 端点的完整契约：认证与 API 令牌、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
+                        <p>102 个 REST 端点的完整契约：认证与 API 令牌、错误码、WebSocket 与数据模型。要写脚本或对接时用这份。</p>
                     </a>
                 </div>
 
@@ -333,7 +333,7 @@ docker run -d --name qdrust -p 8923:8923 \
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-14</span>
+                    <span>最后更新：2026-10-19</span>
                 </div>
             </main>
 

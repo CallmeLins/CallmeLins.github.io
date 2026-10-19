@@ -68,6 +68,7 @@ DESC = {
     ("GET", "/api/v1/auth/config"): "读取服务端认证策略：<code>auth_mode</code>、<code>local_login_enabled</code>、<code>oidc_enabled</code>、<code>oidc_provider_name</code>、<code>header_auth_enabled</code>。WebUI 据此决定渲染哪些登录入口",
     ("GET", "/api/v1/auth/oidc/start"): "发起 OIDC 授权码 + PKCE 流程：发现 IdP 后生成 state 与 PKCE verifier，落一条一次性记录并重定向到 IdP",
     ("GET", "/api/v1/auth/oidc/callback"): "OIDC 回调端点：校验 state 与 PKCE 后建档或登录并下发会话。<strong>需在 IdP 侧登记为回调地址</strong>",
+    ("PUT", "/api/v1/auth/avatar"): "从内置头像里选一个（<code>avatar-01</code> 到 <code>avatar-10</code>），返回更新后的用户。只接受内置 id，<strong>不接受图片上传或任意 URL</strong>，所以这不是一个上传面",
 
     ("GET", "/api/v1/templates"): "分页列出模板，支持关键词搜索、分组过滤与游标翻页",
     ("POST", "/api/v1/templates"): "新建模板（Template Schema v1）",
@@ -91,10 +92,13 @@ DESC = {
     ("POST", "/api/v1/tasks/{id}/run"): "立即触发一次运行；已返回 202 表示入队，不等待执行完成",
     ("GET", "/api/v1/tasks/{id}/runs"): "列出该任务的运行历史",
     ("DELETE", "/api/v1/tasks/{id}/runs"): "清空该任务的运行历史",
+    ("GET", "/api/v1/tasks/{id}/latest-failure-trace"): "该任务<strong>最近一次失败</strong>运行的完整诊断 trace（纯文本、可复制）。有 trace 返 200，任务存在但没保留 trace 返 <strong>204</strong>，任务不存在返 404——它只按需在弹窗打开时取，不进列表响应",
+
+    ("GET", "/api/v1/runs/calendar"): "签到日历数据：按<strong>调用方时区</strong>把运行分桶成每天一条（<code>date</code> / <code>total</code> / <code>failed</code>）。<code>from</code>/<code>to</code> 为 unix 秒，<code>tz</code> 是 IANA 时区（如 <code>Asia/Shanghai</code>，默认 UTC），跨度上限 400 天，只返回有运行的日子",
 
     ("GET", "/api/v1/runs"): "运行日志总览：跨<strong>全部任务</strong>的运行记录，按时间倒序，可按 <code>status</code>（成功 / 失败）与 <code>task_id</code> 筛选，游标分页（<code>limit</code> / <code>before_id</code>）",
     ("GET", "/api/v1/runs/{id}/steps"): "列出一次运行的每个步骤：请求、响应与提取到的变量",
-    ("GET", "/api/v1/runs/{id}/steps/live"): "WebSocket 实时推送步骤与状态变更",
+    ("GET", "/api/v1/runs/{id}/steps/live"): "WebSocket 实时推送步骤与状态变更；每个请求步骤先推一条 <code>running</code> 再推完成的完整 step",
     ("POST", "/api/v1/runs/{id}/cancel"): "请求取消运行；由执行器在下一个可中断点停下",
     ("DELETE", "/api/v1/runs/{id}"): "删除单条运行记录",
     ("DELETE", "/api/v1/runs"): "清空当前用户的全部运行记录",
@@ -188,16 +192,16 @@ MODEL_ORDER = ["Task", "Run", "Template", "TestTemplate", "TemplateTestResult", 
                "Meta", "ApiToken", "CreateApiToken", "IssuedApiToken", "SetNotepad",
                "PushRequest", "TemplateSubscription", "TemplateLibrary",
                "LibraryOverview", "LibraryEntry", "LibrarySourceStatus", "LibraryImportResult",
-               "Plugin", "RunEvent", "ApiError"]
+               "Plugin", "RunEvent", "ChangeAvatar", "RunCalendarDay", "ApiError"]
 
 MODEL_NOTES = {
     "Task": "任务。<code>template_id</code> 是请求来源——任务的请求完全由模板决定；<code>method</code> / <code>url</code> / <code>headers</code> / <code>body</code> 只在未绑定模板的存量任务上使用（列表里展示的方法与 URL 是模板首条请求的镜像）。读回的对象是 <code>CreateTask</code> 加上服务端生成的字段，因此 <code>id</code>、<code>created_at</code> 等只在响应中出现。",
-    "Run": "一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。",
+    "Run": "一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。最近一次失败运行的完整诊断 trace 存在 <code>runs.failure_trace</code>，但它<strong>不进列表响应</strong>，只在打开失败详情弹窗时经 <code>GET /api/v1/tasks/{id}/latest-failure-trace</code> 单独取。",
     "Template": "模板。<code>definition</code>（原生 schema）与 <code>qd_har</code>（旧 QD HAR）二选一，由 <code>source_format</code> 标明。<code>variables</code> 是需要填写的变量名，<code>variable_defaults</code> 是其中带默认值的那部分（取自 <code>{{name|default(\"...\")}}</code> 的字面量首参）。",
     "TestTemplate": "试跑模板时传入的变量表（<code>variables</code>，可选）。",
     "TemplateTestResult": "试跑结果：<code>steps</code>（每一步的请求 / 响应 / 提取）、<code>variables</code>（跑完后最终变量）、<code>log</code>（模板的日志）。<strong>不创建任务、不落运行记录。</strong>",
     "Meta": "部署元数据，WebUI 挂载前读取：<code>version</code>（发行版本号）与 <code>default_locale</code>（默认语言，来自 <code>QDRUST_DEFAULT_LOCALE</code>）。",
-    "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。",
+    "User": "用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档；<code>avatar_id</code> 是选中的内置头像（<code>avatar-01</code>…<code>avatar-10</code>），新建账号默认 <code>avatar-01</code>。",
     "NotificationChannel": "通知渠道。<code>kind</code> 决定 <code>config</code> 的结构，共 11 种渠道（webhook / custom_http / email + 8 种推送）。",
     "NotificationAction": "渠道与任务的绑定。<code>event</code> 是触发时机；<code>failure_threshold</code> 为「上次成功之后」的连续失败阈值；<code>automatic_only</code> 为 true 时手动「立即运行」不触发；<code>title_template</code> / <code>body_template</code> 是该动作自己的标题与正文模板（留空则回落到账号默认模板）。",
     "NotificationDefaults": "账号级的默认通知模板：<code>defaults</code> 是每个事件各自的模板，<code>builtin</code> 是没设默认值时兜底的内置模板。渲染顺序为「绑定自己的模板 → 这里的默认模板 → 内置模板」。",
@@ -213,7 +217,9 @@ MODEL_NOTES = {
     "LibraryEntry": "模板库里的一个条目。<code>installed</code> / <code>installed_template_id</code> / <code>installed_version</code> 由本地库现算，<code>update_available</code> 表示上游版本比本地新。",
     "LibrarySourceStatus": "汇总视图里单个来源的状态：条目数、是否来自<strong>缓存</strong>（<code>cached</code>），以及该来源自己的 <code>error</code>。",
     "LibraryImportResult": "批量导入的逐条结果：成功 / 原地更新的条数、写入的模板 id，以及失败清单（<code>failed</code>）。",
-    "RunEvent": "WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。",
+    "RunEvent": "WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。v0.1.28 起每个请求步骤还会先推一条 <code>step</code>（<code>status</code> 为 <code>running</code>）表示「开始」，再在完成时推一条带请求 / 响应 / 变量的完整 <code>step</code>，让 WebUI 能把执行进度实时画出来。",
+    "ChangeAvatar": "换头像的请求体：<code>avatar_id</code> 是 10 个内置头像之一（<code>avatar-01</code>…<code>avatar-10</code>），非法 id 返 422。",
+    "RunCalendarDay": "签到日历里的一格：<code>date</code>（<code>YYYY-MM-DD</code>，已按调用方时区折算）、<code>total</code>（当天运行数）、<code>failed</code>（其中失败数，WebUI 据此把格子涂红）。",
     "TemplatePage": "模板列表的分页结果。<code>next_cursor</code> 为 null 时表示已到末页。",
     "ApiError": "所有 4xx / 5xx 响应的统一信封。<code>code</code> 是稳定的错误键，前端据此做本地化；<code>message</code> 为英文兜底。",
 }

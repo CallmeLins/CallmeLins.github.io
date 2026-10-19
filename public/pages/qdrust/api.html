@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="qdrust 完整 REST API 参考：99 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
+    <meta name="description" content="qdrust 完整 REST API 参考：102 个端点的路径、权限与用途，Cookie 与 CSRF 认证、错误信封与错误码、WebSocket 实时接口、核心数据模型与调用示例。">
     <title>API 接口 | qdrust Wiki</title>
     <link rel="canonical" href="https://callmelins.github.io/pages/qdrust/api.html">
     <link rel="icon" href="https://callmelins.github.io/favicon.svg">
@@ -190,10 +190,10 @@
             <main class="wiki-article min-w-0">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">API 接口</h1>
                 <p class="text-lg text-gray-600 mb-6">
-                    qdrust 服务端的完整 REST 契约：<strong>99 个端点</strong>，覆盖部署元数据、认证与 API 令牌、模板、任务调度、运行记录、订阅模板库、通知、记事本、插件与站点管理。
+                    qdrust 服务端的完整 REST 契约：<strong>102 个端点</strong>，覆盖部署元数据、认证与 API 令牌、模板、任务调度、运行记录、订阅模板库、通知、记事本、插件与站点管理。
                 </p>
                 <div class="mb-10">
-                    <span class="badge badge-dark">v0.1.26</span>
+                    <span class="badge badge-dark">v0.1.28</span>
                     <span class="badge">REST · JSON</span>
                     <span class="badge">OpenAPI 3.1</span>
                     <span class="badge">Cookie + CSRF</span>
@@ -216,18 +216,18 @@
                         <thead><tr><th>资源</th><th>端点数</th><th>公开</th><th>需登录</th><th>需管理员</th></tr></thead>
                         <tbody>
                             <tr><td><a href="#ep-system">系统与监控</a></td><td>4</td><td>4</td><td>0</td><td>0</td></tr>
-                            <tr><td><a href="#ep-auth">认证与会话</a></td><td>14</td><td>9</td><td>5</td><td>0</td></tr>
+                            <tr><td><a href="#ep-auth">认证与会话</a></td><td>15</td><td>9</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-tokens">API 令牌</a></td><td>3</td><td>0</td><td>3</td><td>0</td></tr>
                             <tr><td><a href="#ep-templates">模板</a></td><td>11</td><td>1</td><td>10</td><td>0</td></tr>
-                            <tr><td><a href="#ep-tasks">任务</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
-                            <tr><td><a href="#ep-runs">运行记录</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
+                            <tr><td><a href="#ep-tasks">任务</a></td><td>11</td><td>0</td><td>11</td><td>0</td></tr>
+                            <tr><td><a href="#ep-runs">运行记录</a></td><td>7</td><td>0</td><td>7</td><td>0</td></tr>
                             <tr><td><a href="#ep-subscriptions">模板订阅与模板库</a></td><td>10</td><td>0</td><td>10</td><td>0</td></tr>
                             <tr><td><a href="#ep-notepads">记事本</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
                             <tr><td><a href="#ep-notifications">通知渠道与绑定</a></td><td>16</td><td>0</td><td>16</td><td>0</td></tr>
                             <tr><td><a href="#ep-public">公共模板与发布申请</a></td><td>4</td><td>0</td><td>4</td><td>0</td></tr>
                             <tr><td><a href="#ep-plugins">外部插件</a></td><td>6</td><td>0</td><td>6</td><td>0</td></tr>
                             <tr><td><a href="#ep-admin">管理员</a></td><td>11</td><td>0</td><td>0</td><td>11</td></tr>
-                            <tr><td><strong>合计</strong></td><td><strong>99</strong></td><td><strong>14</strong></td><td><strong>74</strong></td><td><strong>11</strong></td></tr>
+                            <tr><td><strong>合计</strong></td><td><strong>102</strong></td><td><strong>14</strong></td><td><strong>77</strong></td><td><strong>11</strong></td></tr>
                         </tbody>
                     </table>
 
@@ -267,7 +267,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         <thead><tr><th>级别</th><th>数量</th><th>判定方式</th></tr></thead>
                         <tbody>
                             <tr><td><span class="perm perm-public">公开</span></td><td>14</td><td>不校验会话。含探针、登录注册、密码重置与 HAR 预检</td></tr>
-                            <tr><td><span class="perm perm-user">登录</span></td><td>74</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
+                            <tr><td><span class="perm perm-user">登录</span></td><td>77</td><td>校验 <code>qd_session</code>；数据按 <code>owner_id</code> 隔离，看不到他人资源</td></tr>
                             <tr><td><span class="perm perm-admin">管理员</span></td><td>11</td><td>在会话有效的基础上再要求 <code>role == "admin"</code>，否则 <code>403 admin_required</code></td></tr>
                         </tbody>
                     </table>
@@ -328,7 +328,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
 
                 <h2 id="endpoints">接口一览</h2>
                 <p>
-                    下表按资源分组列出全部 99 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
+                    下表按资源分组列出全部 102 个端点。标 <code>WS</code> 的是 WebSocket 升级端点，其余为标准 HTTP。
                     路径参数写作 <code>{id}</code>。
                 </p>
 
@@ -343,10 +343,11 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-auth">认证与会话 <span class="count">14</span></h3>
+                <h3 id="ep-auth">认证与会话 <span class="count">15</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
+                            <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/auth/avatar</code></td><td><span class="perm perm-user">登录</span></td><td>从内置头像里选一个（<code>avatar-01</code> 到 <code>avatar-10</code>），返回更新后的用户。只接受内置 id，<strong>不接受图片上传或任意 URL</strong>，所以这不是一个上传面</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/bootstrap</code></td><td><span class="perm perm-public">公开</span></td><td>创建首个管理员账号；已有用户时返回 409，整个生命周期只能成功一次</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/auth/config</code></td><td><span class="perm perm-public">公开</span></td><td>读取服务端认证策略：<code>auth_mode</code>、<code>local_login_enabled</code>、<code>oidc_enabled</code>、<code>oidc_provider_name</code>、<code>header_auth_enabled</code>。WebUI 据此决定渲染哪些登录入口</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/auth/csrf/rotate</code></td><td><span class="perm perm-user">登录</span></td><td>轮换 CSRF 令牌，返回新的 <code>qd_csrf</code></td></tr>
@@ -392,7 +393,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                         </tbody>
                     </table>
 
-                <h3 id="ep-tasks">任务 <span class="count">10</span></h3>
+                <h3 id="ep-tasks">任务 <span class="count">11</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
@@ -403,22 +404,24 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>获取任务详情，含上次运行状态与错误</td></tr>
                             <tr><td><code class="m-put">PUT</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>更新任务配置</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/tasks/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除任务</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}/latest-failure-trace</code></td><td><span class="perm perm-user">登录</span></td><td>该任务<strong>最近一次失败</strong>运行的完整诊断 trace（纯文本、可复制）。有 trace 返 200，任务存在但没保留 trace 返 <strong>204</strong>，任务不存在返 404——它只按需在弹窗打开时取，不进列表响应</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/tasks/{id}/run</code></td><td><span class="perm perm-user">登录</span></td><td>立即触发一次运行；已返回 202 表示入队，不等待执行完成</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/tasks/{id}/runs</code></td><td><span class="perm perm-user">登录</span></td><td>列出该任务的运行历史</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/tasks/{id}/runs</code></td><td><span class="perm perm-user">登录</span></td><td>清空该任务的运行历史</td></tr>
                         </tbody>
                     </table>
 
-                <h3 id="ep-runs">运行记录 <span class="count">6</span></h3>
+                <h3 id="ep-runs">运行记录 <span class="count">7</span></h3>
                     <table>
                         <thead><tr><th>方法</th><th>路径</th><th>权限</th><th>说明</th></tr></thead>
                         <tbody>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/runs</code></td><td><span class="perm perm-user">登录</span></td><td>运行日志总览：跨<strong>全部任务</strong>的运行记录，按时间倒序，可按 <code>status</code>（成功 / 失败）与 <code>task_id</code> 筛选，游标分页（<code>limit</code> / <code>before_id</code>）</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs</code></td><td><span class="perm perm-user">登录</span></td><td>清空当前用户的全部运行记录</td></tr>
+                            <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/runs/calendar</code></td><td><span class="perm perm-user">登录</span></td><td>签到日历数据：按<strong>调用方时区</strong>把运行分桶成每天一条（<code>date</code> / <code>total</code> / <code>failed</code>）。<code>from</code>/<code>to</code> 为 unix 秒，<code>tz</code> 是 IANA 时区（如 <code>Asia/Shanghai</code>，默认 UTC），跨度上限 400 天，只返回有运行的日子</td></tr>
                             <tr><td><code class="m-del">DELETE</code></td><td><code>/api/v1/runs/{id}</code></td><td><span class="perm perm-user">登录</span></td><td>删除单条运行记录</td></tr>
                             <tr><td><code class="m-post">POST</code></td><td><code>/api/v1/runs/{id}/cancel</code></td><td><span class="perm perm-user">登录</span></td><td>请求取消运行；由执行器在下一个可中断点停下</td></tr>
                             <tr><td><code class="m-get">GET</code></td><td><code>/api/v1/runs/{id}/steps</code></td><td><span class="perm perm-user">登录</span></td><td>列出一次运行的每个步骤：请求、响应与提取到的变量</td></tr>
-                            <tr><td><code class="m-get">WS</code></td><td><code>/api/v1/runs/{id}/steps/live</code></td><td><span class="perm perm-user">登录</span></td><td>WebSocket 实时推送步骤与状态变更</td></tr>
+                            <tr><td><code class="m-get">WS</code></td><td><code>/api/v1/runs/{id}/steps/live</code></td><td><span class="perm perm-user">登录</span></td><td>WebSocket 实时推送步骤与状态变更；每个请求步骤先推一条 <code>running</code> 再推完成的完整 step</td></tr>
                         </tbody>
                     </table>
 
@@ -571,7 +574,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-run"><code>Run</code></h3>
-                <p>一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。</p>
+                <p>一次任务运行。<code>lease_owner</code> / <code>lease_expires_at</code> 是崩溃恢复用的租约，非调度参数。最近一次失败运行的完整诊断 trace 存在 <code>runs.failure_trace</code>，但它<strong>不进列表响应</strong>，只在打开失败详情弹窗时经 <code>GET /api/v1/tasks/{id}/latest-failure-trace</code> 单独取。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -635,7 +638,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-user"><code>User</code></h3>
-                <p>用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档。</p>
+                <p>用户。<code>role</code> 只有 <code>admin</code> 与 <code>user</code> 两档；<code>avatar_id</code> 是选中的内置头像（<code>avatar-01</code>…<code>avatar-10</code>），新建账号默认 <code>avatar-01</code>。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -643,6 +646,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code>username</code></td><td>string</td><td>是</td></tr>
                             <tr><td><code>role</code></td><td>enum: admin, user</td><td>是</td></tr>
                             <tr><td><code>disabled</code></td><td>boolean</td><td>是</td></tr>
+                            <tr><td><code>avatar_id</code></td><td>enum: avatar-01, avatar-02, avatar-03, avatar-04</td><td>是</td></tr>
                             <tr><td><code>created_at</code></td><td>int64</td><td>是</td></tr>
                             <tr><td><code>updated_at</code></td><td>int64</td><td>是</td></tr>
                             <tr><td><code>email</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
@@ -886,7 +890,7 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                     </table>
 
                 <h3 id="model-runevent"><code>RunEvent</code></h3>
-                <p>WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。</p>
+                <p>WebSocket 推送的事件。<code>type</code> 为 <code>status</code>（状态变更）、<code>step</code>（步骤完成）或 <code>snapshot</code>（连接建立时的全量快照，用于补齐连上之前已产出的步骤）。v0.1.28 起每个请求步骤还会先推一条 <code>step</code>（<code>status</code> 为 <code>running</code>）表示「开始」，再在完成时推一条带请求 / 响应 / 变量的完整 <code>step</code>，让 WebUI 能把执行进度实时画出来。</p>
                     <table>
                         <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
                         <tbody>
@@ -895,6 +899,26 @@ curl -X POST http://localhost:5000/api/v1/tasks \
                             <tr><td><code>status</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>step</code></td><td>any</td><td><span class="dim">否</span></td></tr>
                             <tr><td><code>error</code></td><td>['string', 'null']</td><td><span class="dim">否</span></td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-changeavatar"><code>ChangeAvatar</code></h3>
+                <p>换头像的请求体：<code>avatar_id</code> 是 10 个内置头像之一（<code>avatar-01</code>…<code>avatar-10</code>），非法 id 返 422。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>avatar_id</code></td><td>enum: avatar-01, avatar-02, avatar-03, avatar-04</td><td>是</td></tr>
+                        </tbody>
+                    </table>
+
+                <h3 id="model-runcalendarday"><code>RunCalendarDay</code></h3>
+                <p>签到日历里的一格：<code>date</code>（<code>YYYY-MM-DD</code>，已按调用方时区折算）、<code>total</code>（当天运行数）、<code>failed</code>（其中失败数，WebUI 据此把格子涂红）。</p>
+                    <table>
+                        <thead><tr><th>字段</th><th>类型</th><th>必填</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>date</code></td><td>string</td><td>是</td></tr>
+                            <tr><td><code>total</code></td><td>int64</td><td>是</td></tr>
+                            <tr><td><code>failed</code></td><td>int64</td><td>是</td></tr>
                         </tbody>
                     </table>
 
@@ -963,8 +987,8 @@ curl -b jar.txt http://localhost:5000/api/v1/runs/7/steps</code></pre>
                 </ul>
                 <p>若你用文档生成客户端 SDK，这些端点需要手动补。</p>
                 <div class="wiki-meta">
-                    <span>基于 qdrust v0.1.26 服务端路由与 OpenAPI 3.1 文档整理</span>
-                    <span>共 99 个端点</span>
+                    <span>基于 qdrust v0.1.28 服务端路由与 OpenAPI 3.1 文档整理</span>
+                    <span>共 102 个端点</span>
                 </div>
             </main>
 

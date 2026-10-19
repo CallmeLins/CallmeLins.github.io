@@ -1,6 +1,6 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">使用指南</h1>
                 <p class="text-lg text-gray-600 mb-10">
-                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、用记事本让模板跨运行记住状态、可视化编辑 HAR、出站请求与两个高风险网络开关、配置调度与随机延迟、cron 格式与时区、查看运行日志，以及命令行工具。
+                    从初始化管理员到跑起第一个任务：配置 OIDC / 反向代理 Header 第三方登录、导入旧 QD 模板、创建任务与填写变量、用记事本让模板跨运行记住状态、可视化编辑 HAR、出站请求与两个高风险网络开关、配置调度与随机延迟、cron 格式与时区、查看运行日志（实时进度 / 失败 trace / 签到日历），以及命令行工具。
                 </p>
 
                 <h2 id="first-run">首次启动与管理员</h2>
@@ -344,6 +344,31 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <li>已完成记录的保留天数由 <code>LOG_RETENTION_DAYS</code> 控制，<code>0</code> 表示永久保留。</li>
                 </ul>
 
+                <h3 id="live-progress">实时执行进度</h3>
+                <p>
+                    v0.1.28 起，运行不再只是「开始 → 结束」两拍：每个<strong>请求步骤</strong>会先推一条「开始」，再推一条带请求 / 响应 / 提取变量的「完成」，
+                    WebUI 据此把正在执行的步骤实时画出来（步骤高亮、逐个亮起），不用等整轮跑完才看得到进度。这条流走的是<strong>同一条 WebSocket</strong>
+                    （<code>/api/v1/runs/{id}/steps/live</code>），事件类型仍是 <code>step</code>，只是「开始」那条的 <code>status</code> 是 <code>running</code>。
+                    只有请求步骤有网络延迟、值得盯着看，所以实时进度也只覆盖请求步骤。
+                </p>
+
+                <h3 id="failure-trace">失败诊断 trace</h3>
+                <p>
+                    每个任务会额外保留<strong>最近一次失败</strong>运行的完整诊断 trace，放在 <code>runs.failure_trace</code> 列里。它和运行表里那行简短的
+                    <code>log</code>/错误文案是两回事：<code>log</code> 是列表上就能扫一眼的 QD 风格短行，trace 是点开失败详情弹窗时<strong>单独按需拉取</strong>的
+                    排查负载（接口 <code>GET /api/v1/tasks/{id}/latest-failure-trace</code>）。trace 是<strong>纯文本、可直接复制</strong>，超过上限会截断并标注
+                    <code>[trace truncated]</code>。任务存在但没保留 trace 时接口返 <code>204</code>，任务不存在返 <code>404</code>——两者刻意分开，前端据此区分
+                    「没有 trace」和「任务已删」。
+                </p>
+
+                <h3 id="calendar">签到日历</h3>
+                <p>
+                    任务页底部有一张<strong>贡献图风格的签到日历</strong>，把运行历史按天铺开：每天一格，颜色深浅代表当天运行次数，失败的日子涂红。
+                    数据来自 <code>GET /api/v1/runs/calendar</code>，按<strong>调用方时区</strong>分桶（凌晨 00:30 的运行算它本地时区的那天，而不是 UTC 的前一天），
+                    所以画出来的日期就是 WebUI 直接要显示的，不需要再换算。支持 <code>from</code>/<code>to</code>（unix 秒）与 <code>tz</code>（IANA 时区，默认 UTC），
+                    跨度上限 400 天。
+                </p>
+
                 <h3 id="run-log">运行日志总览</h3>
                 <p>
                     任务页标题右侧的「运行日志」打开的是一个<strong>宽弹窗</strong>（不是独立页面），把<strong>所有任务</strong>的运行放在同一张表里：
@@ -482,10 +507,10 @@ QDRUST_HEADER_ADMIN_GROUPS=qdrust-admins</code></pre>
                     <li><a href="templates.html">模板与表达式</a> —— 变量与断言、Jinja2 函数与过滤器、<code>api://util/*</code> 内置工具与记事本。</li>
                     <li><a href="browser.html">浏览器插件</a> —— 纯 HTTP 跑不通时的无头浏览器方案。</li>
                     <li><a href="mcp.html">MCP server</a> —— 用 API 令牌把 qdrust 接进 Claude Desktop / Cursor，让模型直接建任务、跑任务。</li>
-                    <li><a href="api.html">API 接口</a> —— 99 个 REST 端点的完整契约，适合做外部集成。</li>
+                    <li><a href="api.html">API 接口</a> —— 102 个 REST 端点的完整契约，适合做外部集成。</li>
                 </ul>
 
                 <div class="wiki-meta">
                     <span>MIT License · Copyright (c) 2026 CallmeLins</span>
-                    <span>最后更新：2026-10-12</span>
+                    <span>最后更新：2026-10-19</span>
                 </div>
