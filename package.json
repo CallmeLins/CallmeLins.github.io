@@ -42,7 +42,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@aws-sdk/client-s3": "^3.1127.0",
     "@lucide/astro": "^1.51.0",
-    "astro": "^7.3.1",
+    "astro": "^7.4.12",
     "github-slugger": "^2.0.0"
   },
   "devDependencies": {
